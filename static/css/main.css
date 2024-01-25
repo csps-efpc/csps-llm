@@ -1,0 +1,26 @@
+@import url('https://fonts.cdnfonts.com/css/segoe-ui-4');
+
+body {
+    font-family: 'Segoe UI', sans-serif;
+    font-size: 13px;
+    background-color: #f5f5f5;
+    margin: 0px;
+}
+
+#dialogue {
+    position: absolute;
+    width: 100%;
+    top: 0px;
+    margin-top: 1em;
+    left: 0px;
+    bottom: 3rem;
+    overflow-y: scroll;
+}
+
+.footer {
+    display: block;
+    position: absolute;
+    bottom: 0px;
+    width: 100%;
+    z-index: 10;
+}
