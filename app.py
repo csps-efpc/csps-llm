@@ -32,27 +32,41 @@ def gpt_socket(personality):
     ws = Server.accept(request.environ)
     # We receive and parse the first user prompt.
     message = ws.receive()
-    
+    folded = message.casefold()
     url = None
     ## TODO: make this bit modular.
-    if("news".casefold() in message.casefold()):
+    if(message.startswith("http")):
+        s = message.split(" ",1)
+        message = s[1]
+        url = s[0]
+        ws.send("Fetching the page at " + url)
+    elif("news".casefold() in folded):
         url = "https://www.cbc.ca/webfeed/rss/rss-topstories"
-        if("canad".casefold() in message.casefold()):
+        if("canad".casefold() in folded):
             url = "https://www.cbc.ca/webfeed/rss/rss-canada"
-        if("politi".casefold() in message.casefold()):
+        if("government".casefold() in folded):
+            url = "https://api.io.canada.ca/io-server/gc/news/en/v2?sort=publishedDate&orderBy=desc&publishedDate%3E=2021-10-25&pick=100&format=atom&atomtitle=National%20News"
+        if("politi".casefold() in folded):
             url = "https://www.cbc.ca/webfeed/rss/rss-politics"
-        if("tech".casefold() in message.casefold()):
+        if("health".casefold() in folded):
+            url = "https://api.io.canada.ca/io-server/gc/news/en/v2?topic=health&sort=publishedDate&orderBy=desc&publishedDate%3E=2021-10-25&pick=100&format=atom&atomtitle=Health"
+        if("tech".casefold() in folded):
             url = "https://www.cbc.ca/webfeed/rss/rss-technology"
-        if("sport".casefold() in message.casefold()):
+        if("sport".casefold() in folded):
             url = "https://www.cbc.ca/webfeed/rss/rss-sports"
+        if("ottawa".casefold() in folded):
+            url = "https://www.cbc.ca/webfeed/rss/rss-canada-ottawa"
         ws.send("Checking the news...\n")
-    if(("csps".casefold() in message.casefold() or "school".casefold() in message.casefold()) and ("cours".casefold() in message.casefold() or "learn".casefold() in message.casefold())):
+    elif(("csps".casefold() in folded or "school".casefold() in folded) and ("cours".casefold() in folded or "learn".casefold() in folded)):
         url = "https://www.csps-efpc.gc.ca/stayconnected/csps-rss-eng.xml"
         ws.send("Checking the catalogue...\n")
-    if(("open".casefold() in message.casefold() or "new".casefold() in message.casefold()) and "dataset".casefold() in message.casefold()):
+    elif(("open".casefold() in folded or "new".casefold() in folded) and "dataset".casefold() in folded):
         url = "https://open.canada.ca/data/en/feeds/dataset.atom"
         ws.send("Checking the open data portal...\n")
-        ws.send("\n")
+    elif(("weather".casefold() in folded or "rain".casefold() in folded  or "snow".casefold() in folded or "temperature".casefold() in folded) and ("today".casefold() in folded or "this week".casefold() in folded or "tomorrow".casefold() in folded or "now".casefold() in folded or "later".casefold() in folded or "forecast".casefold() in folded)):
+        url = "https://weather.gc.ca/rss/city/on-118_e.xml"
+        ws.send("Checking the forecast...\n")
+
     try:
         # Get a lock on the model.    
         if(not lock.acquire(blocking=False)):
