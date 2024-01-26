@@ -21,7 +21,7 @@ response_prefix = "### Assistant:\n"
 response_suffix = "\n"
 # Initialize the model
 llm = Llama(
-        model_path="../neural-chat-7b-v3-3.Q4_K_M.gguf", n_gpu_layers=-1, n_threads=4, numa=True, n_ctx=2048
+        model_path="../neural-chat-7b-v3-3.Q4_0.gguf", n_gpu_layers=-1, n_threads=4, numa=True, n_ctx=2048
     )
 
 pleaseWaitText = "\n[Please note that I'm currently helping another user and will be with you as soon as they've finished.]\n"
