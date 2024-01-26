@@ -21,7 +21,7 @@ response_prefix = "### Assistant:\n"
 response_suffix = "\n"
 # Initialize the model
 llm = Llama(
-        model_path="../neural-chat-7b-v3-3.Q4_0.gguf", n_gpu_layers=-1, n_threads=4, numa=False, n_ctx=2048
+        model_path="../neural-chat-7b-v3-3.Q4_K_M.gguf", n_gpu_layers=-1, n_threads=4, numa=True, n_ctx=2048
     )
 
 pleaseWaitText = "\n[Please note that I'm currently helping another user and will be with you as soon as they've finished.]\n"
@@ -69,7 +69,9 @@ def gpt_socket(personality):
 
     try:
         state = None
-        lock.acquire()
+        if(not lock.acquire(blocking=False)):
+            print("Blocking for pre-parsing lock")
+            lock.acquire()
         if(url is not None) :
             state = rag.get_rag_state(personality, llm, url, user_prefix=prompt_prefix, system_prefix=system_prefix, system_suffix=system_suffix)
         else :
@@ -104,7 +106,8 @@ def gpt_socket(personality):
             ws.send("<END>")
             # We wait for a subsequent user prompt, and the cycle begins anew.
             message = prompt_prefix + ws.receive() + prompt_suffix + response_prefix;
-    except Exception:
+    except Exception as e:
+        print(e)
         if(lock.locked()):
             lock.release()
         pass

@@ -29,6 +29,7 @@ def get_rag_state(personality, model, url, user_prefix = '', rag_prefix='Conside
     print ((rag_prefix + rag_text + getDateTimeText() + rag_suffix))
     model.eval(model.tokenize((rag_prefix + rag_text + getDateTimeText() + rag_suffix).encode()))
     state = model.save_state()
+    return state
 
 def getDateTimeText():
     now = datetime.now()
