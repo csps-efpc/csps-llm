@@ -96,6 +96,7 @@ sendPrompt = function () {
     userTextElement.textContent = promptElement.value;
 
     userTextElement.classList.add('chat-bubble');
+    userTextElement.classList.add('chat-bubble-accent');
     chatElement.append(userTextElement);
     dialogueElement.append(chatElement);
 
@@ -120,6 +121,7 @@ sendPrompt = function () {
     chatElement.append(avatarElement);
     outputElement = document.createElement('div');
     outputElement.classList.add('chat-bubble');
+    outputElement.classList.add('chat-bubble-info');
     chatElement.append(outputElement);
     chatElement.classList.add('animate__animated');
     chatElement.classList.add('animate__fadeIn');

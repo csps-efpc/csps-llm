@@ -68,23 +68,26 @@ def gpt_socket(personality):
         ws.send("Checking the forecast...\n")
 
     try:
-        # Get a lock on the model.    
-        if(not lock.acquire(blocking=False)):
-                ws.send(pleaseWaitText)
-                lock.acquire()
+        state = None
+        lock.acquire()
         if(url is not None) :
-            llm.load_state(rag.get_rag_state(personality, llm, url, user_prefix=prompt_prefix, system_prefix=system_prefix, system_suffix=system_suffix))
+            state = rag.get_rag_state(personality, llm, url, user_prefix=prompt_prefix, system_prefix=system_prefix, system_suffix=system_suffix)
         else :
-            llm.load_state(rag.get_personality_state(personality, llm, system_prefix=system_prefix, system_suffix=system_suffix))
+            state = rag.get_personality_state(personality, llm, system_prefix=system_prefix, system_suffix=system_suffix)
             # We tuck the beginning of the user interaction in, because we've got no RAG headers.
             message = prompt_prefix + message
         # At this stage, we're positioned just before the prompt.
-
+        lock.release()
         message += prompt_suffix + response_prefix;
 
         while True:
             print(message)
             accumulator = '';
+            # Get a lock on the model.    
+            if(not lock.acquire(blocking=False)):
+                print("Blocking for lock")
+                lock.acquire()
+            llm.load_state(state)    
             llm.eval(llm.tokenize(message.encode()))
             token = llm.sample()
             token_string = llm.detokenize([token]).decode()
@@ -96,12 +99,16 @@ def gpt_socket(personality):
                 token = llm.sample()
                 token_string = llm.detokenize([token]).decode()
             llm.eval([token]) # Ensure that the model evaluates its own end-of-sequence.
+            state = llm.save_state()
+            lock.release()
             ws.send("<END>")
             # We wait for a subsequent user prompt, and the cycle begins anew.
             message = prompt_prefix + ws.receive() + prompt_suffix + response_prefix;
-    except ConnectionClosed:
+    except Exception:
+        if(lock.locked()):
+            lock.release()
         pass
-    lock.release();
+    return ''
 
 # Actually start the flask server
 if __name__ == "__main__":
