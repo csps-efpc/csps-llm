@@ -102,7 +102,7 @@ sendPrompt = function () {
 
     chatElement.classList.add('animate__animated');
     chatElement.classList.add('animate__fadeIn');
-    chatElement.classList.add('animate__delay-2s');
+    chatElement.classList.add('animate__delay-1s');
 
 
 
