@@ -123,13 +123,11 @@ def gpt_socket(personality):
                 print("Blocking for pre-parsing lock")
                 lock.acquire()
             if(url is not None) :
-                chat_session += rag.get_rag_prefix(personality, url, user_prefix=prompt_prefix, system_prefix=system_prefix, system_suffix=system_suffix)
+                chat_session += rag.get_rag_prefix(personality, url, system_prefix=system_prefix, system_suffix=system_suffix)
             else :
-                chat_session += rag.get_personality_prefix(personality, system_prefix=system_prefix, system_suffix=system_suffix)
-                # We tuck the beginning of the user interaction in, because we've got no RAG headers.
-                chat_session += prompt_prefix + message
+                chat_session += rag.get_personality_prefix(personality, system_prefix=system_prefix, system_suffix=system_suffix) + prompt_prefix
             # At this stage, we're positioned just before the prompt.
-            chat_session += prompt_suffix + response_prefix;
+            chat_session += message + prompt_suffix + response_prefix;
             print(chat_session)
             llm.reset()
             while True:

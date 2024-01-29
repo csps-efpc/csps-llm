@@ -28,11 +28,10 @@ def get_personality_state(personality, model, system_prefix = '', system_suffix 
             personality_cache[personality] = state;     
     return personality_cache[personality]
 
-def get_rag_prefix(personality, url, rag_prefix='Consider the following content:\n', rag_suffix='\nGiven the preceding content, ', system_prefix="", system_suffix=""):
+def get_rag_prefix(personality, url, rag_prefix='Consider the following content:\n', rag_suffix='\nGiven the preceding content, ', system_prefix="", system_suffix="", max_url_content_length = 4096, prompt_prefix=""):
     rag_text = fetchUrlText(url, max_url_content_length)
     personality_prefix = get_personality_prefix(personality, system_prefix, system_suffix)
-    returnable = (personality_prefix + rag_prefix + rag_text + getDateTimeText() + rag_suffix) 
-    print (returnable)
+    returnable = (personality_prefix + prompt_prefix + rag_prefix + rag_text + getDateTimeText() + rag_suffix) 
     return returnable
 
 def get_rag_state(personality, model, url, user_prefix = '', rag_prefix='Consider the following content:\n', rag_suffix='\nGiven the preceding content, ', system_prefix="", system_suffix="", max_url_content_length = 4096):
