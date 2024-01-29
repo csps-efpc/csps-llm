@@ -4,6 +4,7 @@ from flask import redirect, render_template, request
 from simple_websocket import Server, ConnectionClosed
 from llama_cpp import Llama
 import threading
+import traceback
 
 # Initialize the LLM model
 app = flask.Flask(__name__) #, static_url_path=''
@@ -85,6 +86,7 @@ def gpt_socket(personality):
         while True:
             print(message)
             accumulator = '';
+            token_bytes = bytearray()
             # Get a lock on the model.    
             if(not lock.acquire(blocking=False)):
                 print("Blocking for lock")
@@ -92,14 +94,21 @@ def gpt_socket(personality):
             llm.load_state(state)    
             llm.eval(llm.tokenize(message.encode()))
             token = llm.sample()
-            token_string = llm.detokenize([token]).decode()
+            token_bytes.extend(llm.detokenize([token]))
             while token is not llm.token_eos():
-                print(token_string, end='', flush=True)
-                ws.send(token_string)
-                accumulator += token_string
+                try:
+                    token_string = token_bytes.decode()
+                    print(token_string, end='', flush=True)
+                    ws.send(token_string)
+                    accumulator += token_string
+                    token_bytes = bytearray()
+                except UnicodeError as e:
+                    print(e)
+                    print(traceback.format_exc())
+                    pass # because the token bytes contain an unfinished unicode sequence.
                 llm.eval([token])
                 token = llm.sample()
-                token_string = llm.detokenize([token]).decode()
+                token_bytes.extend(llm.detokenize([token]))
             llm.eval([token]) # Ensure that the model evaluates its own end-of-sequence.
             state = llm.save_state()
             lock.release()
