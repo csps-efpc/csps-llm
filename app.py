@@ -10,6 +10,9 @@ import traceback
 app = flask.Flask(__name__) #, static_url_path=''
 # Create an exclusive lock on the model state.
 lock = threading.Lock()
+
+#Global setting - should we try to cache states?
+CACHE_STATES = False
 # Stop tokens
 stopTokens = ["### User:","</s>"]
 temperature = 0.8
@@ -22,7 +25,7 @@ response_prefix = "### Assistant:\n"
 response_suffix = "\n"
 # Initialize the model
 llm = Llama(
-        model_path="../neural-chat-7b-v3-3.Q4_K_M.gguf", n_gpu_layers=-1, n_threads=4, numa=True, n_ctx=2048
+        model_path="../neural-chat-7b-v3-3.Q4_0.gguf", n_gpu_layers=-1, n_threads=4, numa=True, n_ctx=2048
     )
 
 pleaseWaitText = "\n[Please note that I'm currently helping another user and will be with you as soon as they've finished.]\n"
@@ -69,50 +72,83 @@ def gpt_socket(personality):
         ws.send("Checking the forecast...\n")
 
     try:
-        state = None
-        if(not lock.acquire(blocking=False)):
-            print("Blocking for pre-parsing lock")
-            lock.acquire()
-        if(url is not None) :
-            state = rag.get_rag_state(personality, llm, url, user_prefix=prompt_prefix, system_prefix=system_prefix, system_suffix=system_suffix)
-        else :
-            state = rag.get_personality_state(personality, llm, system_prefix=system_prefix, system_suffix=system_suffix)
-            # We tuck the beginning of the user interaction in, because we've got no RAG headers.
-            message = prompt_prefix + message
-        # At this stage, we're positioned just before the prompt.
-        lock.release()
-        message += prompt_suffix + response_prefix;
-
-        while True:
-            print(message)
-            accumulator = '';
-            token_bytes = bytearray()
-            # Get a lock on the model.    
+        if CACHE_STATES:
+            state = None
             if(not lock.acquire(blocking=False)):
-                print("Blocking for lock")
+                print("Blocking for pre-parsing lock")
                 lock.acquire()
-            llm.load_state(state)    
-            llm.eval(llm.tokenize(message.encode()))
-            token = llm.sample()
-            token_bytes.extend(llm.detokenize([token]))
-            while token is not llm.token_eos():
-                try:
-                    token_string = token_bytes.decode()
-                    print(token_string, end='', flush=True)
-                    ws.send(token_string)
-                    accumulator += token_string
-                    token_bytes = bytearray()
-                except UnicodeError as e:
-                    pass # because the token bytes contain an unfinished unicode sequence.
-                llm.eval([token])
+            if(url is not None) :
+                state = rag.get_rag_state(personality, llm, url, user_prefix=prompt_prefix, system_prefix=system_prefix, system_suffix=system_suffix)
+            else :
+                state = rag.get_personality_state(personality, llm, system_prefix=system_prefix, system_suffix=system_suffix)
+                # We tuck the beginning of the user interaction in, because we've got no RAG headers.
+                message = prompt_prefix + message
+            # At this stage, we're positioned just before the prompt.
+            lock.release()
+            message += prompt_suffix + response_prefix;
+
+            while True:
+                print(message)
+                accumulator = '';
+                token_bytes = bytearray()
+                # Get a lock on the model.    
+                if(not lock.acquire(blocking=False)):
+                    print("Blocking for lock")
+                    lock.acquire()
+                llm.load_state(state)    
+                llm.eval(llm.tokenize(message.encode()))
                 token = llm.sample()
                 token_bytes.extend(llm.detokenize([token]))
-            llm.eval([token]) # Ensure that the model evaluates its own end-of-sequence.
-            state = llm.save_state()
-            lock.release()
-            ws.send("<END>")
-            # We wait for a subsequent user prompt, and the cycle begins anew.
-            message = prompt_prefix + ws.receive() + prompt_suffix + response_prefix;
+                while token is not llm.token_eos():
+                    try:
+                        token_string = token_bytes.decode()
+                        print(token_string, end='', flush=True)
+                        ws.send(token_string)
+                        accumulator += token_string
+                        token_bytes = bytearray()
+                    except UnicodeError as e:
+                        pass # because the token bytes contain an unfinished unicode sequence.
+                    llm.eval([token])
+                    token = llm.sample()
+                    token_bytes.extend(llm.detokenize([token]))
+                llm.eval([token]) # Ensure that the model evaluates its own end-of-sequence.
+                state = llm.save_state()
+                lock.release()
+                ws.send("<END>")
+                # We wait for a subsequent user prompt, and the cycle begins anew.
+                message = prompt_prefix + ws.receive() + prompt_suffix + response_prefix;
+        else: #We run the event loop with no cached states, and the lock blocks the llm the whole time.
+            chat_session = '';
+            if(not lock.acquire(blocking=False)):
+                print("Blocking for pre-parsing lock")
+                lock.acquire()
+            if(url is not None) :
+                chat_session += rag.get_rag_prefix(personality, url, user_prefix=prompt_prefix, system_prefix=system_prefix, system_suffix=system_suffix)
+            else :
+                chat_session += rag.get_personality_prefix(personality, system_prefix=system_prefix, system_suffix=system_suffix)
+                # We tuck the beginning of the user interaction in, because we've got no RAG headers.
+                chat_session += prompt_prefix + message
+            # At this stage, we're positioned just before the prompt.
+            chat_session += prompt_suffix + response_prefix;
+            print(chat_session)
+            llm.reset()
+            while True:
+                stream = llm(
+                    chat_session,
+                    max_tokens=2048,
+                    stop=stopTokens,
+                    stream=True,
+                    temperature=temperature
+                )
+                for tok in stream:
+                    token_string = tok["choices"][0]["text"]
+                    chat_session += token_string
+                    print(token_string, end='', flush=True)
+                    ws.send(token_string)
+                # For some reason - this method doesn't require the EOS token in the stream?!?! chat_session += llm.token_eos()
+                ws.send("<END>")
+                # We wait for a subsequent user prompt, and the cycle begins anew.
+                chat_session += prompt_prefix + ws.receive() + prompt_suffix + response_prefix;
     except Exception as e:
         print(e)
         if(lock.locked()):
