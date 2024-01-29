@@ -103,8 +103,6 @@ def gpt_socket(personality):
                     accumulator += token_string
                     token_bytes = bytearray()
                 except UnicodeError as e:
-                    print(e)
-                    print(traceback.format_exc())
                     pass # because the token bytes contain an unfinished unicode sequence.
                 llm.eval([token])
                 token = llm.sample()
