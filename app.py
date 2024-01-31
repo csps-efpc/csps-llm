@@ -42,6 +42,7 @@ def gpt_socket(personality):
     message = ws.receive()
     folded = message.casefold()
     url = None
+    rag_source_description = ""
     ## TODO: make this bit modular.
     if(message.startswith("http")):
         s = message.split(" ",1)
@@ -49,15 +50,18 @@ def gpt_socket(personality):
         url = s[0]
         ws.send("Fetching the page at " + url)
     elif("news".casefold() in folded):
+        rag_source_description = "The latest news from the CBC is:\n"
         url = "https://www.cbc.ca/webfeed/rss/rss-topstories"
         if("canad".casefold() in folded):
             url = "https://www.cbc.ca/webfeed/rss/rss-canada"
         if("government".casefold() in folded):
-            url = "https://api.io.canada.ca/io-server/gc/news/en/v2?sort=publishedDate&orderBy=desc&publishedDate%3E=2021-10-25&pick=100&format=atom&atomtitle=National%20News"
+            rag_source_description = "The latest news from the Government of Canada is:\n"
+            url = "https://api.io.canada.ca/io-server/gc/news/en/v2?sort=publishedDate&orderBy=desc&pick=5&format=atom&atomtitle=National%20News"
         if("politi".casefold() in folded):
             url = "https://www.cbc.ca/webfeed/rss/rss-politics"
         if("health".casefold() in folded):
-            url = "https://api.io.canada.ca/io-server/gc/news/en/v2?topic=health&sort=publishedDate&orderBy=desc&publishedDate%3E=2021-10-25&pick=100&format=atom&atomtitle=Health"
+            rag_source_description = "The latest health news from the Government of Canada is:\n"
+            url = "https://api.io.canada.ca/io-server/gc/news/en/v2?topic=health&sort=publishedDate&orderBy=desc&pick=5&format=atom&atomtitle=Health"
         if("tech".casefold() in folded):
             url = "https://www.cbc.ca/webfeed/rss/rss-technology"
         if("sport".casefold() in folded):
@@ -66,15 +70,20 @@ def gpt_socket(personality):
             url = "https://www.cbc.ca/webfeed/rss/rss-canada-ottawa"
         ws.send("Checking the news...\n")
     elif("busrides".casefold() in folded):
+        rag_source_description = "Busrides is a series of articles from the CSPS. Busrides is not about riding public transit. What follows is a list of the newest article titles and summaries from Busrides:\n"
         url = "https://busrides.ghost.io/rss/"
         ws.send("Checking the latest microlearning...\n")
+
     elif(("csps".casefold() in folded or "school".casefold() in folded) and ("cours".casefold() in folded or "learn".casefold() in folded)):
+        rag_source_description = "The latest learning products from the CSPS are:\n"
         url = "https://www.csps-efpc.gc.ca/stayconnected/csps-rss-eng.xml"
         ws.send("Checking the catalogue...\n")
     elif(("open".casefold() in folded or "new".casefold() in folded) and "dataset".casefold() in folded):
+        rag_source_description = "The latest open datasets from the Government of Canada are:\n"
         url = "https://open.canada.ca/data/en/feeds/dataset.atom"
         ws.send("Checking the open data portal...\n")
     elif(("weather".casefold() in folded or "rain".casefold() in folded  or "snow".casefold() in folded or "temperature".casefold() in folded) and ("today".casefold() in folded or "this week".casefold() in folded or "tomorrow".casefold() in folded or "now".casefold() in folded or "later".casefold() in folded or "forecast".casefold() in folded)):
+        rag_source_description = "The weather forecast for the Ottawa area is:\n"
         url = "https://weather.gc.ca/rss/city/on-118_e.xml"
         ws.send("Checking the forecast...\n")
 
@@ -85,7 +94,7 @@ def gpt_socket(personality):
                 print("Blocking for pre-parsing lock")
                 lock.acquire()
             if(url is not None) :
-                state = rag.get_rag_state(personality, llm, url, user_prefix=prompt_prefix, system_prefix=system_prefix, system_suffix=system_suffix)
+                state = rag.get_rag_state(personality, llm, url, rag_prefix = rag_source_description, user_prefix=prompt_prefix, system_prefix=system_prefix, system_suffix=system_suffix)
             else :
                 state = rag.get_personality_state(personality, llm, system_prefix=system_prefix, system_suffix=system_suffix)
                 # We tuck the beginning of the user interaction in, because we've got no RAG headers.
@@ -130,7 +139,7 @@ def gpt_socket(personality):
                 print("Blocking for pre-parsing lock")
                 lock.acquire()
             if(url is not None) :
-                chat_session += rag.get_rag_prefix(personality, url, system_prefix=system_prefix, system_suffix=system_suffix)
+                chat_session += rag.get_rag_prefix(personality, url, rag_prefix = rag_source_description, system_prefix=system_prefix, system_suffix=system_suffix)
             else :
                 chat_session += rag.get_personality_prefix(personality, system_prefix=system_prefix, system_suffix=system_suffix) + prompt_prefix
             # At this stage, we're positioned just before the prompt.
