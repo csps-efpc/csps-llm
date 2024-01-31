@@ -5,6 +5,7 @@ from simple_websocket import Server, ConnectionClosed
 from llama_cpp import Llama
 import threading
 import traceback
+from datetime import datetime
 
 # Initialize the LLM model
 app = flask.Flask(__name__) #, static_url_path=''
@@ -34,6 +35,9 @@ pleaseWaitText = "\n[Please note that I'm currently helping another user and wil
 @app.route("/gpt-socket/<personality>", websocket=True)
 def gpt_socket(personality):
     ws = Server.accept(request.environ)
+    now = datetime.now()
+    time_prompt = """Today's date is {0}. The current time is {1}.
+""".format(now.strftime("%A, %B %-d, %Y"), now.strftime("%I:%M %p %Z"))
     # We receive and parse the first user prompt.
     message = ws.receive()
     folded = message.casefold()
@@ -127,7 +131,7 @@ def gpt_socket(personality):
             else :
                 chat_session += rag.get_personality_prefix(personality, system_prefix=system_prefix, system_suffix=system_suffix) + prompt_prefix
             # At this stage, we're positioned just before the prompt.
-            chat_session += message + prompt_suffix + response_prefix;
+            chat_session += time_prompt + message + prompt_suffix + response_prefix;
             print(chat_session)
             llm.reset()
             while True:
