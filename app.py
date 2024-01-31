@@ -65,6 +65,9 @@ def gpt_socket(personality):
         if("ottawa".casefold() in folded):
             url = "https://www.cbc.ca/webfeed/rss/rss-canada-ottawa"
         ws.send("Checking the news...\n")
+    elif("busrides".casefold() in folded):
+        url = "https://busrides.ghost.io/rss/"
+        ws.send("Checking the latest microlearning...\n")
     elif(("csps".casefold() in folded or "school".casefold() in folded) and ("cours".casefold() in folded or "learn".casefold() in folded)):
         url = "https://www.csps-efpc.gc.ca/stayconnected/csps-rss-eng.xml"
         ws.send("Checking the catalogue...\n")
