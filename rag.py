@@ -38,7 +38,6 @@ def get_rag_state(personality, model, url, user_prefix = '', rag_prefix='Conside
     """Retrieves a state for the given personality that incorporates the given url as RAG context. The state will be positioned just before the user prompt."""
     model.load_state(get_personality_state(personality, model, system_prefix, system_suffix))
     rag_text = get_rag_prefix(personality, model, url, user_prefix = '', rag_prefix=rag_prefix, rag_suffix=rag_suffix, system_prefix=system_prefix, system_suffix=system_suffix, max_url_content_length = 4096)
-    print ()
     model.eval(model.tokenize((rag_prefix + rag_text + getDateTimeText() + rag_suffix).encode()))
     state = model.save_state()
     return state
