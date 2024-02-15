@@ -18,15 +18,17 @@ CACHE_STATES = False
 stopTokens = ["### User:","</s>"]
 temperature = 0.8
 # Prompt parts
-system_prefix="### System:\n"
-system_suffix="\n"
-prompt_prefix = "### User:\n"
-prompt_suffix = "\n"
-response_prefix = "### Assistant:\n"
-response_suffix = "\n"
+system_prefix="[INST]<<SYS>>\n"
+system_suffix="<</SYS>>\n[/INST]\n"
+prompt_prefix = "[INST]\n"
+prompt_suffix = " [/INST]"
+response_prefix = ""
+response_suffix = ""
+rag_prefix = "\nBEGININPUT\n"
+rag_suffix = "\nENDINPUT\nBEGININSTRUCTION\n"
 # Initialize the model
 llm = Llama(
-        model_path="../neural-chat-7b-v3-3.Q4_0.gguf", n_gpu_layers=-1, n_threads=4, numa=True, n_ctx=2048
+        model_path="../bagel-dpo-7b-v0.4.Q4_K_M.gguf", n_gpu_layers=18, n_threads=4, numa=False, n_ctx=2048
     )
 
 pleaseWaitText = "\n[Please note that I'm currently helping another user and will be with you as soon as they've finished.]\n"
@@ -94,7 +96,7 @@ def gpt_socket(personality):
                 print("Blocking for pre-parsing lock")
                 lock.acquire()
             if(url is not None) :
-                state = rag.get_rag_state(personality, llm, url, rag_prefix = rag_source_description, user_prefix=prompt_prefix, system_prefix=system_prefix, system_suffix=system_suffix)
+                state = rag.get_rag_state(personality, llm, url, rag_prefix = rag_prefix+rag_source_description, rag_suffix = rag_suffix, user_prefix=prompt_prefix, system_prefix=system_prefix, system_suffix=system_suffix)
             else :
                 state = rag.get_personality_state(personality, llm, system_prefix=system_prefix, system_suffix=system_suffix)
                 # We tuck the beginning of the user interaction in, because we've got no RAG headers.
