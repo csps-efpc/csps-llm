@@ -24,11 +24,11 @@ prompt_prefix = "<start_of_turn>user\n"
 prompt_suffix = "<end_of_turn>\n"
 response_prefix = "<start_of_turn>model\n"
 response_suffix = ""
-rag_prefix = "\nConsider the following:\n"
-rag_suffix = "\nGiven the preceding text, "
+rag_prefix = "<start_of_turn>system\nConsider the following:\n"
+rag_suffix = "\n<end_of_term>\n"
 # Initialize the model
 llm = Llama(
-        model_path="../gemma-2b-it-q8_0.gguf", n_gpu_layers=-1, n_threads=4, numa=False, n_ctx=2048
+        model_path="../gemma-7b-it.Q4_K_M.gguf", n_gpu_layers=-1, n_threads=4, numa=False, n_ctx=2048
     )
 
 pleaseWaitText = "\n[Please note that I'm currently helping another user and will be with you as soon as they've finished.]\n"
@@ -141,11 +141,11 @@ def gpt_socket(personality):
                 print("Blocking for pre-parsing lock")
                 lock.acquire()
             if(url is not None) :
-                chat_session += rag.get_rag_prefix(personality, url, rag_prefix = rag_source_description, system_prefix=system_prefix, system_suffix=system_suffix)
+                chat_session += rag.get_rag_prefix(personality, url, rag_prefix = rag_source_description, prompt_prefix=prompt_prefix, rag_suffix=rag_suffix, system_prefix=system_prefix, system_suffix=system_suffix) 
             else :
-                chat_session += rag.get_personality_prefix(personality, system_prefix=system_prefix, system_suffix=system_suffix) + prompt_prefix
+                chat_session += rag.get_personality_prefix(personality, system_prefix=system_prefix, system_suffix=system_suffix) 
             # At this stage, we're positioned just before the prompt.
-            chat_session += time_prompt + message + prompt_suffix + response_prefix;
+            chat_session += prompt_prefix + message + prompt_suffix + response_prefix;
             print(chat_session)
             llm.reset()
             while True:
