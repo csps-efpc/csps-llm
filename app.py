@@ -15,20 +15,20 @@ lock = threading.Lock()
 #Global setting - should we try to cache states?
 CACHE_STATES = False
 # Stop tokens
-stopTokens = ["### User:","</s>"]
+stopTokens = ["[/INST]","</s>","User:", "Assistant:"]
 temperature = 0.8
 # Prompt parts
-system_prefix="[INST]<<SYS>>\n"
-system_suffix="<</SYS>>\n[/INST]\n"
-prompt_prefix = "[INST]\n"
-prompt_suffix = " [/INST]"
-response_prefix = ""
+system_prefix="[INST]\n"
+system_suffix="\n[/INST]\n"
+prompt_prefix = "\nUser: "
+prompt_suffix = " \n"
+response_prefix = "Assistant: "
 response_suffix = ""
-rag_prefix = "\nBEGININPUT\n"
-rag_suffix = "\nENDINPUT\nBEGININSTRUCTION\n"
+rag_prefix = "\nConsider the following:\n"
+rag_suffix = "\nGiven the preceding text, "
 # Initialize the model
 llm = Llama(
-        model_path="../bagel-dpo-7b-v0.4.Q4_K_M.gguf", n_gpu_layers=18, n_threads=4, numa=False, n_ctx=2048
+        model_path="../mixtral-8x7b-instruct-v0.1.Q4_K_M.gguf", n_gpu_layers=0, n_threads=4, numa=False, n_ctx=2048
     )
 
 pleaseWaitText = "\n[Please note that I'm currently helping another user and will be with you as soon as they've finished.]\n"
