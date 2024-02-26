@@ -18,13 +18,35 @@
 <body>
 
     <div class="footer">
-        <div class="join w-full flex">
-            <input type="text" class="input input-bordered join-item grow" id="prompt" />
+        <div class="w-full flex">
+          <div class="dropdown dropdown-top" id="context_menu">
+            <div tabindex="0" role="button" class="btn join-item" id="context_button">&#x2795;</div>
+            <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52">
+              <li><a onclick="text_input_modal.showModal()">Text...</a></li>
+              <!-- <li><a>File...</a></li> -->
+            </ul>
+          </div>
+          <div class="join w-full">
+          <input type="text" class="input input-bordered join-item grow" id="prompt" />
             <button id="listen-button" class="btn btn-active join-item" hidden>Listen &#x1F399;</button>
             <input type="checkbox" id="speech-toggle" aria-label="Speak &#x1F5E3;" name="speech"
                 class="btn btn-outline join-item"></input>
+          </div>
         </div>
     </div>
+    <dialog id="text_input_modal" class="modal">
+      <div class="modal-box">
+        <h3 class="font-bold text-lg">Add context</h3>
+        <textarea id="text_context_textarea" class="textarea textarea-bordered w-full" placeholder="Paste here..."></textarea>
+        <div class="modal-action">
+          <form method="dialog">
+            <!-- if there is a button in form, it will close the modal -->
+            <button class="btn" id="text_context_ok">OK</button>
+            <button class="btn">Cancel</button>
+          </form>
+        </div>
+      </div>
+    </dialog>
     <hr />
     <img id="botImage" src="img/agent.svg" width="3em" height="3em" />
     <div id="dialogue">
@@ -46,6 +68,15 @@
                 sendPrompt();
             }
         });
+        // Bind the text-context control.
+        var contextOkButton = document.getElementById("text_context_ok");
+        contextOkButton.addEventListener("click", function (event) {
+          window.firstContextText = document.getElementById("text_context_textarea").value;
+          if(window.firstContextText) {
+            document.getElementById("context_button").classList.add("btn-neutral");
+          }
+        });
+        
         if (window.hasOwnProperty('webkitSpeechRecognition')) {
             var listenButton = document.getElementById('listen-button');
             listenButton.hidden = false;
@@ -55,6 +86,7 @@
         }
         input.focus();
         thinkerElement = document.getElementById("thinker");
+        contextElement = document.getElementById("context_menu");
         thinkerElement.parentElement.removeChild(thinkerElement);
         botImage = document.getElementById("botImage");
         botImage.parentElement.removeChild(botImage);
