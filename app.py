@@ -151,7 +151,7 @@ def gpt_socket(personality):
             else :
                 chat_session += rag.get_personality_prefix(personality, system_prefix=system_prefix, system_suffix=system_suffix) + prompt_prefix
             # At this stage, we're positioned just before the prompt.
-            chat_session += time_prompt + message + prompt_suffix + response_prefix;
+            chat_session += message + prompt_suffix + response_prefix;
             print(chat_session)
             llm.reset()
             while True:

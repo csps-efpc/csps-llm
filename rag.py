@@ -11,10 +11,10 @@ personality_cache = {}
 def get_personality_prefix(personality, system_prefix = '', system_suffix = ''):
     """Retrieves the model state for the given personality, calculating it if necessary."""
     imperative = ""
-    print("Fetching personality for " + personality + "...")
+    #print("Fetching personality for " + personality + "...")
     imperative = personalities[personality]['imperative']
     personality_prefix = system_prefix + imperative + system_suffix; 
-    print (personality_prefix)
+    #print (personality_prefix)
     return personality_prefix
 
 def get_personality_state(personality, model, system_prefix = '', system_suffix = ''):
