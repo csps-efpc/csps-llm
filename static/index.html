@@ -18,7 +18,7 @@
 <body>
 
     <div class="footer">
-        <div class="w-full flex">
+        <div class="w-full flex join">
           <div class="dropdown dropdown-top" id="context_menu">
             <div tabindex="0" role="button" class="btn join-item" id="context_button">&#x2795;</div>
             <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52">
@@ -26,18 +26,23 @@
               <!-- <li><a>File...</a></li> -->
             </ul>
           </div>
-          <div class="join w-full">
           <input type="text" class="input input-bordered join-item grow" id="prompt" />
             <button id="listen-button" class="btn btn-active join-item" hidden>Listen &#x1F399;</button>
             <input type="checkbox" id="speech-toggle" aria-label="Speak &#x1F5E3;" name="speech"
                 class="btn btn-outline join-item"></input>
-          </div>
         </div>
     </div>
     <dialog id="text_input_modal" class="modal">
       <div class="modal-box">
         <h3 class="font-bold text-lg">Add context</h3>
-        <textarea id="text_context_textarea" class="textarea textarea-bordered w-full" placeholder="Paste here..."></textarea>
+        <p></p>
+        <label class="form-control">
+          <div class="label">
+            <span class="label-text">Reminder: do not submit any information subject to sensitivity.</span>
+          </div>
+          <textarea id="text_context_textarea" class="textarea textarea-bordered grow w-full" placeholder="Paste here..."></textarea>
+        </label>
+        <input id="text_context_prompt" type="text" placeholder="Your question" class="input input-bordered w-full" />
         <div class="modal-action">
           <form method="dialog">
             <!-- if there is a button in form, it will close the modal -->
@@ -72,8 +77,13 @@
         var contextOkButton = document.getElementById("text_context_ok");
         contextOkButton.addEventListener("click", function (event) {
           window.firstContextText = document.getElementById("text_context_textarea").value;
+          var contextPrompt = document.getElementById("text_context_prompt").value;
           if(window.firstContextText) {
             document.getElementById("context_button").classList.add("btn-neutral");
+          }
+          if(contextPrompt) {
+            document.getElementById("prompt").value = contextPrompt;
+            sendPrompt();
           }
         });
         
