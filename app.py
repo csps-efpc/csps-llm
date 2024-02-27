@@ -52,7 +52,7 @@ def gpt_socket(personality):
         message = s[1]
         text = s[0]
         ws.send("Reading the provided context...")
-    if(message.startswith("http")):
+    elif if(message.startswith("http")):
         s = message.split(" ",1)
         message = s[1]
         url = s[0]
