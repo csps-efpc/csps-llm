@@ -125,6 +125,7 @@ sendPrompt = function () {
     outputElement = document.createElement('div');
     outputElement.classList.add('chat-bubble');
     outputElement.classList.add('chat-bubble-info');
+    outputElement.classList.add('prose');
     chatElement.append(outputElement);
     chatElement.classList.add('animate__animated');
     chatElement.classList.add('animate__fadeIn');
