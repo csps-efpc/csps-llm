@@ -178,6 +178,49 @@ def gpt_socket(personality):
         pass
     return ''
 
+# Plain old webservice endpoints
+@app.route("/gpt/<personality>", methods=["GET", "POST"])
+def gpt(personality):
+    prompt = request.args["prompt"]
+    
+    chat_session = rag.get_personality_prefix(personality, system_prefix=system_prefix, system_suffix=system_suffix) + prompt_prefix + prompt + prompt_suffix + response_prefix;
+    print(chat_session)
+    llm.reset()
+    
+#    if "mathjson" in prompt.lower():
+#        current_temperature = cold_temperature
+    lock.acquire()
+    llm.reset()
+    result = llm(
+        chat_session,
+        max_tokens=2048,
+        stop=stopTokens,
+        stream=False,
+        temperature=temperature,
+    )
+    lock.release()
+    return flask.Response(result["choices"][0]["text"], mimetype="text/plain")
+
+
+@app.route("/toil/<personality>", methods=["POST"])
+def toil(personality):
+    request_context = request.json
+    user_prompt = request_context["prompt"]
+    del request_context["prompt"]
+    structured_prompt = rag.get_personality_prefix(personality, system_prefix=system_prefix, system_suffix=system_suffix) + prompt_prefix + user_prompt + prompt_suffix + response_prefix;
+    print(structured_prompt)
+    lock.acquire()
+    llm.reset()
+    result = llm(
+        structured_prompt,
+        max_tokens=2048,
+        stop=stopTokens,
+        stream=False,
+        temperature=temperature
+    )
+    lock.release()
+    return flask.Response(result["choices"][0]["text"], mimetype="text/plain")
+
 # Actually start the flask server
 if __name__ == "__main__":
     app.run(host="0.0.0.0")
