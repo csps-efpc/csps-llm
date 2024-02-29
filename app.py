@@ -15,7 +15,7 @@ lock = threading.Lock()
 #Global setting - should we try to cache states?
 CACHE_STATES = False
 # Stop tokens
-stopTokens = ["### User:","</s>"]
+stopTokens = ["### User:","</s>", "[INST]"]
 temperature = 0.8
 # Prompt parts
 system_prefix="[INST]<<SYS>>\n"
@@ -206,6 +206,8 @@ def gpt(personality):
 def toil(personality):
     request_context = request.json
     user_prompt = request_context["prompt"]
+    rag_text = None
+    
     del request_context["prompt"]
     structured_prompt = rag.get_personality_prefix(personality, system_prefix=system_prefix, system_suffix=system_suffix) + prompt_prefix + user_prompt + prompt_suffix + response_prefix;
     print(structured_prompt)
