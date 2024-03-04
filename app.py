@@ -28,7 +28,7 @@ rag_prefix = "\nConsider the following:\n"
 rag_suffix = "\nGiven the preceding text, "
 # Initialize the model
 llm = Llama(
-        model_path="../mixtral-8x7b-instruct-v0.1.Q4_K_M.gguf", n_gpu_layers=0, n_threads=4, numa=False, n_ctx=2048
+        model_path="../mixtral-8x7b-instruct-v0.1.Q4_0.gguf", n_gpu_layers=0, n_threads=4, numa=False, n_ctx=2048
     )
 
 pleaseWaitText = "\n[Please note that I'm currently helping another user and will be with you as soon as they've finished.]\n"
