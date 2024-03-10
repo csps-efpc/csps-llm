@@ -28,7 +28,7 @@ rag_prefix = "\nBEGININPUT\n"
 rag_suffix = "\nENDINPUT\nBEGININSTRUCTION\n"
 # Initialize the model
 llm = Llama(
-        model_path="../bagel-dpo-7b-v0.4.Q4_0.gguf", n_gpu_layers=18, n_threads=4, numa=False, n_ctx=2048
+        model_path="../bagel-dpo-7b-v0.4.Q4_K_M.gguf", n_gpu_layers=18, n_threads=4, numa=False, n_ctx=2048
     )
 
 pleaseWaitText = "\n[Please note that I'm currently helping another user and will be with you as soon as they've finished.]\n"
@@ -186,7 +186,6 @@ def gpt(personality):
     
     chat_session = rag.get_personality_prefix(personality, system_prefix=system_prefix, system_suffix=system_suffix) + prompt_prefix + prompt + prompt_suffix + response_prefix;
     print(chat_session)
-    llm.reset()
     
 #    if "mathjson" in prompt.lower():
 #        current_temperature = cold_temperature
