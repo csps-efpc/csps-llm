@@ -28,7 +28,7 @@ rag_prefix = "\nBEGININPUT\n"
 rag_suffix = "\nENDINPUT\nBEGININSTRUCTION\n"
 # Initialize the model
 llm = Llama(
-        model_path="../bagel-dpo-7b-v0.4.Q4_K_M.gguf", n_gpu_layers=18, n_threads=4, numa=False, n_ctx=2048
+        model_path="../bagel-dpo-7b-v0.4.Q4_K_M.gguf", n_gpu_layers=18, n_threads=4, numa=False, n_ctx=2048, chat_format='llama-2'
     )
 
 pleaseWaitText = "\n[Please note that I'm currently helping another user and will be with you as soon as they've finished.]\n"
@@ -184,22 +184,45 @@ def gpt_socket(personality):
 def gpt(personality):
     prompt = request.args["prompt"]
     
-    chat_session = rag.get_personality_prefix(personality, system_prefix=system_prefix, system_suffix=system_suffix) + prompt_prefix + prompt + prompt_suffix + response_prefix;
-    print(chat_session)
+    #chat_session = rag.get_personality_prefix(personality, system_prefix=system_prefix, system_suffix=system_suffix) + prompt_prefix + prompt + prompt_suffix + response_prefix;
+    #print(chat_session)
     
 #    if "mathjson" in prompt.lower():
 #        current_temperature = cold_temperature
     lock.acquire()
     llm.reset()
-    result = llm(
-        chat_session,
-        max_tokens=2048,
-        stop=stopTokens,
-        stream=False,
-        temperature=temperature,
+    result=llm.create_chat_completion(
+        messages=[
+            {
+                "role": "system",
+                "content": personality,
+            },
+            {"role": "user", "content": prompt},
+        ],
+        response_format={
+            "type": "json_object",
+            "schema": {
+                "type": "object",
+                "title": "response_list",
+                "properties": {
+                    "responses": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "answer": {
+                        "type": "boolean"
+                    }
+#                    "required": ["team_name"],
+                },
+            }
+        },
+        temperature=0.7,
     )
     lock.release()
-    return flask.Response(result["choices"][0]["text"], mimetype="text/plain")
+    print(result)
+    return flask.Response(result["choices"][0]["message"]["content"], mimetype="text/plain")
 
 
 @app.route("/toil/<personality>", methods=["POST"])
