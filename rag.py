@@ -11,10 +11,10 @@ personality_cache = {}
 def get_personality_prefix(personality, system_prefix = '', system_suffix = ''):
     """Retrieves the model state for the given personality, calculating it if necessary."""
     imperative = ""
-    print("Fetching personality for " + personality + "...")
+    #print("Fetching personality for " + personality + "...")
     imperative = personalities[personality]['imperative']
     personality_prefix = system_prefix + imperative + system_suffix; 
-    print (personality_prefix)
+    #print (personality_prefix)
     return personality_prefix
 
 def get_personality_state(personality, model, system_prefix = '', system_suffix = ''):
@@ -28,16 +28,17 @@ def get_personality_state(personality, model, system_prefix = '', system_suffix 
             personality_cache[personality] = state;     
     return personality_cache[personality]
 
-def get_rag_prefix(personality, url, rag_prefix='Consider the following content:\n', rag_suffix='\nGiven the preceding content, ', system_prefix="", system_suffix="", max_url_content_length = 4096, prompt_prefix=""):
-    rag_text = fetchUrlText(url, max_url_content_length)
+def get_rag_prefix(personality, url, rag_prefix='Consider the following content:\n', rag_suffix='\nGiven the preceding content, ', system_prefix="", system_suffix="", max_url_content_length = 4096, prompt_prefix="", rag_text = None):
+    if url :
+      rag_text = fetchUrlText(url, max_url_content_length)
     personality_prefix = get_personality_prefix(personality, system_prefix, system_suffix)
     returnable = (personality_prefix + prompt_prefix + rag_prefix + rag_text + getDateTimeText() + rag_suffix) 
     return returnable
 
-def get_rag_state(personality, model, url, user_prefix = '', rag_prefix='Consider the following content:\n', rag_suffix='\nGiven the preceding content, ', system_prefix="", system_suffix="", max_url_content_length = 4096):
+def get_rag_state(personality, model, url, user_prefix = '', rag_prefix='Consider the following content:\n', rag_suffix='\nGiven the preceding content, ', system_prefix="", system_suffix="", max_url_content_length = 4096, rag_text = None):
     """Retrieves a state for the given personality that incorporates the given url as RAG context. The state will be positioned just before the user prompt."""
     model.load_state(get_personality_state(personality, model, system_prefix, system_suffix))
-    rag_text = get_rag_prefix(personality, model, url, user_prefix = '', rag_prefix=rag_prefix, rag_suffix=rag_suffix, system_prefix=system_prefix, system_suffix=system_suffix, max_url_content_length = 4096)
+    rag_text = get_rag_prefix(personality, model, url, user_prefix = '', rag_prefix=rag_prefix, rag_suffix=rag_suffix, system_prefix=system_prefix, system_suffix=system_suffix, max_url_content_length = 4096, rag_text=rag_text)
     model.eval(model.tokenize((rag_prefix + rag_text + getDateTimeText() + rag_suffix).encode()))
     state = model.save_state()
     return state

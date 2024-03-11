@@ -1,7 +1,7 @@
-@import url('https://fonts.cdnfonts.com/css/segoe-ui-4');
+@import url('https://fonts.cdnfonts.com/css/atkinson-hyperlegible-2');
 
 body {
-    font-family: 'Segoe UI', sans-serif;
+    font-family: 'Atkinson Hyperlegible', sans-serif;
     font-size: 13px;
     background-color: #f5f5f5;
     margin: 0px;
@@ -35,4 +35,18 @@ ul {
     list-style-position: inside !important;
 }
 
-
+h1 {
+    font-size: x-large !important;
+}
+h2 {
+    font-size: large !important;
+}
+h3 {
+    font-size: medium !important;
+}
+strong {
+    font-weight: bold !important;
+}
+em {
+    font-style: italic !important;
+}

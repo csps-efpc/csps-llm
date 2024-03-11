@@ -15,7 +15,7 @@ lock = threading.Lock()
 #Global setting - should we try to cache states?
 CACHE_STATES = False
 # Stop tokens
-stopTokens = ["[/INST]","</s>","User:", "Assistant:"]
+stopTokens = ["[/INST]","[INST]","</s>","User:", "Assistant:"]
 temperature = 0.8
 # Prompt parts
 system_prefix="[INST]\n"
@@ -28,7 +28,7 @@ rag_prefix = "\nConsider the following:\n"
 rag_suffix = "\nGiven the preceding text, "
 # Initialize the model
 llm = Llama(
-        model_path="../mixtral-8x7b-instruct-v0.1.Q4_0.gguf", n_gpu_layers=0, n_threads=4, numa=False, n_ctx=2048
+        model_path="../mixtral-8x7b-instruct-v0.1.Q4_0.gguf", n_gpu_layers=0, n_threads=4, numa=True, n_ctx=2048
     )
 
 pleaseWaitText = "\n[Please note that I'm currently helping another user and will be with you as soon as they've finished.]\n"
@@ -44,9 +44,15 @@ def gpt_socket(personality):
     message = ws.receive()
     folded = message.casefold()
     url = None
+    text = None
     rag_source_description = ""
     ## TODO: make this bit modular.
-    if(message.startswith("http")):
+    if(message.startswith("|CONTEXT|")):
+        s = message[9:].split("""|/CONTEXT|""",1)
+        message = s[1]
+        text = s[0]
+        ws.send("Reading the provided context...")
+    elif(message.startswith("http")):
         s = message.split(" ",1)
         message = s[1]
         url = s[0]
@@ -96,7 +102,7 @@ def gpt_socket(personality):
                 print("Blocking for pre-parsing lock")
                 lock.acquire()
             if(url is not None) :
-                state = rag.get_rag_state(personality, llm, url, rag_prefix = rag_prefix+rag_source_description, rag_suffix = rag_suffix, user_prefix=prompt_prefix, system_prefix=system_prefix, system_suffix=system_suffix)
+                state = rag.get_rag_state(personality, llm, url, rag_text = text, rag_prefix = rag_prefix+rag_source_description, rag_suffix = rag_suffix, user_prefix=prompt_prefix, system_prefix=system_prefix, system_suffix=system_suffix)
             else :
                 state = rag.get_personality_state(personality, llm, system_prefix=system_prefix, system_suffix=system_suffix)
                 # We tuck the beginning of the user interaction in, because we've got no RAG headers.
@@ -140,12 +146,12 @@ def gpt_socket(personality):
             if(not lock.acquire(blocking=False)):
                 print("Blocking for pre-parsing lock")
                 lock.acquire()
-            if(url is not None) :
-                chat_session += rag.get_rag_prefix(personality, url, rag_prefix = rag_source_description, system_prefix=system_prefix, system_suffix=system_suffix)
+            if((url is not None) or (text is not None)) :
+                chat_session += rag.get_rag_prefix(personality, url, rag_text = text, rag_prefix = rag_source_description, system_prefix=system_prefix, system_suffix=system_suffix)
             else :
                 chat_session += rag.get_personality_prefix(personality, system_prefix=system_prefix, system_suffix=system_suffix) + prompt_prefix
             # At this stage, we're positioned just before the prompt.
-            chat_session += time_prompt + message + prompt_suffix + response_prefix;
+            chat_session += message + prompt_suffix + response_prefix;
             print(chat_session)
             llm.reset()
             while True:
@@ -171,6 +177,51 @@ def gpt_socket(personality):
             lock.release()
         pass
     return ''
+
+# Plain old webservice endpoints
+@app.route("/gpt/<personality>", methods=["GET", "POST"])
+def gpt(personality):
+    prompt = request.args["prompt"]
+    
+    chat_session = rag.get_personality_prefix(personality, system_prefix=system_prefix, system_suffix=system_suffix) + prompt_prefix + prompt + prompt_suffix + response_prefix;
+    print(chat_session)
+    llm.reset()
+    
+#    if "mathjson" in prompt.lower():
+#        current_temperature = cold_temperature
+    lock.acquire()
+    llm.reset()
+    result = llm(
+        chat_session,
+        max_tokens=2048,
+        stop=stopTokens,
+        stream=False,
+        temperature=temperature,
+    )
+    lock.release()
+    return flask.Response(result["choices"][0]["text"], mimetype="text/plain")
+
+
+@app.route("/toil/<personality>", methods=["POST"])
+def toil(personality):
+    request_context = request.json
+    user_prompt = request_context["prompt"]
+    rag_text = None
+    
+    del request_context["prompt"]
+    structured_prompt = rag.get_personality_prefix(personality, system_prefix=system_prefix, system_suffix=system_suffix) + prompt_prefix + user_prompt + prompt_suffix + response_prefix;
+    print(structured_prompt)
+    lock.acquire()
+    llm.reset()
+    result = llm(
+        structured_prompt,
+        max_tokens=2048,
+        stop=stopTokens,
+        stream=False,
+        temperature=temperature
+    )
+    lock.release()
+    return flask.Response(result["choices"][0]["text"], mimetype="text/plain")
 
 # Actually start the flask server
 if __name__ == "__main__":

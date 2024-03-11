@@ -3,6 +3,7 @@ var tokenElement = null;
 var outputElement = null;
 var currentAudio = null;
 var thinkerElement = null;
+
 var md = markdownit();
 var speechAccumulator = "";
 var textAccumulator = "";
@@ -57,6 +58,7 @@ createWebSocket = function (firstMessage) {
     };
     ws.onclose = function (evt) {
         document.getElementById('dialogue').append(document.createElement('hr'));
+        contextElement.hidden = false;
     };
     ws.onmessage = function (evt) {
         token = evt.data;
@@ -82,6 +84,7 @@ createWebSocket = function (firstMessage) {
     return ws;
 }
 sendPrompt = function () {
+    contextElement.hidden = true;
     var promptElement = document.getElementById('prompt');
     newBotImage = document.getElementById("botImage").cloneNode(true);
 
@@ -122,15 +125,20 @@ sendPrompt = function () {
     outputElement = document.createElement('div');
     outputElement.classList.add('chat-bubble');
     outputElement.classList.add('chat-bubble-info');
+    outputElement.classList.add('prose');
     chatElement.append(outputElement);
     chatElement.classList.add('animate__animated');
     chatElement.classList.add('animate__fadeIn');
     chatElement.classList.add('animate__delay-2s');
     outputElement.append(thinkerElement);
-    if (socket.readyState == 1) {
+    if (socket && socket.readyState == 1) {
         socket.send(promptElement.value);
     } else {
-        socket = createWebSocket(promptElement.value)
+        var firstPrompt = promptElement.value;
+        if(window.firstContextText) {
+          firstPrompt = "|CONTEXT|" + window.firstContextText + "|/CONTEXT|" + promptElement.value; 
+        }
+        socket = createWebSocket(firstPrompt)
     }
     promptElement.value = '';
     textAccumulator = "";
@@ -160,4 +168,4 @@ startDictation = function () {
 }
 
 
-socket = createWebSocket();
+//socket = createWebSocket();
