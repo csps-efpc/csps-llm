@@ -184,38 +184,20 @@ def gpt_socket(personality):
 def gpt(personality):
     prompt = request.args["prompt"]
     
-    #chat_session = rag.get_personality_prefix(personality, system_prefix=system_prefix, system_suffix=system_suffix) + prompt_prefix + prompt + prompt_suffix + response_prefix;
-    #print(chat_session)
-    
-#    if "mathjson" in prompt.lower():
-#        current_temperature = cold_temperature
     lock.acquire()
     llm.reset()
     result=llm.create_chat_completion(
         messages=[
             {
                 "role": "system",
-                "content": personality,
+                "content": rag.get_personality_prefix(personality),
             },
             {"role": "user", "content": prompt},
         ],
         response_format={
             "type": "json_object",
             "schema": {
-                "type": "object",
-                "title": "response_list",
-                "properties": {
-                    "responses": {
-                        "type": "array",
-                        "items": {
-                            "type": "string"
-                        }
-                    },
-                    "answer": {
-                        "type": "boolean"
-                    }
-#                    "required": ["team_name"],
-                },
+                "type": "string",
             }
         },
         temperature=0.7,
@@ -228,23 +210,30 @@ def gpt(personality):
 @app.route("/toil/<personality>", methods=["POST"])
 def toil(personality):
     request_context = request.json
-    user_prompt = request_context["prompt"]
+    prompt = request_context["prompt"]
     rag_text = None
-    
-    del request_context["prompt"]
-    structured_prompt = rag.get_personality_prefix(personality, system_prefix=system_prefix, system_suffix=system_suffix) + prompt_prefix + user_prompt + prompt_suffix + response_prefix;
-    print(structured_prompt)
     lock.acquire()
     llm.reset()
-    result = llm(
-        structured_prompt,
-        max_tokens=2048,
-        stop=stopTokens,
-        stream=False,
-        temperature=temperature
+    response_format = None
+    if('schema' in request_context) :
+        response_format={
+            "type": "json_object",
+            "schema": request_context["schema"]
+        }
+    system_prompt = rag.get_personality_prefix(personality)
+    result=llm.create_chat_completion(
+        messages=[
+            {
+                "role": "system",
+                "content": system_prompt,
+            },
+            {"role": "user", "content": prompt},
+        ],
+        response_format=response_format,
+        temperature=0.7,
     )
     lock.release()
-    return flask.Response(result["choices"][0]["text"], mimetype="text/plain")
+    return flask.Response(result["choices"][0]["message"]["content"], mimetype="application/json")
 
 # Actually start the flask server
 if __name__ == "__main__":
