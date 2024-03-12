@@ -145,13 +145,14 @@ def gpt_socket(personality):
             chat_session = '';
             if(not lock.acquire(blocking=False)):
                 print("Blocking for pre-parsing lock")
+                ws.send("(Currently helping another user...)\n")
                 lock.acquire()
             if((url is not None) or (text is not None)) :
                 chat_session += rag.get_rag_prefix(personality, url, rag_text = text, rag_prefix = rag_source_description, system_prefix=system_prefix, system_suffix=system_suffix)
             else :
                 chat_session += rag.get_personality_prefix(personality, system_prefix=system_prefix, system_suffix=system_suffix) + prompt_prefix
             # At this stage, we're positioned just before the prompt.
-            chat_session += message + prompt_suffix + response_prefix;
+            chat_session += time_prompt + message + prompt_suffix + response_prefix;
             print(chat_session)
             llm.reset()
             while True:
@@ -183,23 +184,45 @@ def gpt_socket(personality):
 def gpt(personality):
     prompt = request.args["prompt"]
     
-    chat_session = rag.get_personality_prefix(personality, system_prefix=system_prefix, system_suffix=system_suffix) + prompt_prefix + prompt + prompt_suffix + response_prefix;
-    print(chat_session)
-    llm.reset()
+    #chat_session = rag.get_personality_prefix(personality, system_prefix=system_prefix, system_suffix=system_suffix) + prompt_prefix + prompt + prompt_suffix + response_prefix;
+    #print(chat_session)
     
 #    if "mathjson" in prompt.lower():
 #        current_temperature = cold_temperature
     lock.acquire()
     llm.reset()
-    result = llm(
-        chat_session,
-        max_tokens=2048,
-        stop=stopTokens,
-        stream=False,
-        temperature=temperature,
+    result=llm.create_chat_completion(
+        messages=[
+            {
+                "role": "system",
+                "content": personality,
+            },
+            {"role": "user", "content": prompt},
+        ],
+        response_format={
+            "type": "json_object",
+            "schema": {
+                "type": "object",
+                "title": "response_list",
+                "properties": {
+                    "responses": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "answer": {
+                        "type": "boolean"
+                    }
+#                    "required": ["team_name"],
+                },
+            }
+        },
+        temperature=0.7,
     )
     lock.release()
-    return flask.Response(result["choices"][0]["text"], mimetype="text/plain")
+    print(result)
+    return flask.Response(result["choices"][0]["message"]["content"], mimetype="text/plain")
 
 
 @app.route("/toil/<personality>", methods=["POST"])
