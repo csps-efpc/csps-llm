@@ -41,7 +41,7 @@ The service supports the creation of an arbitrary number of "personalities" with
 
 ### RAG powers
 
-The websocket endpoint offers certain RAG integrations with public services. Sessions that start with a URL pointing to an HTML page or an RSS/Atom feed will have that URL's content added to the context for the prompt.
+The websocket endpoint offers certain RAG integrations with public services. Sessions that start with a URL pointing to an HTML page or an RSS/Atom feed will have that URL's content added to the context for the prompt. HTML pages that have accessibility semantics, or feeds with good (short) summaries work best.
 
 Similarly, custom context can be used with if a session begins with something like:
 ```
@@ -70,3 +70,10 @@ An HTTP POST-only endpoint that accepts JSON-coded requests of the form:
 }
 ```
 The service will return a well-formed JSON object in every case, and will comply with the provided schema if it's there.
+
+## Contributions
+Nothing makes us happier than sonstrucutve feedback and well-formed PRs - if you're looking to contribute, some areas where we'd love help:
+* Auto-download of models from HuggingFace - easy
+* Support session suspend and restore when several are running concurrently - tricky
+* Switch to using llama-cpp-python's built in chat formatting - easy
+* Improved RAC - use the constrained-schema feature to make the model do grounding on the initial prompt and make better decisions about which source(s) to retrieve. - hard
