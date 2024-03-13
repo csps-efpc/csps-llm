@@ -10,7 +10,7 @@ pip install flask simple_websocket traceback llama_cpp feedparser requests json 
 
 You'll need to download a model to use. We recommend one of the Q4 versions of https://huggingface.co/tsunemoto/bagel-dpo-7b-v0.4-GGUF/tree/main although Mistral-instruct, Mixtral-instruct, and Intel Neural Chat all work extremely well. By default, the app loads the model from the parent of the working directory.
 
-As an absolute minimum, you'll need 12GB of RAM and as much local on-disk storage. To be able to reasonably work with your model, you'll need an AVX2-capable CPU with four real cores (not hyperthreaded).
+As an absolute minimum, you'll need 12GB of RAM and as much local on-disk storage to work with a 7-billion parmeter model. To be able to reasonably work with your model, you'll need an AVX2-capable CPU with four real cores (not hyperthreaded).
 
 Once you've got the basics installed, you can start the service with:
 
@@ -36,13 +36,16 @@ A device that can do CUDA capability 6.1 or better *really* helps (that's Pascal
 
 Brave implementers with other GPUs, extremely new CPUs, or other fancy hardware are encouraged to check out the awesome work at https://github.com/abetlen/llama-cpp-python and to let us know how you make out.
 
+### Personalities
+The service supports the creation of an arbitrary number of "personalities" with their own endpoints, which are implemented as system prompts. Implementers are encouraged to experiment with their own system prompts, as well as the creation of GPT-like applications by stuffing the personalities with the most common facts that their chatbots are asked for. The models recommended above have an effective window of 4000 tokens for this type of applicaiton, but you can plug in whatever model you like! 
+
 ### RAG powers
 
 The websocket endpoint offers certain RAG integrations with public services. Sessions that start with a URL pointing to an HTML page or an RSS/Atom feed will have that URL's content added to the context for the prompt.
 
 Similarly, custom context can be used with if a session begins with something like:
 ```
-|CONTEXT|Your context goes here|\CONTEXT| Your prompt goes here.
+|CONTEXT|Your context goes here|/CONTEXT| Your prompt goes here.
 ```
 ## Endpoints
 The service offers three endpoints:
