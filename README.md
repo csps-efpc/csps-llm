@@ -72,7 +72,7 @@ An HTTP POST-only endpoint that accepts JSON-coded requests of the form:
 The service will return a well-formed JSON object in every case, and will comply with the provided schema if it's there.
 
 ## Contributions
-Nothing makes us happier than sonstrucutve feedback and well-formed PRs - if you're looking to contribute, some areas where we'd love help:
+Nothing makes us happier than constructive feedback and well-formed PRs - if you're looking to contribute, some areas where we'd love help:
 * Auto-download of models from HuggingFace - easy
 * Support session suspend and restore when several are running concurrently - tricky
 * Switch to using llama-cpp-python's built in chat formatting - easy
