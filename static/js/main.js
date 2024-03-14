@@ -22,7 +22,11 @@ addUtterance = function () {
         var encodedText = encodeURIComponent(speechAccumulator);
         if (document.getElementById("speech-toggle").checked) {
             // alternate voice: currentAudio = new Audio("https://psx-xsp.csps-efpc.ca/tts?&voice=en_US%2Fvctk_low%23p283&noiseScale=0.667&noiseW=0.8&lengthScale=1&ssml=false&audioTarget=client&text=" + encodedText);
+            if(document.documentElement.getAttribute("lang") == "fr") {
+            currentAudio = new Audio("https://psx-xsp.csps-efpc.ca/tts?&voice=fr_FR%2Fm-ailabs_low%23nadine_eckert_boulet&noiseScale=0.667&noiseW=0.8&lengthScale=1&ssml=false&audioTarget=client&text=" + encodedText);
+            } else {
             currentAudio = new Audio("https://psx-xsp.csps-efpc.ca/tts?&voice=en_US%2Fhifi-tts_low%2392&noiseScale=0.667&noiseW=0.8&lengthScale=1&ssml=false&audioTarget=client&text=" + encodedText);
+            }
             utteranceQueue.push(currentAudio);
             speechAccumulator = "";
             if (utteranceQueue.length == 1) {

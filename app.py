@@ -94,7 +94,10 @@ def gpt_socket(personality):
         rag_source_description = "The weather forecast for the Ottawa area is:\n"
         url = "https://weather.gc.ca/rss/city/on-118_e.xml"
         ws.send("Checking the forecast...\n")
-
+    elif(("nouvelles").casefold() in folded):
+        rag_source_description = "Les dernieres nouvelles de La Presse sont :\n"
+        url = "https://www.lapresse.ca/actualites/rss"
+        ws.send("Je rassemble les actualités...\n")
     try:
         if CACHE_STATES:
             state = None

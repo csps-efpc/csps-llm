@@ -4,27 +4,54 @@
 <head>
     <title>Chuchotte</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- local resources -->
+    <link href="css/main.css" rel="stylesheet"  />
     <!-- CDN resources -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/daisyui@4.4.20/dist/full.min.css" />
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/markdown-it@14.0.0/dist/markdown-it.min.js"></script>
-    <!-- local resources -->
     <script src="js/main.js"></script>
-    <link href="css/main.css" rel="stylesheet"  />
 </head>
 
 
 <body>
 
     <div class="footer">
-        <div class="join w-full flex">
-            <input type="text" class="input input-bordered join-item grow" id="prompt" />
+        <div class="w-full flex join">
+          <div class="dropdown dropdown-top" id="context_menu">
+            <div tabindex="0" role="button" class="btn join-item" id="context_button">&#x2795;</div>
+            <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52">
+              <li><a onclick="text_input_modal.showModal()">Texte...</a></li>
+              <!-- <li><a>File...</a></li> -->
+            </ul>
+          </div>
+          <input type="text" class="input input-bordered join-item grow" id="prompt" />
             <button id="listen-button" class="btn btn-active join-item" hidden>Écouter &#x1F399;</button>
             <input type="checkbox" id="speech-toggle" aria-label="Parler &#x1F5E3;" name="speech"
                 class="btn btn-outline join-item"></input>
         </div>
     </div>
+    <dialog id="text_input_modal" class="modal">
+      <div class="modal-box">
+        <h3 class="font-bold text-lg">Ajouter du contexte</h3>
+        <p></p>
+        <label class="form-control">
+          <div class="label">
+            <span class="label-text">Rappel : ne soumettez pas d'informations sensibles.</span>
+          </div>
+          <textarea id="text_context_textarea" class="textarea textarea-bordered grow w-full" placeholder="Collez ici..."></textarea>
+        </label>
+        <input id="text_context_prompt" type="text" placeholder="Votre question" class="input input-bordered w-full" />
+        <div class="modal-action">
+          <form method="dialog">
+            <!-- if there is a button in form, it will close the modal -->
+            <button class="btn" id="text_context_ok">OK</button>
+            <button class="btn">Annuler</button>
+          </form>
+        </div>
+      </div>
+    </dialog>
     <hr />
     <img id="botImage" src="img/agent.svg" width="3em" height="3em" />
     <div id="dialogue">
@@ -46,6 +73,20 @@
                 sendPrompt();
             }
         });
+        // Bind the text-context control.
+        var contextOkButton = document.getElementById("text_context_ok");
+        contextOkButton.addEventListener("click", function (event) {
+          window.firstContextText = document.getElementById("text_context_textarea").value;
+          var contextPrompt = document.getElementById("text_context_prompt").value;
+          if(window.firstContextText) {
+            document.getElementById("context_button").classList.add("btn-neutral");
+          }
+          if(contextPrompt) {
+            document.getElementById("prompt").value = contextPrompt;
+            sendPrompt();
+          }
+        });
+        
         if (window.hasOwnProperty('webkitSpeechRecognition')) {
             var listenButton = document.getElementById('listen-button');
             listenButton.hidden = false;
@@ -55,6 +96,7 @@
         }
         input.focus();
         thinkerElement = document.getElementById("thinker");
+        contextElement = document.getElementById("context_menu");
         thinkerElement.parentElement.removeChild(thinkerElement);
         botImage = document.getElementById("botImage");
         botImage.parentElement.removeChild(botImage);
