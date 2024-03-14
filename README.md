@@ -43,6 +43,11 @@ The service supports the creation of an arbitrary number of "personalities" with
 
 The websocket endpoint offers certain RAG integrations with public services. Sessions that start with a URL pointing to an HTML page or an RSS/Atom feed will have that URL's content added to the context for the prompt. HTML pages that have accessibility semantics, or feeds with good (short) summaries work best.
 
+# Example prompts:
+* "Given the weather forecast, what should I wear tomorrow?"
+* "What's the most interesting new learning product from the CSPS?"
+* "What are the latest articles about AI on Busrides?"
+
 Similarly, custom context can be used with if a session begins with something like:
 ```
 |CONTEXT|Your context goes here|/CONTEXT| Your prompt goes here.
@@ -73,6 +78,7 @@ The service will return a well-formed JSON object in every case, and will comply
 
 ## Contributions
 Nothing makes us happier than constructive feedback and well-formed PRs - if you're looking to contribute, some areas where we'd love help:
+* Unit and integration tests - as easy or as hard as you like.
 * Auto-download of models from HuggingFace - easy
 * Support session suspend and restore when several are running concurrently - tricky
 * Switch to using llama-cpp-python's built in chat formatting - easy
