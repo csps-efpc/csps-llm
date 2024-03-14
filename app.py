@@ -28,7 +28,7 @@ rag_prefix = "\nConsider the following:\n"
 rag_suffix = "\nGiven the preceding text, "
 # Initialize the model
 llm = Llama(
-        model_path="../mixtral-8x7b-instruct-v0.1.Q4_0.gguf", n_gpu_layers=0, n_threads=4, numa=True, n_ctx=2048
+        model_path="../bagel-dpo-7b-v0.4.Q4_0.gguf", n_gpu_layers=-1, n_threads=4, numa=False, n_ctx=2048
     )
 
 pleaseWaitText = "\n[Please note that I'm currently helping another user and will be with you as soon as they've finished.]\n"
@@ -183,7 +183,7 @@ def gpt_socket(personality):
 @app.route("/gpt/<personality>", methods=["GET", "POST"])
 def gpt(personality):
     prompt = request.args["prompt"]
-    
+    print(prompt)
     lock.acquire()
     llm.reset()
     result=llm.create_chat_completion(
@@ -194,16 +194,10 @@ def gpt(personality):
             },
             {"role": "user", "content": prompt},
         ],
-        response_format={
-            "type": "json_object",
-            "schema": {
-                "type": "string",
-            }
-        },
         temperature=0.7,
     )
     lock.release()
-    print(result)
+    print(result["choices"][0]["message"]["content"])
     return flask.Response(result["choices"][0]["message"]["content"], mimetype="text/plain")
 
 
@@ -233,7 +227,10 @@ def toil(personality):
         temperature=0.7,
     )
     lock.release()
-    return flask.Response(result["choices"][0]["message"]["content"], mimetype="application/json")
+    if(response_format is None) :
+        return flask.Response(result["choices"][0]["message"]["content"], mimetype="text/plain")
+    else:
+        return flask.Response(result["choices"][0]["message"]["content"], mimetype="application/json")
 
 # Actually start the flask server
 if __name__ == "__main__":
