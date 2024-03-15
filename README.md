@@ -79,7 +79,15 @@ The service will return a well-formed JSON object in every case, and will comply
 ## Contributions
 Nothing makes us happier than constructive feedback and well-formed PRs - if you're looking to contribute, some areas where we'd love help:
 * Unit and integration tests - as easy or as hard as you like.
-* Auto-download of models from HuggingFace - easy
+* Auto-download of models from HuggingFace - trivial
+* Add more public RSS/Atom sources as RAG feeds - easy
+* Add server-side RAG fact databases - medium
+* Move model configuration to environment variables configured at runtime, with sane defaults - trivial
+* - OR - Move model configuration to being attributes of "personalities", and make them hot-swap during execution. - easy
+* Finish the a11y work, particularly around `aria-live`. - moderate
 * Support session suspend and restore when several are running concurrently - tricky
 * Switch to using llama-cpp-python's built in chat formatting - easy
 * Improved RAC - use the constrained-schema feature to make the model do grounding on the initial prompt and make better decisions about which source(s) to retrieve. - hard
+* Write a webhook binding for MS Teams - medium
+* Write a webhook binding for Slack/Discord - medium
+* Make installation auto-detect the best back-end available, and configure it automatically. - hard
