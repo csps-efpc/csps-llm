@@ -1,6 +1,8 @@
 # csps-llm
 A base for Government of Canada LLM services like chatbots, RAGs, and batch processors. This is the engine behind the CSPS' "Whisper" and "Chuchotte" demo services.
 
+**Please Note:** - the contents of this repo have not (yet) been endorsed by an architecture review board or other governance body.
+
 ### Getting Started
 
 Given a base install of both Python 3 and `pip`, install dependencies with:
