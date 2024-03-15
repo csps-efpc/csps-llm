@@ -5,7 +5,7 @@ A base for Government of Canada LLM services like chatbots, RAGs, and batch proc
 
 Given a base install of both Python 3 and `pip`, install dependencies with:
 ```
-pip install flask simple_websocket traceback llama_cpp feedparser requests json bs4
+pip install flask simple_websocket llama_cpp feedparser requests bs4 huggingface_hub
 ```
 
 You'll need to download a model to use. We recommend one of the Q4 versions of https://huggingface.co/tsunemoto/bagel-dpo-7b-v0.4-GGUF/tree/main although Mistral-instruct, Mixtral-instruct, and Intel Neural Chat all work extremely well. By default, the app loads the model from the parent of the working directory.
@@ -79,7 +79,7 @@ The service will return a well-formed JSON object in every case, and will comply
 ## Contributions
 Nothing makes us happier than constructive feedback and well-formed PRs - if you're looking to contribute, some areas where we'd love help:
 * Unit and integration tests - as easy or as hard as you like.
-* Auto-download of models from HuggingFace - trivial
+* ~~Auto-download of models from HuggingFace - trivial~~
 * Add more public RSS/Atom sources as RAG feeds - easy
 * Add server-side RAG fact databases - medium
 * Move model configuration to environment variables configured at runtime, with sane defaults - trivial
