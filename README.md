@@ -1,7 +1,7 @@
 # csps-llm
 A base for Government of Canada LLM services like chatbots, RAGs, and batch processors. This is the engine behind the CSPS' "Whisper" and "Chuchotte" demo services.
 
-**Please Note:** - the contents of this repo have not (yet) been endorsed by an architecture review board or other governance body.
+**Please Note:** - the contents of this repo have not (yet) been endorsed by an architecture review board or other governance body. Any use of artificial intelligence by GoC users needs to comply with the appropriate TBS and departmental policies.
 
 ### Getting Started
 
@@ -9,9 +9,6 @@ Given a base install of both Python 3 and `pip`, install dependencies with:
 ```
 pip install flask simple_websocket llama_cpp feedparser requests bs4 huggingface_hub
 ```
-
-You'll need to download a model to use. We recommend one of the Q4 versions of https://huggingface.co/tsunemoto/bagel-dpo-7b-v0.4-GGUF/tree/main although Mistral-instruct, Mixtral-instruct, and Intel Neural Chat all work extremely well. By default, the app loads the model from the parent of the working directory.
-
 As an absolute minimum, you'll need 12GB of RAM and as much local on-disk storage to work with a 7-billion parmeter model. To be able to reasonably work with your model, you'll need an AVX2-capable CPU with four real cores (not hyperthreaded).
 
 Once you've got the basics installed, you can start the service with:
@@ -19,7 +16,7 @@ Once you've got the basics installed, you can start the service with:
 ```
 python app.py
 ```
-and then browse to `http://localhost:5000/static/index.html`.
+on the first invocation, it'll download about 4GB of model. You can then browse to `http://localhost:5000/static/index.html`.
 
 ### Going fast
 
