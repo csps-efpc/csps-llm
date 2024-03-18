@@ -15,14 +15,14 @@ lock = threading.Lock()
 #Global setting - should we try to cache states?
 CACHE_STATES = False
 # Stop tokens
-stopTokens = ["[/INST]","[INST]","</s>","User:", "Assistant:"]
+stopTokens = ["[/INST]","[INST]","</s>","User:", "Assistant:", "<|im_end|>"]
 temperature = 0.8
 # Prompt parts
-system_prefix="[INST]\n"
-system_suffix="\n[/INST]\n"
-prompt_prefix = "\nUser: "
-prompt_suffix = " \n"
-response_prefix = "Assistant: "
+system_prefix="<|im_start|>system\n"
+system_suffix="<|im_end|>\n"
+prompt_prefix = "<|im_start|>user\n"
+prompt_suffix = "<|im_end|>\n"
+response_prefix = "<|im_start|>assistant\n"
 response_suffix = ""
 rag_prefix = "\nConsider the following:\n"
 rag_suffix = "\nGiven the preceding text, "
@@ -33,10 +33,10 @@ rag_suffix = "\nGiven the preceding text, "
 #    )
 
 llm = Llama.from_pretrained(
-    repo_id="tsunemoto/bagel-dpo-7b-v0.4-GGUF",
+    repo_id="MaziyarPanahi/Experiment26-7B-GGUF",
     filename="*Q4_K_M.gguf",
     verbose=False,
-    n_gpu_layers=18, # -1 for "the whole thing, if supported"
+    n_gpu_layers=-1, # -1 for "the whole thing, if supported"
     n_threads=4, 
     numa=False, 
     n_ctx=2048
