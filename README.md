@@ -18,6 +18,13 @@ python app.py
 ```
 on the first invocation, it'll download about 4GB of model. You can then browse to `http://localhost:5000/static/index.html`.
 
+## Model config
+The choice of models can be configured at runtime using environment variables:
+* `LLM_MODEL_FILE` - path to the GGUF-formatted model to load. If present, overrides any other path settings.
+* `LLM_HUGGINGFACE_REPO` - huggingface repo ID from which to load the model
+* `LLM_HUGGINGFACE_FILE` - hugginface file reference from which to load the model. Can use wildcards like "*Q4_K_M.gguf".
+* `LLM_GPU_LAYERS` - Number of model layers to load onto the GPU. By default, the runtime tries to load all of them if there's a GPU present, or none if there isn't. You only need to set this if you're loading a model that doesn't fit completely on your GPU.
+
 ### Going fast
 
 If you have a CUDA-capable GPU, you can make the endpoint use it by following a few additional steps:

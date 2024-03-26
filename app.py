@@ -1,3 +1,4 @@
+import os
 import flask
 import rag
 from flask import redirect, render_template, request
@@ -27,19 +28,27 @@ response_suffix = ""
 rag_prefix = "\nConsider the following:\n"
 rag_suffix = "\nGiven the preceding text, "
 # Initialize the model
-# If you want to pull your model from somewhere other than huggingface, use the following instead of the from_pretrained method.
-#llm = Llama(
-#        model_path="../bagel-dpo-7b-v0.4.Q4_0.gguf", n_gpu_layers=-1, n_threads=4, numa=False, n_ctx=2048
-#    )
 
-llm = Llama.from_pretrained(
-    repo_id="tsunemoto/bagel-dpo-7b-v0.4-GGUF",
-    filename="*Q4_K_M.gguf",
-    verbose=False,
-    n_gpu_layers=18, # -1 for "the whole thing, if supported"
-    n_threads=4, 
-    numa=False, 
-    n_ctx=2048
+llm_local_file=os.environ.get("LLM_MODEL_FILE", None)
+llm_hf_repo=os.environ.get("LLM_HUGGINGFACE_REPO", "tsunemoto/bagel-dpo-7b-v0.4-GGUF")
+llm_hf_filename=os.environ.get("LLM_HUGGINGFACE_FILE", "*Q4_K_M.gguf")
+llm_gpu_layers=int(os.environ.get("LLM_GPU_LAYERS", "-1")) # -1 for "the whole thing, if supported"
+
+llm = None
+
+if(llm_local_file is not None) :
+    llm = Llama(
+        model_path=llm_local_file, n_gpu_layers=llm_gpu_layers, n_threads=4, numa=False, n_ctx=2048
+    )
+else:
+    llm = Llama.from_pretrained(
+        repo_id=llm_hf_repo,
+        filename=llm_hf_filename,
+        verbose=False,
+        n_gpu_layers=llm_gpu_layers, 
+        n_threads=4, 
+        numa=False, 
+        n_ctx=2048
     )
 
 pleaseWaitText = "\n[Please note that I'm currently helping another user and will be with you as soon as they've finished.]\n"
