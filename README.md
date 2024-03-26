@@ -88,7 +88,7 @@ Nothing makes us happier than constructive feedback and well-formed PRs - if you
 * ~~Auto-download of models from HuggingFace - trivial~~
 * Add more public RSS/Atom sources as RAG feeds - easy
 * Add server-side RAG fact databases - medium
-* Move model configuration to environment variables configured at runtime, with sane defaults - trivial
+* ~~Move model configuration to environment variables configured at runtime, with sane defaults - trivial~~
 * - OR - Move model configuration to being attributes of "personalities", and make them hot-swap during execution. - easy
 * Finish the a11y work, particularly around `aria-live`. - moderate
 * Support session suspend and restore when several are running concurrently - tricky
