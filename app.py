@@ -92,10 +92,16 @@ def gpt_socket(personality):
             url = "https://api.io.canada.ca/io-server/gc/news/en/v2?topic=health&sort=publishedDate&orderBy=desc&pick=5&format=atom&atomtitle=Health"
         if("tech".casefold() in folded):
             url = "https://www.cbc.ca/webfeed/rss/rss-technology"
+        if("gaming".casefold() in folded):
+            url = "https://kotaku.com/rss"
         if("sport".casefold() in folded):
             url = "https://www.cbc.ca/webfeed/rss/rss-sports"
+        if("financ".casefold() in folded):
+            url = "https://financialpost.com/feed"
         if("ottawa".casefold() in folded):
             url = "https://www.cbc.ca/webfeed/rss/rss-canada-ottawa"
+        if("ottawa citizen".casefold() in folded):
+            url = "https://ottawacitizen.com/feed"
         ws.send("Checking the news...\n")
     elif("busrides".casefold() in folded):
         rag_source_description = "Busrides is a series of articles from the CSPS. Busrides is not about riding public transit. What follows is a list of the newest article titles and summaries from Busrides:\n"

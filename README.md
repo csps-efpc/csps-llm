@@ -87,6 +87,7 @@ Nothing makes us happier than constructive feedback and well-formed PRs - if you
 * Unit and integration tests - as easy or as hard as you like.
 * ~~Auto-download of models from HuggingFace - trivial~~
 * Add more public RSS/Atom sources as RAG feeds - easy
+* Make the RSS/Atom RAG retriever configurable at runtime - medium
 * Add server-side RAG fact databases - medium
 * ~~Move model configuration to environment variables configured at runtime, with sane defaults - trivial~~
 * - OR - Move model configuration to being attributes of "personalities", and make them hot-swap during execution. - easy
