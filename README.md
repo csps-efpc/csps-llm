@@ -24,6 +24,8 @@ The choice of models can be configured at runtime using environment variables:
 * `LLM_HUGGINGFACE_REPO` - huggingface repo ID from which to load the model
 * `LLM_HUGGINGFACE_FILE` - hugginface file reference from which to load the model. Can use wildcards like "*Q4_K_M.gguf".
 * `LLM_GPU_LAYERS` - Number of model layers to load onto the GPU. By default, the runtime tries to load all of them if there's a GPU present, or none if there isn't. You only need to set this if you're loading a model that doesn't fit completely on your GPU.
+* `LLM_CONTEXT_WINDOW` - size of the context window to allocate - must be equal or less than the maximum context window supported by the model
+* `LLM_CPU_THREADS` - Number of hardware threads to allocate to inference. The ideal number is the number of real (ie not SMT, nor hyperthreaded) cores your system has.
 
 ### Going fast
 
