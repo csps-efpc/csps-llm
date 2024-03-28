@@ -1,6 +1,7 @@
 import feedparser
 import requests
 import json
+import os
 from bs4 import BeautifulSoup
 from datetime import datetime
 
@@ -8,6 +9,37 @@ personalities = json.load(open("personalities.json"))
 
 personality_cache = {}
 
+default_llm_local_file=os.environ.get("LLM_MODEL_FILE", None)
+default_llm_hf_repo=os.environ.get("LLM_HUGGINGFACE_REPO", "tsunemoto/bagel-dpo-7b-v0.4-GGUF")
+default_llm_hf_filename=os.environ.get("LLM_HUGGINGFACE_FILE", "*Q4_K_M.gguf")
+default_llm_gpu_layers=int(os.environ.get("LLM_GPU_LAYERS", "-1")) # -1 for "the whole thing, if supported"
+default_llm_context_window=int(os.environ.get("LLM_CONTEXT_WINDOW", "2048"))
+default_llm_cpu_threads=int(os.environ.get("LLM_CPU_THREADS", "4"))
+
+
+def get_model_spec(personality):
+    returnable = {
+        'hf_repo': default_llm_hf_repo,
+        'hf_filename': default_llm_hf_filename,
+        'local_file': default_llm_local_file,
+        'gpu_layers': default_llm_gpu_layers,
+        'context_window': default_llm_context_window,
+        'cpu_threads': default_llm_cpu_threads
+    }
+    if 'hf_repo' in personalities[personality] :
+        returnable['hf_repo'] = personalities[personality]['hf_repo'] 
+    if 'hf_filename' in personalities[personality] :
+        returnable['hf_filename'] = personalities[personality]['hf_filename']     
+    if 'local_file' in personalities[personality] :
+        returnable['local_file'] = personalities[personality]['local_file'] 
+    if 'gpu_layers' in personalities[personality] :
+        returnable['gpu_layers'] = personalities[personality]['gpu_layers'] 
+    if 'context_window' in personalities[personality] :
+        returnable['context_window'] = personalities[personality]['context_window'] 
+    if 'cpu_threads' in personalities[personality] :
+        returnable['cpu_threads'] = personalities[personality]['cpu_threads'] 
+    return returnable
+    
 def get_personality_prefix(personality, system_prefix = '', system_suffix = ''):
     """Retrieves the model state for the given personality, calculating it if necessary."""
     imperative = ""

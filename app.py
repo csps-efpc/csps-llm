@@ -1,4 +1,4 @@
-import os
+
 import flask
 import rag
 from flask import redirect, render_template, request
@@ -29,33 +29,46 @@ rag_prefix = "\nConsider the following:\n"
 rag_suffix = "\nGiven the preceding text, "
 # Initialize the model
 
-llm_local_file=os.environ.get("LLM_MODEL_FILE", None)
-llm_hf_repo=os.environ.get("LLM_HUGGINGFACE_REPO", "tsunemoto/bagel-dpo-7b-v0.4-GGUF")
-llm_hf_filename=os.environ.get("LLM_HUGGINGFACE_FILE", "*Q4_K_M.gguf")
-llm_gpu_layers=int(os.environ.get("LLM_GPU_LAYERS", "-1")) # -1 for "the whole thing, if supported"
-llm_context_window=int(os.environ.get("LLM_CONTEXT_WINDOW", "2048"))
-llm_cpu_threads=int(os.environ.get("LLM_CPU_THREADS", "4"))
 
-
-llm = None
-
-if(llm_local_file is not None) :
-    llm = Llama(
-        model_path=llm_local_file, n_gpu_layers=llm_gpu_layers, n_threads=llm_cpu_threads, numa=False, n_ctx=llm_context_window
-    )
-else:
-    llm = Llama.from_pretrained(
-        repo_id=llm_hf_repo,
-        filename=llm_hf_filename,
-        verbose=False,
-        n_gpu_layers=llm_gpu_layers, 
-        n_threads=llm_cpu_threads, 
-        numa=False, 
-        n_ctx=llm_context_window
-    )
 
 pleaseWaitText = "\n[Please note that I'm currently helping another user and will be with you as soon as they've finished.]\n"
 
+__cached_llm = None
+__cached_personality = None
+
+def getLlm(personality):
+    global __cached_llm
+    global __cached_personality
+    if not lock.locked():
+        #The method has been called by a thread not holding the lock.
+        raise Error('Attempted to control the LLM without holding the exclusivity lock.')
+    if(personality == __cached_personality):
+        __cached_llm.reset()
+        return __cached_llm    
+    llm = None
+    llm_spec = rag.get_model_spec(personality)
+    if(llm_spec['local_file'] is not None) :
+        llm = Llama(
+            model_path=llm_spec['local_file'], 
+            n_gpu_layers=llm_spec['gpu_layers'], 
+            n_threads=llm_spec['cpu_threads'], 
+            numa=False, 
+            n_ctx=llm_spec['context_window']
+        )
+    else:
+        llm = Llama.from_pretrained(
+            repo_id=llm_spec['hf_repo'],
+            filename=llm_spec['hf_filename'],
+            verbose=True,
+            n_gpu_layers=llm_spec['gpu_layers'], 
+            n_threads=llm_spec['cpu_threads'], 
+            numa=False, 
+            n_ctx=llm_spec['context_window']
+        )
+    __cached_llm = llm
+    __cached_personality = personality
+    return llm
+    
 
 @app.route("/gpt-socket/<personality>", websocket=True)
 def gpt_socket(personality):
@@ -186,7 +199,7 @@ def gpt_socket(personality):
             # At this stage, we're positioned just before the prompt.
             chat_session += time_prompt + message + prompt_suffix + response_prefix;
             print(chat_session)
-            llm.reset()
+            llm = getLlm(personality)
             while True:
                 stream = llm(
                     chat_session,
@@ -217,7 +230,7 @@ def gpt(personality):
     prompt = request.args["prompt"]
     print(prompt)
     lock.acquire()
-    llm.reset()
+    llm=getLlm(personality)
     result=llm.create_chat_completion(
         messages=[
             {
@@ -239,7 +252,7 @@ def toil(personality):
     prompt = request_context["prompt"]
     rag_text = None
     lock.acquire()
-    llm.reset()
+    llm=getLlm(personality)
     response_format = None
     if('schema' in request_context) :
         response_format={
