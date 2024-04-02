@@ -44,7 +44,9 @@ def getLlm(personality):
         raise Error('Attempted to control the LLM without holding the exclusivity lock.')
     if(personality == __cached_personality):
         __cached_llm.reset()
-        return __cached_llm    
+        return __cached_llm
+    if(__cached_llm is not None) :
+        __cached_llm._model.__del__()
     llm = None
     llm_spec = rag.get_model_spec(personality)
     if(llm_spec['local_file'] is not None) :
