@@ -53,7 +53,8 @@ nextUtterance = function () {
 }
 
 createWebSocket = function (firstMessage) {
-    var ws = new WebSocket(makeSocketAddress("whisper"));
+    var personality = window.personality ? window.personality : "whisper";
+    var ws = new WebSocket(makeSocketAddress(personality));
     var conversationStarter = firstMessage;
     ws.onopen = function () {
         if (conversationStarter) {
