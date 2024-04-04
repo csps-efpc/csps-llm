@@ -1,4 +1,4 @@
-
+# Import necessary libraries
 import flask
 import rag
 from flask import redirect, render_template, request
@@ -8,16 +8,15 @@ import threading
 import traceback
 from datetime import datetime
 
-# Initialize the LLM model
+# Initialize the Flask app and a thread lock for the LLM model
 app = flask.Flask(__name__) #, static_url_path=''
-# Create an exclusive lock on the model state.
 lock = threading.Lock()
 
-#Global setting - should we try to cache states?
+# Global settings and constants
 CACHE_STATES = False
-# Stop tokens
 stopTokens = ["[/INST]","[INST]","</s>","User:", "Assistant:"]
 temperature = 0.8
+
 # Prompt parts
 system_prefix="[INST]\n"
 system_suffix="\n[/INST]\n"
@@ -27,15 +26,12 @@ response_prefix = "Assistant: "
 response_suffix = ""
 rag_prefix = "\nConsider the following:\n"
 rag_suffix = "\nGiven the preceding text, "
-# Initialize the model
-
-
-
 pleaseWaitText = "\n[Please note that I'm currently helping another user and will be with you as soon as they've finished.]\n"
 
 __cached_llm = None
 __cached_personality = None
 
+# Function to get the LLM model based on the provided personality
 def getLlm(personality):
     global __cached_llm
     global __cached_personality
@@ -71,7 +67,7 @@ def getLlm(personality):
     __cached_personality = personality
     return llm
     
-
+# Flask route for handling websocket connections for user conversations
 @app.route("/gpt-socket/<personality>", websocket=True)
 def gpt_socket(personality):
     ws = Server.accept(request.environ)
@@ -226,7 +222,7 @@ def gpt_socket(personality):
         pass
     return ''
 
-# Plain old webservice endpoints
+# Flask route for handling plain old webservice endpoints
 @app.route("/gpt/<personality>", methods=["GET", "POST"])
 def gpt(personality):
     prompt = request.args["prompt"]
@@ -247,7 +243,7 @@ def gpt(personality):
     print(result["choices"][0]["message"]["content"])
     return flask.Response(result["choices"][0]["message"]["content"], mimetype="text/plain")
 
-
+# Flask route for handling 'toil' requests having JSON bodies
 @app.route("/toil/<personality>", methods=["POST"])
 def toil(personality):
     request_context = request.json
@@ -279,7 +275,7 @@ def toil(personality):
     else:
         return flask.Response(result["choices"][0]["message"]["content"], mimetype="application/json")
 
-# Actually start the flask server
+# Start the Flask server
 if __name__ == "__main__":
     app.run(host="0.0.0.0")
 
