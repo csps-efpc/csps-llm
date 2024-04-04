@@ -1,3 +1,4 @@
+# Import necessary libraries
 import feedparser
 import requests
 import json
@@ -5,10 +6,13 @@ import os
 from bs4 import BeautifulSoup
 from datetime import datetime
 
+# Load personalities from a JSON file
 personalities = json.load(open("personalities.json"))
 
+# Initialize a dictionary to cache personalities
 personality_cache = {}
 
+# Define default values for various parameters
 default_llm_local_file=os.environ.get("LLM_MODEL_FILE", None)
 default_llm_hf_repo=os.environ.get("LLM_HUGGINGFACE_REPO", "tsunemoto/bagel-dpo-7b-v0.4-GGUF")
 default_llm_hf_filename=os.environ.get("LLM_HUGGINGFACE_FILE", "*Q4_K_M.gguf")
@@ -16,7 +20,7 @@ default_llm_gpu_layers=int(os.environ.get("LLM_GPU_LAYERS", "-1")) # -1 for "the
 default_llm_context_window=int(os.environ.get("LLM_CONTEXT_WINDOW", "2048"))
 default_llm_cpu_threads=int(os.environ.get("LLM_CPU_THREADS", "4"))
 
-
+# Function to get model specification for a given personality
 def get_model_spec(personality):
     returnable = {
         'hf_repo': default_llm_hf_repo,
@@ -26,6 +30,7 @@ def get_model_spec(personality):
         'context_window': default_llm_context_window,
         'cpu_threads': default_llm_cpu_threads
     }
+    # Update the returnable dictionary with personality-specific values if they exist
     if 'hf_repo' in personalities[personality] :
         returnable['hf_repo'] = personalities[personality]['hf_repo'] 
     if 'hf_filename' in personalities[personality] :
@@ -40,15 +45,15 @@ def get_model_spec(personality):
         returnable['cpu_threads'] = personalities[personality]['cpu_threads'] 
     return returnable
     
+# Function to get the personality prefix
 def get_personality_prefix(personality, system_prefix = '', system_suffix = ''):
-    """Retrieves the model state for the given personality, calculating it if necessary."""
-    imperative = ""
-    #print("Fetching personality for " + personality + "...")
+    # Retrieve the imperative for the given personality
     imperative = personalities[personality]['imperative']
-    personality_prefix = system_prefix + imperative + system_suffix; 
-    #print (personality_prefix)
+    # Create the personality prefix by concatenating the system prefix, imperative, and system suffix
+    personality_prefix = system_prefix + imperative + system_suffix
     return personality_prefix
 
+# Function to get a personality state
 def get_personality_state(personality, model, system_prefix = '', system_suffix = ''):
     """Retrieves the model state for the given personality, calculating it if necessary."""
     if(personality not in personality_cache.keys() and personality in personalities.keys() and 'imperative' in personalities[personality].keys()) :
@@ -60,13 +65,17 @@ def get_personality_state(personality, model, system_prefix = '', system_suffix 
             personality_cache[personality] = state;     
     return personality_cache[personality]
 
+# Function to get RAG prefix
 def get_rag_prefix(personality, url, rag_prefix='Consider the following content:\n', rag_suffix='\nGiven the preceding content, ', system_prefix="", system_suffix="", max_url_content_length = 4096, prompt_prefix="", rag_text = None):
+    # If a URL is provided, fetch the text from the URL
     if url :
       rag_text = fetchUrlText(url, max_url_content_length)
+    # Create the RAG prefix by concatenating the personality prefix, prompt prefix, RAG prefix, RAG text, current date and time, and RAG suffix
     personality_prefix = get_personality_prefix(personality, system_prefix, system_suffix)
     returnable = (personality_prefix + prompt_prefix + rag_prefix + rag_text + getDateTimeText() + rag_suffix) 
     return returnable
 
+# Function to get RAG state
 def get_rag_state(personality, model, url, user_prefix = '', rag_prefix='Consider the following content:\n', rag_suffix='\nGiven the preceding content, ', system_prefix="", system_suffix="", max_url_content_length = 4096, rag_text = None):
     """Retrieves a state for the given personality that incorporates the given url as RAG context. The state will be positioned just before the user prompt."""
     model.load_state(get_personality_state(personality, model, system_prefix, system_suffix))
@@ -75,10 +84,12 @@ def get_rag_state(personality, model, url, user_prefix = '', rag_prefix='Conside
     state = model.save_state()
     return state
 
+# Function to get the current date and time as a prompt-part
 def getDateTimeText():
     now = datetime.now()
     return """\n\n Today's date is {0}. The current time is {1}.""".format(now.strftime("%A, %B %-d, %Y"), now.strftime("%I:%M %p %Z"))
 
+# Function to fetch text from a URL, parsing HTML and feed formats
 def fetchUrlText(url, max_url_content_length):
     returnable = ""
     res = requests.head(url)
