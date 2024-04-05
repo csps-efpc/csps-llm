@@ -1,4 +1,5 @@
 # Import necessary libraries
+import gc
 import flask
 import rag
 from flask import redirect, render_template, request
@@ -14,7 +15,7 @@ lock = threading.Lock()
 
 # Global settings and constants
 CACHE_STATES = False
-stopTokens = ["[/INST]","[INST]","</s>","User:", "Assistant:"]
+stopTokens = ["[/INST]","[INST]","</s>","User:", "Assistant:", "[/ASK]", "[INFO]"]
 temperature = 0.8
 
 # Prompt parts
@@ -42,7 +43,8 @@ def getLlm(personality):
         __cached_llm.reset()
         return __cached_llm
     if(__cached_llm is not None) :
-        __cached_llm._model.__del__()
+        del __cached_llm
+        gc.collect()
     llm = None
     llm_spec = rag.get_model_spec(personality)
     if(llm_spec['local_file'] is not None) :
