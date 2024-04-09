@@ -68,6 +68,11 @@ def getLlm(personality):
     __cached_llm = llm
     __cached_personality = personality
     return llm
+
+# Flask route to bounnce users to the default UI
+@app.route('/')
+def root_redir():
+    return redirect("/static/index.html", code=302)
     
 # Flask route for handling websocket connections for user conversations
 @app.route("/gpt-socket/<personality>", websocket=True)
