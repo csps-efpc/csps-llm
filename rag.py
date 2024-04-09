@@ -46,11 +46,14 @@ def get_model_spec(personality):
     return returnable
     
 # Function to get the personality prefix
-def get_personality_prefix(personality, system_prefix = '', system_suffix = ''):
+def get_personality_prefix(personality, system_prefix = '', system_suffix = '', include_time = True):
     # Retrieve the imperative for the given personality
     imperative = personalities[personality]['imperative']
     # Create the personality prefix by concatenating the system prefix, imperative, and system suffix
-    personality_prefix = system_prefix + imperative + system_suffix
+    personality_prefix = system_prefix + imperative
+    if(include_time) :
+        personality_prefix = personality_prefix + getDateTimeText()
+    personality_prefix = personality_prefix + system_suffix
     return personality_prefix
 
 # Function to get a personality state
@@ -72,7 +75,7 @@ def get_rag_prefix(personality, url, rag_prefix='Consider the following content:
       rag_text = fetchUrlText(url, max_url_content_length)
     # Create the RAG prefix by concatenating the personality prefix, prompt prefix, RAG prefix, RAG text, current date and time, and RAG suffix
     personality_prefix = get_personality_prefix(personality, system_prefix, system_suffix)
-    returnable = (personality_prefix + prompt_prefix + rag_prefix + rag_text + getDateTimeText() + rag_suffix) 
+    returnable = (personality_prefix + prompt_prefix + rag_prefix + rag_text + rag_suffix) 
     return returnable
 
 # Function to get RAG state
@@ -80,7 +83,7 @@ def get_rag_state(personality, model, url, user_prefix = '', rag_prefix='Conside
     """Retrieves a state for the given personality that incorporates the given url as RAG context. The state will be positioned just before the user prompt."""
     model.load_state(get_personality_state(personality, model, system_prefix, system_suffix))
     rag_text = get_rag_prefix(personality, model, url, user_prefix = '', rag_prefix=rag_prefix, rag_suffix=rag_suffix, system_prefix=system_prefix, system_suffix=system_suffix, max_url_content_length = 4096, rag_text=rag_text)
-    model.eval(model.tokenize((rag_prefix + rag_text + getDateTimeText() + rag_suffix).encode()))
+    model.eval(model.tokenize((rag_prefix + rag_text + rag_suffix).encode()))
     state = model.save_state()
     return state
 
