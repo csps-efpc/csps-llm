@@ -6,6 +6,7 @@ from flask import redirect, render_template, request
 from simple_websocket import Server, ConnectionClosed
 from llama_cpp import Llama
 import threading
+import uuid
 import traceback
 from datetime import datetime
 
@@ -14,9 +15,9 @@ app = flask.Flask(__name__) #, static_url_path=''
 lock = threading.Lock()
 
 # Global settings and constants
-CACHE_STATES = False
 stopTokens = ["[/INST]","[INST]","</s>","User:", "Assistant:", "[/ASK]", "[INFO]"]
 temperature = 0.8
+session_cache_size = 100
 
 # Prompt parts
 system_prefix="[INST]\n"
@@ -31,6 +32,7 @@ pleaseWaitText = "\n[Please note that I'm currently helping another user and wil
 
 __cached_llm = None
 __cached_personality = None
+__cached_sessions = {}
 
 # Function to get the LLM model based on the provided personality
 def getLlm(personality):
@@ -40,7 +42,7 @@ def getLlm(personality):
         #The method has been called by a thread not holding the lock.
         raise Error('Attempted to control the LLM without holding the exclusivity lock.')
     if(personality == __cached_personality):
-        __cached_llm.reset()
+    #    __cached_llm.reset()
         return __cached_llm
     if(__cached_llm is not None) :
         del __cached_llm
@@ -86,8 +88,13 @@ def gpt_socket(personality):
     folded = message.casefold()
     url = None
     text = None
+    sessionkey = uuid.uuid4().urn
     rag_source_description = ""
     ## TODO: make this bit modular.
+    if(message.startswith("|SESSION|")):
+        s = message[9:].split("""|/SESSION|""",1)
+        message = s[1]
+        sessionkey = s[0]
     if(message.startswith("|CONTEXT|")):
         s = message[9:].split("""|/CONTEXT|""",1)
         message = s[1]
@@ -145,88 +152,56 @@ def gpt_socket(personality):
         rag_source_description = "Les dernieres nouvelles de La Presse sont :\n"
         url = "https://www.lapresse.ca/actualites/rss"
         ws.send("Je rassemble les actualités...\n")
-    try:
-        if CACHE_STATES:
-            state = None
-            if(not lock.acquire(blocking=False)):
-                print("Blocking for pre-parsing lock")
-                lock.acquire()
-            if(url is not None) :
-                state = rag.get_rag_state(personality, llm, url, rag_text = text, rag_prefix = rag_prefix+rag_source_description, rag_suffix = rag_suffix, user_prefix=prompt_prefix, system_prefix=system_prefix, system_suffix=system_suffix)
-            else :
-                state = rag.get_personality_state(personality, llm, system_prefix=system_prefix, system_suffix=system_suffix)
-                # We tuck the beginning of the user interaction in, because we've got no RAG headers.
-                message = prompt_prefix + message
-            # At this stage, we're positioned just before the prompt.
-            lock.release()
-            message += prompt_suffix + response_prefix;
 
-            while True:
-                print(message)
-                accumulator = '';
-                token_bytes = bytearray()
-                # Get a lock on the model.    
-                if(not lock.acquire(blocking=False)):
-                    print("Blocking for lock")
-                    lock.acquire()
-                llm.load_state(state)    
-                llm.eval(llm.tokenize(message.encode()))
-                token = llm.sample()
-                token_bytes.extend(llm.detokenize([token]))
-                while token is not llm.token_eos():
-                    try:
-                        token_string = token_bytes.decode()
-                        print(token_string, end='', flush=True)
-                        ws.send(token_string)
-                        accumulator += token_string
-                        token_bytes = bytearray()
-                    except UnicodeError as e:
-                        pass # because the token bytes contain an unfinished unicode sequence.
-                    llm.eval([token])
-                    token = llm.sample()
-                    token_bytes.extend(llm.detokenize([token]))
-                llm.eval([token]) # Ensure that the model evaluates its own end-of-sequence.
-                state = llm.save_state()
-                lock.release()
-                ws.send("<END>")
-                # We wait for a subsequent user prompt, and the cycle begins anew.
-                message = prompt_prefix + ws.receive() + prompt_suffix + response_prefix;
-        else: #We run the event loop with no cached states, and the lock blocks the llm the whole time.
-            chat_session = '';
-            if(not lock.acquire(blocking=False)):
-                print("Blocking for pre-parsing lock")
-                ws.send("(Currently helping another user...)\n")
-                lock.acquire()
+    chat_session = ''
+
+    try:
+        if(not lock.acquire(blocking=False)):
+            print("Blocking for pre-parsing lock")
+            ws.send("(Currently helping another user...)\n")
+            lock.acquire()
+        if(sessionkey in __cached_sessions) :
+            chat_session = __cached_sessions.get(sessionkey, '')
+        else :
             if((url is not None) or (text is not None)) :
                 chat_session += rag.get_rag_prefix(personality, url, rag_text = text, rag_prefix = rag_source_description, system_prefix=system_prefix, system_suffix=system_suffix)
             else :
                 chat_session += rag.get_personality_prefix(personality, system_prefix=system_prefix, system_suffix=system_suffix) + prompt_prefix
-            # At this stage, we're positioned just before the prompt.
-            chat_session += time_prompt + message + prompt_suffix + response_prefix;
-            print(chat_session)
-            llm = getLlm(personality)
-            while True:
-                stream = llm(
-                    chat_session,
-                    max_tokens=2048,
-                    stop=stopTokens,
-                    stream=True,
-                    temperature=temperature
-                )
-                for tok in stream:
-                    token_string = tok["choices"][0]["text"]
-                    chat_session += token_string
-                    print(token_string, end='', flush=True)
-                    ws.send(token_string)
-                # For some reason - this method doesn't require the EOS token in the stream?!?! chat_session += llm.token_eos()
-                ws.send("<END>")
-                # We wait for a subsequent user prompt, and the cycle begins anew.
-                chat_session += prompt_prefix + ws.receive() + prompt_suffix + response_prefix;
+        # At this stage, we're positioned just before the prompt.
+        chat_session += message + prompt_suffix + response_prefix;
+        print(chat_session)
+        llm = getLlm(personality)
+        stream = llm(
+            chat_session,
+            max_tokens=2048,
+            stop=stopTokens,
+            stream=True,
+            temperature=temperature
+        )
+        for tok in stream:
+            token_string = tok["choices"][0]["text"]
+            chat_session += token_string
+            print(token_string, end='', flush=True)
+            ws.send(token_string)
+        # For some reason - this method doesn't require the EOS token in the stream?!?! chat_session += llm.token_eos()
+        ws.send("<END "+sessionkey+">")
+        print("End session " + sessionkey)
+        # We prepare the session for a subsequent user prompt, and the cycle begins anew.
+        chat_session += prompt_prefix;
+
     except Exception as e:
         print(e)
-        if(lock.locked()):
-            lock.release()
-        pass
+        pass;
+    if(lock.locked()):
+        lock.release()
+    # remove the cached session from whrever it is in the cache so it gets reinserted at the tail.
+    if(sessionkey in __cached_sessions):
+        del __cached_sessions[sessionkey]
+    # add the session to the tail of the cache
+    __cached_sessions[sessionkey] = chat_session
+    # shrink the cache if necessary
+    while(len(__cached_sessions) > session_cache_size):
+        del dict[(next(iter(dict)))]
     return ''
 
 # Flask route for handling plain old webservice endpoints

@@ -22,10 +22,10 @@ addUtterance = function () {
         var encodedText = encodeURIComponent(speechAccumulator);
         if (document.getElementById("speech-toggle").checked) {
             // alternate voice: currentAudio = new Audio("https://psx-xsp.csps-efpc.ca/tts?&voice=en_US%2Fvctk_low%23p283&noiseScale=0.667&noiseW=0.8&lengthScale=1&ssml=false&audioTarget=client&text=" + encodedText);
-            if(document.documentElement.getAttribute("lang") == "fr") {
-            currentAudio = new Audio("https://psx-xsp.csps-efpc.ca/tts?&voice=fr_FR%2Fm-ailabs_low%23nadine_eckert_boulet&noiseScale=0.667&noiseW=0.8&lengthScale=1&ssml=false&audioTarget=client&text=" + encodedText);
+            if (document.documentElement.getAttribute("lang") == "fr") {
+                currentAudio = new Audio("https://psx-xsp.csps-efpc.ca/tts?&voice=fr_FR%2Fm-ailabs_low%23nadine_eckert_boulet&noiseScale=0.667&noiseW=0.8&lengthScale=1&ssml=false&audioTarget=client&text=" + encodedText);
             } else {
-            currentAudio = new Audio("https://psx-xsp.csps-efpc.ca/tts?&voice=en_US%2Fhifi-tts_low%2392&noiseScale=0.667&noiseW=0.8&lengthScale=1&ssml=false&audioTarget=client&text=" + encodedText);
+                currentAudio = new Audio("https://psx-xsp.csps-efpc.ca/tts?&voice=en_US%2Fhifi-tts_low%2392&noiseScale=0.667&noiseW=0.8&lengthScale=1&ssml=false&audioTarget=client&text=" + encodedText);
             }
             utteranceQueue.push(currentAudio);
             speechAccumulator = "";
@@ -52,23 +52,22 @@ nextUtterance = function () {
     }
 }
 
-createWebSocket = function (firstMessage) {
+createWebSocket = function (prompt) {
     var personality = window.personality ? window.personality : "whisper";
     var ws = new WebSocket(makeSocketAddress(personality));
-    var conversationStarter = firstMessage;
+    var conversationStarter = prompt;
     ws.onopen = function () {
-        if (conversationStarter) {
-            ws.send(conversationStarter);
-        }
+        ws.send(prompt);
     };
     ws.onclose = function (evt) {
-        document.getElementById('dialogue').append(document.createElement('hr'));
-        contextElement.hidden = false;
+        //        contextElement.hidden = false;
     };
     ws.onmessage = function (evt) {
         token = evt.data;
-        if (token == "<END>") {
+        if (token.startsWith("<END ")) {
             addUtterance();
+            window.llmSessionId = token.substring(5, token.length - 1)
+            ws.close();
             // Do any UI work that marks the end of the interaction here.
         } else {
             textAccumulator += token;
@@ -139,11 +138,13 @@ sendPrompt = function () {
     if (socket && socket.readyState == 1) {
         socket.send(promptElement.value);
     } else {
-        var firstPrompt = promptElement.value;
-        if(window.firstContextText) {
-          firstPrompt = "|CONTEXT|" + window.firstContextText + "|/CONTEXT|" + promptElement.value; 
+        var nextMessage = promptElement.value;
+        if (window.llmSessionId) {
+            nextMessage = "|SESSION|" + window.llmSessionId + "|/SESSION|" + promptElement.value;
+        } else if (window.firstContextText) {
+            nextMessage = "|CONTEXT|" + window.firstContextText + "|/CONTEXT|" + promptElement.value;
         }
-        socket = createWebSocket(firstPrompt)
+        socket = createWebSocket(nextMessage)
     }
     promptElement.value = '';
     textAccumulator = "";
