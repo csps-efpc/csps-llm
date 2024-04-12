@@ -7,7 +7,7 @@ from simple_websocket import Server, ConnectionClosed
 from llama_cpp import Llama
 import threading
 import uuid
-import traceback
+import time
 from datetime import datetime
 
 # Initialize the Flask app and a thread lock for the LLM model
@@ -185,10 +185,11 @@ def gpt_socket(personality):
             ws.send(token_string)
         # For some reason - this method doesn't require the EOS token in the stream?!?! chat_session += llm.token_eos()
         ws.send("<END "+sessionkey+">")
+        ws.send(" ") #Junk frame to ensure the previous one gets flushed?
         print("End session " + sessionkey)
         # We prepare the session for a subsequent user prompt, and the cycle begins anew.
         chat_session += prompt_prefix;
-
+        
     except Exception as e:
         print(e)
         pass;
@@ -202,6 +203,7 @@ def gpt_socket(personality):
     # shrink the cache if necessary
     while(len(__cached_sessions) > session_cache_size):
         del dict[(next(iter(dict)))]
+    time.sleep(0.5)
     return ''
 
 # Flask route for handling plain old webservice endpoints
