@@ -231,6 +231,8 @@ def toil(personality):
     request_context = request.json
     prompt = request_context["prompt"]
     rag_text = None
+    if('text' in request_context):
+        rag_text = request_context['text']
     lock.acquire()
     llm=getLlm(personality)
     response_format = None
@@ -240,6 +242,10 @@ def toil(personality):
             "schema": request_context["schema"]
         }
     system_prompt = rag.get_personality_prefix(personality)
+
+    if(rag_text is not None):
+        prompt = "Consider the following text: " + rag_text + "\n\nGiven the preceding text, " + prompt
+    
     result=llm.create_chat_completion(
         messages=[
             {
