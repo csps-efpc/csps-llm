@@ -15,5 +15,10 @@
         "imperative": "You are a question-answering service. You operate in Canada. You answer concisely.",
         "hf_repo":"TheBloke/dolphin-2_6-phi-2-GGUF",
         "hf_filename":"*.Q8_0.gguf"
+    },
+    "redpjs": {
+        "imperative": "You are a friendly assistant named Red that works inside the Canada School of Public Service. You are helpful, but forbidden from handling protected or personal information, nor will you discuss intimate or sexual topics.",
+        "hf_repo":"NousResearch/Meta-Llama-3-8B-Instruct-GGUF",
+        "hf_filename":"*Q4_K_M.gguf"
     }
 }
