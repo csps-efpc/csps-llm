@@ -1,5 +1,6 @@
 # Import necessary libraries
 import gc
+import re
 import flask
 import rag
 from flask import redirect, render_template, request
@@ -9,6 +10,7 @@ import threading
 import uuid
 import time
 from datetime import datetime
+from duckduckgo_search import DDGS
 
 # Initialize the Flask app and a thread lock for the LLM model
 app = flask.Flask(__name__) #, static_url_path=''
@@ -95,7 +97,7 @@ def gpt_socket(personality):
         s = message[9:].split("""|/SESSION|""",1)
         message = s[1]
         sessionkey = s[0]
-    if(message.startswith("|CONTEXT|")):
+    elif(message.startswith("|CONTEXT|")):
         s = message[9:].split("""|/CONTEXT|""",1)
         message = s[1]
         text = s[0]
@@ -152,6 +154,18 @@ def gpt_socket(personality):
         rag_source_description = "Les dernieres nouvelles de La Presse sont :\n"
         url = "https://www.lapresse.ca/actualites/rss"
         ws.send("Je rassemble les actualités...\n")
+    elif(personality == 'redpjs'):
+        reflection = ask("If the following text is a question that could be answered with a Wikipedia search, answer with a query that would return a relevant article. Answer with only the query as a quoted string, or \"none\". Do not answer anything after the quoted string.\n\n" + message, personality)
+        print(reflection)
+        matches = re.search(r'"([^"]+)"', reflection)
+        if(matches is not None and matches.group(1) is not "none") :
+            query = matches.group(1) + " site:wikipedia.org"
+            results = DDGS().text(query)
+            if(results) :
+                wikiarticle = results[0]
+                rag_source_description = "The page \""+wikiarticle['title']+"\" at "+ wikiarticle['href'] +" says:\n"
+                url = wikiarticle['href']
+                ws.send("Reading ["+ wikiarticle['title'] +"](" + url + ")\n")
 
     chat_session = ''
 
@@ -211,6 +225,9 @@ def gpt_socket(personality):
 def gpt(personality):
     prompt = request.args["prompt"]
     print(prompt)
+    return flask.Response(ask(prompt, personality), mimetype="text/plain")
+
+def ask(prompt, personality="whisper"):
     lock.acquire()
     llm=getLlm(personality)
     result=llm.create_chat_completion(
@@ -224,9 +241,7 @@ def gpt(personality):
         temperature=0.7,
     )
     lock.release()
-    print(result["choices"][0]["message"]["content"])
-    return flask.Response(result["choices"][0]["message"]["content"], mimetype="text/plain")
-
+    return result["choices"][0]["message"]["content"]
 
 # Flask route for handling 'toil' requests having JSON bodies
 @app.route("/toil/<personality>", methods=["POST"])

@@ -101,7 +101,9 @@ def fetchUrlText(url, max_url_content_length):
         res = requests.get(url)
         html_page = res.content
         soup = BeautifulSoup(html_page, 'html.parser')
-        if(soup('main')) :
+        if(soup.find('div', {'class':"mw-body-content"})) :
+            returnable = soup.find('div', {'class':"mw-body-content"}).text
+        elif(soup.find('main')) :
             returnable = soup.find('main').get_text()
         else :
             returnable = soup.find('body').get_text()
