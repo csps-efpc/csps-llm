@@ -20,6 +20,7 @@ lock = threading.Lock()
 stopTokens = ["[/INST]","[INST]","</s>","User:", "Assistant:", "[/ASK]", "[INFO]"]
 temperature = 0.8
 session_cache_size = 100
+max_url_content_length = 4000
 
 # Prompt parts
 system_prefix="[INST]\n"
@@ -158,7 +159,7 @@ def gpt_socket(personality):
         reflection = ask("If the following text is a question that could be answered with a Wikipedia search, answer with a query that would return a relevant article. Answer with only the query as a quoted string, or \"none\". Do not answer anything after the quoted string.\n\n" + message, personality)
         print(reflection)
         matches = re.search(r'"([^"]+)"', reflection)
-        if(matches is not None and matches.group(1) is not "none") :
+        if(matches is not None and matches.group(1) != "none") :
             query = matches.group(1) + " site:wikipedia.org"
             results = DDGS().text(query)
             if(results) :
@@ -167,7 +168,7 @@ def gpt_socket(personality):
                 url = wikiarticle['href']
                 ws.send("Reading ["+ wikiarticle['title'] +"](" + url + ")\n")
 
-    chat_session = ''
+    chat_session = []
 
     try:
         if(not lock.acquire(blocking=False)):
@@ -176,34 +177,40 @@ def gpt_socket(personality):
             lock.acquire()
         if(sessionkey in __cached_sessions) :
             chat_session = __cached_sessions.get(sessionkey, '')
+            chat_session.append({"role": "user", "content": message})
         else :
-            if((url is not None) or (text is not None)) :
-                chat_session += rag.get_rag_prefix(personality, url, rag_text = text, rag_prefix = rag_source_description, system_prefix=system_prefix, system_suffix=system_suffix)
-            else :
-                chat_session += rag.get_personality_prefix(personality, system_prefix=system_prefix, system_suffix=system_suffix) + prompt_prefix
-        # At this stage, we're positioned just before the prompt.
-        chat_session += message + prompt_suffix + response_prefix;
+            first_prompt = ''
+            chat_session.append({"role": "system", "content": rag.get_personality_prefix(personality)})
+            if(url is not None):
+                text = rag.fetchUrlText(url, max_url_content_length) 
+            if(text is not None) :
+                first_prompt += 'Consider the following content:\n' + text + '\nGiven the preceding content, '
+            first_prompt += message
+            chat_session.append({"role": "user", "content": first_prompt})
+
         print(chat_session)
         llm = getLlm(personality)
-        stream = llm(
+        stream = llm.create_chat_completion(
             chat_session,
             max_tokens=2048,
             stop=stopTokens,
             stream=True,
             temperature=temperature
         )
+        response =''
         for tok in stream:
-            token_string = tok["choices"][0]["text"]
-            chat_session += token_string
-            print(token_string, end='', flush=True)
-            ws.send(token_string)
+            if(("content" in tok["choices"][0]['delta'].keys())) :
+                token_string = tok["choices"][0]['delta']["content"]
+                response += token_string
+                print(token_string, end='', flush=True)
+                ws.send(token_string)
         # For some reason - this method doesn't require the EOS token in the stream?!?! chat_session += llm.token_eos()
         ws.send("<END "+sessionkey+">")
         ws.send(" ") #Junk frame to ensure the previous one gets flushed?
         print("End session " + sessionkey)
         # We prepare the session for a subsequent user prompt, and the cycle begins anew.
-        chat_session += prompt_prefix;
-        
+        chat_session.append({"role": "assistant", "content": response});
+        # TODO: if and when the cache moves out of process memory to a K-V store, the chat session will need to get written to that cache.
     except Exception as e:
         print(e)
         pass;
