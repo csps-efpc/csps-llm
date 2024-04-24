@@ -96,7 +96,7 @@ Nothing makes us happier than constructive feedback and well-formed PRs - if you
 * ~~- AND - Move model configuration to being attributes of "personalities", and make them hot-swap during execution. - easy~~
 * Finish the a11y work, particularly around `aria-live`. - moderate
 * ~~Support session suspend and restore when several are running concurrently - tricky~~
-* Switch to using llama-cpp-python's built in chat formatting - easy
+* ~~Switch to using llama-cpp-python's built in chat formatting - easy~~
 * Improved RAG - use the constrained-schema feature to make the model do grounding on the initial prompt and make better decisions about which source(s) to retrieve. - ~~hard~~ trivial, now that the RAG base is complete.
 * Write a webhook binding for MS Teams - medium
 * Write a webhook binding for Slack/Discord - medium
