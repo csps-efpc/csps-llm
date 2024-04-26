@@ -7,7 +7,7 @@ A base for Government of Canada LLM services like chatbots, RAGs, and batch proc
 
 Given a base install of both Python 3 and `pip`, install dependencies with:
 ```
-pip install flask simple_websocket llama_cpp feedparser requests bs4 huggingface_hub
+pip install flask simple_websocket llama_cpp_python feedparser requests bs4 huggingface_hub duckduckgo_search
 ```
 As an absolute minimum, you'll need 12GB of RAM and as much local on-disk storage to work with a 7-billion parmeter model. To be able to reasonably work with your model, you'll need an AVX2-capable CPU with four real cores (not hyperthreaded).
 
@@ -37,7 +37,7 @@ If you have a CUDA-capable GPU, you can make the endpoint use it by following a 
 Once you've got the prerequisites, reinstall the llama_cpp library with CUDA support:
 
 ```
-CMAKE_ARGS="-DLLAMA_CUBLAS=on" pip install llama-cpp-python --upgrade --force-reinstall --no-cache-dir
+CMAKE_ARGS="-DLLAMA_CUDA=on" pip install llama_cpp_python --upgrade --force-reinstall --no-cache-dir
 ```
 
 A device that can do CUDA capability 6.1 or better *really* helps (that's Pascal, GTX 1000, or better). The "Whisper" demo at the CSPS uses a single GTX 1070.
@@ -88,15 +88,16 @@ The service will return a well-formed JSON object in every case, and will comply
 Nothing makes us happier than constructive feedback and well-formed PRs - if you're looking to contribute, some areas where we'd love help:
 * Unit and integration tests - as easy or as hard as you like.
 * ~~Auto-download of models from HuggingFace - trivial~~
-* Add more public RSS/Atom sources as RAG feeds - easy
+* ~~Add more public RSS/Atom sources as RAG feeds - easy~~
+* ~~Add true RAG - medium~~
 * Make the RSS/Atom RAG retriever configurable at runtime - medium
 * Add server-side RAG fact databases - medium
 * ~~Move model configuration to environment variables configured at runtime, with sane defaults - trivial~~
 * ~~- AND - Move model configuration to being attributes of "personalities", and make them hot-swap during execution. - easy~~
 * Finish the a11y work, particularly around `aria-live`. - moderate
-* Support session suspend and restore when several are running concurrently - tricky
-* Switch to using llama-cpp-python's built in chat formatting - easy
-* Improved RAG - use the constrained-schema feature to make the model do grounding on the initial prompt and make better decisions about which source(s) to retrieve. - hard
+* ~~Support session suspend and restore when several are running concurrently - tricky~~
+* ~~Switch to using llama-cpp-python's built in chat formatting - easy~~
+* Improved RAG - use the constrained-schema feature to make the model do grounding on the initial prompt and make better decisions about which source(s) to retrieve. - ~~hard~~ trivial, now that the RAG base is complete.
 * Write a webhook binding for MS Teams - medium
 * Write a webhook binding for Slack/Discord - medium
 * Make installation auto-detect the best back-end available, and configure it automatically. - hard
