@@ -17,7 +17,7 @@ app = flask.Flask(__name__) #, static_url_path=''
 lock = threading.Lock()
 
 # Global settings and constants
-stopTokens = ["[/INST]","[INST]","</s>","User:", "Assistant:", "[/ASK]", "[INFO]"]
+stopTokens = ["<|assistant|>", "<|end|>", "[/INST]","[INST]","</s>","User:", "Assistant:", "[/ASK]", "[INFO]"]
 temperature = 0.8
 session_cache_size = 100
 max_url_content_length = 4000
@@ -155,7 +155,7 @@ def gpt_socket(personality):
         rag_source_description = "Les dernieres nouvelles de La Presse sont :\n"
         url = "https://www.lapresse.ca/actualites/rss"
         ws.send("Je rassemble les actualités...\n")
-    elif(personality == 'redpjs'):
+    elif(personality in ['redpjs', 'phiona'] ):
         reflection = ask("If the following text is a question that could be answered with a Wikipedia search, answer with a query that would return a relevant article. Answer with only the query as a quoted string, or \"none\". Do not answer anything after the quoted string.\n\n" + message, personality)
         print(reflection)
         matches = re.search(r'"([^"]+)"', reflection)
@@ -246,6 +246,7 @@ def ask(prompt, personality="whisper"):
             {"role": "user", "content": prompt},
         ],
         temperature=0.7,
+        stop=stopTokens
     )
     lock.release()
     return result["choices"][0]["message"]["content"]

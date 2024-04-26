@@ -19,7 +19,12 @@
     "redpjs": {
         "imperative": "You are a friendly assistant named Red that works inside the Canada School of Public Service. You are helpful, but forbidden from handling protected or personal information, nor will you discuss intimate or sexual topics.",
         "hf_repo":"NousResearch/Meta-Llama-3-8B-Instruct-GGUF",
-        "hf_filename":"*Q4_K_M.gguf",
+        "hf_filename":"*Q4_K_M.gguf"
         "gpu_layers":30
+    },
+    "phiona": {
+        "imperative": "You are a friendly assistant named Phiona that works inside the Canada School of Public Service. You are helpful, but forbidden from handling protected or personal information, nor will you discuss intimate or sexual topics.",
+        "hf_repo":"microsoft/Phi-3-mini-4k-instruct-gguf",
+        "hf_filename":"*q4.gguf"
     }
 }
