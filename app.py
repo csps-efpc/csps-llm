@@ -163,10 +163,10 @@ def gpt_socket(personality):
             query = matches.group(1) + " site:wikipedia.org"
             results = DDGS().text(query)
             if(results) :
-                wikiarticle = results[0]
-                rag_source_description = "The page \""+wikiarticle['title']+"\" at "+ wikiarticle['href'] +" says:\n"
-                url = wikiarticle['href']
-                ws.send("Reading ["+ wikiarticle['title'] +"](" + url + ")\n")
+                top_article = results[0]
+                rag_source_description = "The page \""+top_article['title']+"\" at "+ top_article['href'] +" says:\n"
+                url = top_article['href']
+                ws.send("Reading ["+ top_article['title'] +"](" + url + ")\n")
 
     chat_session = []
 

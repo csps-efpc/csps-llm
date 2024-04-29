@@ -50,3 +50,12 @@ strong {
 em {
     font-style: italic !important;
 }
+a:link {
+    color: blue !important;
+    text-decoration: underline !important;
+}
+a:visited {
+    color: purple !important;
+    text-decoration: underline !important;
+}
+
