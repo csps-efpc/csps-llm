@@ -161,7 +161,7 @@ def gpt_socket(personality):
         print(reflection)
         matches = re.search(r'"([^"]+)"', reflection)
         if(matches is not None and matches.group(1) != "none") :
-            query = matches.group(1) + " site:" + rag_spec['rag_domain']
+            query = matches.group(1) + " site:" + (" OR site:".join(rag_spec['rag_domain'].split('|')))
             results = DDGS().text(query)
             if(results) :
                 top_article = results[0]
