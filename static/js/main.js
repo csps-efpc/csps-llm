@@ -128,7 +128,7 @@ sendPrompt = function () {
     chatElement.append(avatarElement);
     outputElement = document.createElement('div');
     outputElement.classList.add('chat-bubble');
-    outputElement.classList.add('chat-bubble-info');
+    outputElement.classList.add('chat-bubble-primary');
     outputElement.classList.add('prose');
     chatElement.append(outputElement);
     chatElement.classList.add('animate__animated');
@@ -171,6 +171,32 @@ startDictation = function () {
             recognition.stop();
         };
     }
+}
+introSpeech = function (firstPhrase) {
+    var dialogueElement = document.getElementById('dialogue');
+    chatElement = document.createElement('div');
+    chatElement.classList.add('chat');
+    chatElement.classList.add('chat-start');
+    avatarElement = document.createElement('div');
+    avatarElement.classList.add('chat-image');
+    avatarElement.classList.add('avatar');
+    avatarHolderElement = document.createElement('div');
+    avatarHolderElement.classList.add("w-10");
+    avatarHolderElement.classList.add("rounded-full");
+    avatarHolderElement.append(botImage);
+    avatarElement.append(avatarHolderElement);
+    chatElement.append(avatarElement);
+    outputElement = document.createElement('div');
+    outputElement.classList.add('chat-bubble');
+    outputElement.classList.add('chat-bubble-primary');
+
+    outputElement.append(document.createTextNode(firstPhrase));
+    // outputElement.classList.add('bot');
+    dialogueElement.append(chatElement);
+    chatElement.append(outputElement);
+    outputElement.classList.add('animate__animated');
+    outputElement.classList.add('animate__fadeIn');
+    outputElement.classList.add('animate__delay-2s');
 }
 
 
