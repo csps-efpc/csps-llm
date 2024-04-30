@@ -28,6 +28,7 @@ def get_model_spec(personality):
         'local_file': default_llm_local_file,
         'gpu_layers': default_llm_gpu_layers,
         'context_window': default_llm_context_window,
+        'rag_domain': None,
         'cpu_threads': default_llm_cpu_threads
     }
     # Update the returnable dictionary with personality-specific values if they exist
@@ -41,6 +42,8 @@ def get_model_spec(personality):
         returnable['gpu_layers'] = personalities[personality]['gpu_layers'] 
     if 'context_window' in personalities[personality] :
         returnable['context_window'] = personalities[personality]['context_window'] 
+    if 'rag_domain' in personalities[personality] :
+        returnable['rag_domain'] = personalities[personality]['rag_domain'] 
     if 'cpu_threads' in personalities[personality] :
         returnable['cpu_threads'] = personalities[personality]['cpu_threads'] 
     return returnable

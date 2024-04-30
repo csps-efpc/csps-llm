@@ -2,136 +2,113 @@
 <html lang="en" data-theme="autumn">
 
 <head>
-    <title>Red PJs</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- local resources -->
-    <link href="css/main.css" rel="stylesheet"  />
-    <!-- CDN resources -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/daisyui@4.4.20/dist/full.min.css" />
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/markdown-it@14.0.0/dist/markdown-it.min.js"></script>
-    <script src="js/main.js"></script>
-    <script>
-        window.personality = "redpjs";
-    </script>
+  <title>Red PJs</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- local resources -->
+  <link href="css/main.css" rel="stylesheet" />
+  <!-- CDN resources -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/daisyui@4.4.20/dist/full.min.css" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/markdown-it@14.0.0/dist/markdown-it.min.js"></script>
+  <script src="js/main.js"></script>
+  <script>
+    window.personality = "redpjs";
+  </script>
 </head>
 
 
 <body>
 
-    <div class="footer">
-        <div class="w-full flex join">
-          <div class="dropdown dropdown-top" id="context_menu">
-            <div tabindex="0" role="button" class="btn join-item" id="context_button">&#x2795;</div>
-            <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52">
-              <li><a onclick="text_input_modal.showModal()">Text...</a></li>
-              <!-- <li><a>File...</a></li> -->
-            </ul>
-          </div>
-          <input type="text" class="input input-bordered join-item grow" id="prompt" />
-            <button id="listen-button" class="btn btn-active join-item" hidden>Listen &#x1F399;</button>
-            <input type="checkbox" id="speech-toggle" aria-label="Speak &#x1F5E3;" name="speech"
-                class="btn btn-outline join-item"></input>
-        </div>
-    </div>
-    <dialog id="text_input_modal" class="modal">
-      <div class="modal-box">
-        <h3 class="font-bold text-lg">Add context</h3>
-        <p></p>
-        <label class="form-control">
-          <div class="label">
-            <span class="label-text">Reminder: do not submit any information subject to sensitivity.</span>
-          </div>
-          <textarea id="text_context_textarea" class="textarea textarea-bordered grow w-full" placeholder="Paste here..."></textarea>
-        </label>
-        <input id="text_context_prompt" type="text" placeholder="Your question" class="input input-bordered w-full" />
-        <div class="modal-action">
-          <form method="dialog">
-            <!-- if there is a button in form, it will close the modal -->
-            <button class="btn" id="text_context_ok">OK</button>
-            <button class="btn">Cancel</button>
-          </form>
-        </div>
+  <div class="footer">
+    <div class="w-full flex join">
+      <div class="dropdown dropdown-top" id="context_menu">
+        <div tabindex="0" role="button" class="btn join-item" id="context_button">&#x2795;</div>
+        <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52">
+          <li><a onclick="text_input_modal.showModal()">Text...</a></li>
+          <!-- <li><a>File...</a></li> -->
+        </ul>
       </div>
-    </dialog>
-    <hr />
-    <img id="botImage" src="img/red.png" width="3em" height="3em" />
-    <div id="dialogue">
-
+      <input type="text" class="input input-bordered join-item grow" id="prompt" />
+      <button id="listen-button" class="btn btn-active join-item" hidden>Listen &#x1F399;</button>
+      <input type="checkbox" id="speech-toggle" aria-label="Speak &#x1F5E3;" name="speech"
+        class="btn btn-outline join-item"></input>
     </div>
-    <!--div id="thinker">&#x1F914;</div-->
-    <span id="thinker" class="loading loading-dots loading-sm"></span>
-    <script>
+  </div>
+  <dialog id="text_input_modal" class="modal">
+    <div class="modal-box">
+      <h3 class="font-bold text-lg">Add context</h3>
+      <p></p>
+      <label class="form-control">
+        <div class="label">
+          <span class="label-text">Reminder: do not submit any information subject to sensitivity.</span>
+        </div>
+        <textarea id="text_context_textarea" class="textarea textarea-bordered grow w-full"
+          placeholder="Paste here..."></textarea>
+      </label>
+      <input id="text_context_prompt" type="text" placeholder="Your question" class="input input-bordered w-full" />
+      <div class="modal-action">
+        <form method="dialog">
+          <!-- if there is a button in form, it will close the modal -->
+          <button class="btn" id="text_context_ok">OK</button>
+          <button class="btn">Cancel</button>
+        </form>
+      </div>
+    </div>
+  </dialog>
+  <hr />
+  <img id="botImage" src="img/red.png" width="3em" height="3em" />
+  <div id="dialogue">
 
-        // Bind the "enter" keystroke.
-        var input = document.getElementById("prompt");
+  </div>
+  <!--div id="thinker">&#x1F914;</div-->
+  <span id="thinker" class="loading loading-dots loading-sm"></span>
+  <script>
 
-        input.addEventListener("keypress", function (event) {
-            if (currentAudio) {
-                currentAudio.pause();
-            }
-            if (event.key === "Enter") {
-                event.preventDefault();
-                sendPrompt();
-            }
-        });
-        // Bind the text-context control.
-        var contextOkButton = document.getElementById("text_context_ok");
-        contextOkButton.addEventListener("click", function (event) {
-          window.firstContextText = document.getElementById("text_context_textarea").value;
-          var contextPrompt = document.getElementById("text_context_prompt").value;
-          if(window.firstContextText) {
-            document.getElementById("context_button").classList.add("btn-neutral");
-          }
-          if(contextPrompt) {
-            document.getElementById("prompt").value = contextPrompt;
-            sendPrompt();
-          }
-        });
-        
-        if (window.hasOwnProperty('webkitSpeechRecognition')) {
-            var listenButton = document.getElementById('listen-button');
-            listenButton.hidden = false;
-            listenButton.addEventListener("click", function (event) {
-                startDictation();
-            });
-        }
-        input.focus();
-        thinkerElement = document.getElementById("thinker");
-        contextElement = document.getElementById("context_menu");
-        thinkerElement.parentElement.removeChild(thinkerElement);
-        botImage = document.getElementById("botImage");
-        botImage.parentElement.removeChild(botImage);
-        // Set up the first interaction
-        window.addEventListener("load", function (event) {
+    // Bind the "enter" keystroke.
+    var input = document.getElementById("prompt");
 
-            var dialogueElement = document.getElementById('dialogue');
-            chatElement = document.createElement('div');
-            chatElement.classList.add('chat');
-            chatElement.classList.add('chat-start');
-            avatarElement = document.createElement('div');
-            avatarElement.classList.add('chat-image');
-            avatarElement.classList.add('avatar');
-            avatarHolderElement = document.createElement('div');
-            avatarHolderElement.classList.add("w-10");
-            avatarHolderElement.classList.add("rounded-full");
-            avatarHolderElement.append(botImage);
-            avatarElement.append(avatarHolderElement);
-            chatElement.append(avatarElement);
-            outputElement = document.createElement('div');
-            outputElement.classList.add('chat-bubble');
-            outputElement.classList.add('chat-bubble-info');
+    input.addEventListener("keypress", function (event) {
+      if (currentAudio) {
+        currentAudio.pause();
+      }
+      if (event.key === "Enter") {
+        event.preventDefault();
+        sendPrompt();
+      }
+    });
+    // Bind the text-context control.
+    var contextOkButton = document.getElementById("text_context_ok");
+    contextOkButton.addEventListener("click", function (event) {
+      window.firstContextText = document.getElementById("text_context_textarea").value;
+      var contextPrompt = document.getElementById("text_context_prompt").value;
+      if (window.firstContextText) {
+        document.getElementById("context_button").classList.add("btn-neutral");
+      }
+      if (contextPrompt) {
+        document.getElementById("prompt").value = contextPrompt;
+        sendPrompt();
+      }
+    });
 
-            outputElement.append(document.createTextNode("Hello, my name is Red. I'm a Large Language Model that works for the CSPS. I'm only allowed to handle unclassified information, and if you use anything I write, please make sure that people know that an AI wrote it. How can I help you today?"));
-            // outputElement.classList.add('bot');
-            dialogueElement.append(chatElement);
-            chatElement.append(outputElement);
-            outputElement.classList.add('animate__animated');
-            outputElement.classList.add('animate__fadeIn');
-            outputElement.classList.add('animate__delay-2s');
-        });
-    </script>
+    if (window.hasOwnProperty('webkitSpeechRecognition')) {
+      var listenButton = document.getElementById('listen-button');
+      listenButton.hidden = false;
+      listenButton.addEventListener("click", function (event) {
+        startDictation();
+      });
+    }
+    input.focus();
+    thinkerElement = document.getElementById("thinker");
+    contextElement = document.getElementById("context_menu");
+    thinkerElement.parentElement.removeChild(thinkerElement);
+    botImage = document.getElementById("botImage");
+    botImage.parentElement.removeChild(botImage);
+    // Set up the first interaction
+    window.addEventListener("load", function (event) {
+      introSpeech("Hello, my name is Red. I'm a Large Language Model that works for the CSPS. I'm only allowed to handle unclassified information, and if you use anything I write, please make sure that people know that an AI wrote it. How can I help you today?");
+    });
+  </script>
 </body>
 
 </html>

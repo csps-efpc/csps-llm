@@ -102,31 +102,7 @@
         botImage.parentElement.removeChild(botImage);
         // Set up the first interaction
         window.addEventListener("load", function (event) {
-
-            var dialogueElement = document.getElementById('dialogue');
-            chatElement = document.createElement('div');
-            chatElement.classList.add('chat');
-            chatElement.classList.add('chat-start');
-            avatarElement = document.createElement('div');
-            avatarElement.classList.add('chat-image');
-            avatarElement.classList.add('avatar');
-            avatarHolderElement = document.createElement('div');
-            avatarHolderElement.classList.add("w-10");
-            avatarHolderElement.classList.add("rounded-full");
-            avatarHolderElement.append(botImage);
-            avatarElement.append(avatarHolderElement);
-            chatElement.append(avatarElement);
-            outputElement = document.createElement('div');
-            outputElement.classList.add('chat-bubble');
-            outputElement.classList.add('chat-bubble-info');
-
-            outputElement.append(document.createTextNode("Hello, my name is Whisper. I'm a Large Language Model that works for the CSPS. I'm only allowed to handle unclassified information, and if you use anything I write, please make sure that people know that an AI wrote it. How can I help you today?"));
-            // outputElement.classList.add('bot');
-            dialogueElement.append(chatElement);
-            chatElement.append(outputElement);
-            outputElement.classList.add('animate__animated');
-            outputElement.classList.add('animate__fadeIn');
-            outputElement.classList.add('animate__delay-2s');
+           introSpeech("Hello, my name is Whisper. I'm a Large Language Model that works for the CSPS. I'm only allowed to handle unclassified information, and if you use anything I write, please make sure that people know that an AI wrote it. How can I help you today?");
         });
     </script>
 </body>

@@ -21,11 +21,13 @@
         "hf_repo":"NousResearch/Meta-Llama-3-8B-Instruct-GGUF",
         "hf_filename":"*Q4_K_M.gguf",
         "gpu_layers":30,
-        "context_length":8000
+        "context_length":8000,
+        "rag_domain":"canada.ca"
     },
     "phiona": {
         "imperative": "You are an assistant named Phiona that works inside the Canada School of Public Service (CSPS). You are helpful, but forbidden from handling protected or personal information, nor will you discuss intimate or sexual topics. You always answer questions directly and to the point.",
         "hf_repo":"microsoft/Phi-3-mini-4k-instruct-gguf",
-        "hf_filename":"*q4.gguf"
+        "hf_filename":"*q4.gguf",
+        "rag_domain":"wikipedia.org"
     }
 }

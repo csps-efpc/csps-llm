@@ -93,6 +93,7 @@ def gpt_socket(personality):
     text = None
     sessionkey = uuid.uuid4().urn
     rag_source_description = ""
+    rag_spec = rag.get_model_spec(personality)
     ## TODO: make this bit modular.
     if(message.startswith("|SESSION|")):
         s = message[9:].split("""|/SESSION|""",1)
@@ -155,26 +156,33 @@ def gpt_socket(personality):
         rag_source_description = "Les dernieres nouvelles de La Presse sont :\n"
         url = "https://www.lapresse.ca/actualites/rss"
         ws.send("Je rassemble les actualités...\n")
-    elif(personality in ['redpjs', 'phiona'] ):
-        reflection = ask("If the following text is a question that could be answered with a Wikipedia search, answer with a query that would return a relevant article. Answer with only the query as a quoted string, or \"none\". Do not answer anything after the quoted string.\n\n" + message, personality)
+    elif(rag_spec['rag_domain']):
+        reflection = ask("If the following text is a question that could be answered with a web search, answer with a query that would return a relevant article. Answer with only the query as a quoted string, or \"none\" if the question is inappropriate. Do not answer anything after the quoted string.\n\n" + message, personality)
         print(reflection)
         matches = re.search(r'"([^"]+)"', reflection)
         if(matches is not None and matches.group(1) != "none") :
-            query = matches.group(1) + " site:wikipedia.org"
+            query = matches.group(1) + " site:" + rag_spec['rag_domain']
             results = DDGS().text(query)
             if(results) :
                 top_article = results[0]
                 rag_source_description = "The page \""+top_article['title']+"\" at "+ top_article['href'] +" says:\n"
                 url = top_article['href']
-                ws.send("Reading ["+ top_article['title'] +"](" + url + ")\n")
+                ws.send("["+ top_article['title'] +"](" + url + "):\n\n")
 
     chat_session = []
 
     try:
         if(not lock.acquire(blocking=False)):
             print("Blocking for pre-parsing lock")
-            ws.send("(Currently helping another user...)\n")
-            lock.acquire()
+            ws.send("(Currently helping another user...)")
+            ws.send("\n\n")
+            if( not lock.acquire(blocking=True, timeout=120)) :
+                ws.send("Error: Couldn't get the model's attention for 120s.")
+                ws.send("<END "+sessionkey+">")
+                ws.send(" ") #Junk frame to ensure the previous one gets flushed?
+                print("Session timeout " + sessionkey)
+                time.sleep(0.5)
+                return ''
         if(sessionkey in __cached_sessions) :
             chat_session = __cached_sessions.get(sessionkey, '')
             chat_session.append({"role": "user", "content": message})
