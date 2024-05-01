@@ -17,7 +17,7 @@ app = flask.Flask(__name__) #, static_url_path=''
 lock = threading.Lock()
 
 # Global settings and constants
-stopTokens = ["<|assistant|>", "<|end|>", "[/INST]","[INST]","</s>","User:", "Assistant:", "[/ASK]", "[INFO]"]
+stopTokens = ["<|assistant|>", "<|user|>", "<|end|>", "[/INST]","[INST]","</s>","User:", "Assistant:", "[/ASK]", "[INFO]"]
 temperature = 0.8
 session_cache_size = 100
 max_url_content_length = 4000
@@ -58,7 +58,7 @@ def getLlm(personality):
             n_gpu_layers=llm_spec['gpu_layers'], 
             n_threads=llm_spec['cpu_threads'], 
             numa=False, 
-            n_ctx=llm_spec['context_window']
+            n_ctx=llm_spec['context_window'],
         )
     else:
         llm = Llama.from_pretrained(
@@ -183,12 +183,16 @@ def gpt_socket(personality):
                 print("Session timeout " + sessionkey)
                 time.sleep(0.5)
                 return ''
+        llm = getLlm(personality)
         if(sessionkey in __cached_sessions) :
             chat_session = __cached_sessions.get(sessionkey, '')
             chat_session.append({"role": "user", "content": message})
         else :
             first_prompt = ''
-            chat_session.append({"role": "system", "content": rag.get_personality_prefix(personality)})
+            if(personality == 'phiona') : 
+                chat_session.append({"role": "user", "content": rag.get_personality_prefix(personality)})
+            else:
+                chat_session.append({"role": "system", "content": rag.get_personality_prefix(personality)})
             if(url is not None):
                 text = rag.fetchUrlText(url, max_url_content_length) 
             if(text is not None) :
@@ -197,7 +201,6 @@ def gpt_socket(personality):
             chat_session.append({"role": "user", "content": first_prompt})
 
         print(chat_session)
-        llm = getLlm(personality)
         stream = llm.create_chat_completion(
             chat_session,
             max_tokens=2048,
@@ -245,14 +248,15 @@ def gpt(personality):
 def ask(prompt, personality="whisper"):
     lock.acquire()
     llm=getLlm(personality)
+    messages=[]
+    if(personality == 'phiona') : 
+        messages.append({"role": "user", "content": rag.get_personality_prefix(personality)})
+    else:
+        messages.append({"role": "system", "content": rag.get_personality_prefix(personality)})
+    messages.append({"role": "user", "content": prompt})
+
     result=llm.create_chat_completion(
-        messages=[
-            {
-                "role": "system",
-                "content": rag.get_personality_prefix(personality),
-            },
-            {"role": "user", "content": prompt},
-        ],
+        messages=messages,
         temperature=0.7,
         stop=stopTokens
     )
