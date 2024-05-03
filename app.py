@@ -156,10 +156,11 @@ def gpt_socket(personality):
         url = "https://www.lapresse.ca/actualites/rss"
         ws.send("Je rassemble les actualités...\n")
     elif(rag_spec['rag_domain']):
-        reflection = ask("If the following text is a question that could be answered with a web search, answer with a query that would return a relevant article. Answer with only the query as a quoted string, or \"none\" if the question is inappropriate. Do not answer anything after the quoted string.\n\n" + message, personality)
+        reflection = ask("If the following text is a question that could be answered with a web search, answer with a relevant search term. Answer with only the terms as a quoted string, or \"none\" if the question is inappropriate. Do not answer anything after the quoted string.\n\n" + message, personality)
         print(reflection)
         matches = re.search(r'"([^"]+)"', reflection)
         if(matches is not None and matches.group(1) != "none") :
+            ws.send("Searching for \""+matches.group(1)+"\" ... ")
             query = matches.group(1) + " site:" + (" OR site:".join(rag_spec['rag_domain'].split('|')))
             results = DDGS().text(query)
             if(results) :
