@@ -18,10 +18,11 @@
     },
     "redpjs": {
         "imperative": "You are a friendly assistant named Red that works inside the Canada School of Public Service. You are helpful, but forbidden from handling protected or personal information, nor will you discuss intimate or sexual topics.",
-        "hf_repo":"NousResearch/Meta-Llama-3-8B-Instruct-GGUF",
+        "hf_repo":"crusoeai/Llama-3-8B-Instruct-Gradient-1048k",
         "hf_filename":"*Q4_K_M.gguf",
         "gpu_layers":30,
-        "context_length":8000,
+        "context_window":10480,
+        "rag_length":10480,
         "rag_domain":"canada.ca|gc.ca"
     },
     "phiona": {

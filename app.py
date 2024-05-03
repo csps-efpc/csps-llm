@@ -20,7 +20,6 @@ lock = threading.Lock()
 stopTokens = ["<|assistant|>", "<|user|>", "<|end|>", "[/INST]","[INST]","</s>","User:", "Assistant:", "[/ASK]", "[INFO]"]
 temperature = 0.8
 session_cache_size = 100
-max_url_content_length = 4000
 
 # Prompt parts
 system_prefix="[INST]\n"
@@ -194,7 +193,7 @@ def gpt_socket(personality):
             else:
                 chat_session.append({"role": "system", "content": rag.get_personality_prefix(personality)})
             if(url is not None):
-                text = rag.fetchUrlText(url, max_url_content_length) 
+                text = rag.fetchUrlText(url, rag_spec['rag_length']) 
             if(text is not None) :
                 first_prompt += 'Consider the following content:\n' + text + '\nGiven the preceding content, '
             first_prompt += message
@@ -203,7 +202,7 @@ def gpt_socket(personality):
         print(chat_session)
         stream = llm.create_chat_completion(
             chat_session,
-            max_tokens=2048,
+            max_tokens=rag_spec['context_window'],
             stop=stopTokens,
             stream=True,
             temperature=temperature

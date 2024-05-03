@@ -19,6 +19,7 @@ default_llm_hf_filename=os.environ.get("LLM_HUGGINGFACE_FILE", "*Q4_K_M.gguf")
 default_llm_gpu_layers=int(os.environ.get("LLM_GPU_LAYERS", "-1")) # -1 for "the whole thing, if supported"
 default_llm_context_window=int(os.environ.get("LLM_CONTEXT_WINDOW", "2048"))
 default_llm_cpu_threads=int(os.environ.get("LLM_CPU_THREADS", "4"))
+default_llm_rag_length=int(os.environ.get("LLM_RAG_LENGTH", "4096"))
 
 # Function to get model specification for a given personality
 def get_model_spec(personality):
@@ -28,6 +29,7 @@ def get_model_spec(personality):
         'local_file': default_llm_local_file,
         'gpu_layers': default_llm_gpu_layers,
         'context_window': default_llm_context_window,
+        'rag_length': default_llm_rag_length,
         'rag_domain': None,
         'cpu_threads': default_llm_cpu_threads
     }
@@ -44,6 +46,8 @@ def get_model_spec(personality):
         returnable['context_window'] = personalities[personality]['context_window'] 
     if 'rag_domain' in personalities[personality] :
         returnable['rag_domain'] = personalities[personality]['rag_domain'] 
+    if 'rag_length' in personalities[personality] :
+        returnable['rag_length'] = personalities[personality]['rag_length'] 
     if 'cpu_threads' in personalities[personality] :
         returnable['cpu_threads'] = personalities[personality]['cpu_threads'] 
     return returnable
