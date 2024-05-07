@@ -143,6 +143,10 @@ sendPrompt = function () {
             nextMessage = "|SESSION|" + window.llmSessionId + "|/SESSION|" + promptElement.value;
         } else if (window.firstContextText) {
             nextMessage = "|CONTEXT|" + window.firstContextText + "|/CONTEXT|" + promptElement.value;
+        } else if (document.getElementById('wikipedia-rag-checkbox').checked) {
+            nextMessage = "|RAG|wikipedia.org|/RAG|" + promptElement.value;
+        } else if (document.getElementById('goc-rag-checkbox').checked) {
+            nextMessage = "|RAG|canada.ca|gc.ca|/RAG|" + promptElement.value;
         }
         socket = createWebSocket(nextMessage)
     }

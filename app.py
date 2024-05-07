@@ -90,9 +90,12 @@ def gpt_socket(personality):
     folded = message.casefold()
     url = None
     text = None
+    rag_domain = None
     sessionkey = uuid.uuid4().urn
     rag_source_description = ""
     rag_spec = rag.get_model_spec(personality)
+    if(rag_spec['rag_domain']) :
+        rag_domain = rag_spec['rag_domain']
     ## TODO: make this bit modular.
     if(message.startswith("|SESSION|")):
         s = message[9:].split("""|/SESSION|""",1)
@@ -103,6 +106,25 @@ def gpt_socket(personality):
         message = s[1]
         text = s[0]
         ws.send("Reading the provided context...")
+    elif(message.startswith("|RAG|")):
+        s = message[5:].split("""|/RAG|""",1)
+        message = s[1]
+        rag_domain = s[0]
+        ws.send("Searching for an answer...")
+
+    if(rag_domain):
+        reflection = ask("If the following text is a question that could be answered with a web search, answer with a relevant search term. Answer with only the terms as a quoted string, or \"none\" if the question is inappropriate. Do not answer anything after the quoted string.\n\n" + message, personality)
+        print(reflection)
+        matches = re.search(r'"([^"]+)"', reflection)
+        if(matches is not None and matches.group(1) != "none") :
+            ws.send("Searching for \""+matches.group(1)+"\" ... ")
+            query = matches.group(1) + " site:" + (" OR site:".join(rag_domain.split('|')))
+            results = DDGS().text(query)
+            if(results) :
+                top_article = results[0]
+                rag_source_description = "The page \""+top_article['title']+"\" at "+ top_article['href'] +" says:\n"
+                url = top_article['href']
+                ws.send("["+ top_article['title'] +"](" + url + "):\n\n")
     elif(message.startswith("http")):
         s = message.split(" ",1)
         message = s[1]
@@ -155,19 +177,7 @@ def gpt_socket(personality):
         rag_source_description = "Les dernieres nouvelles de La Presse sont :\n"
         url = "https://www.lapresse.ca/actualites/rss"
         ws.send("Je rassemble les actualités...\n")
-    elif(rag_spec['rag_domain']):
-        reflection = ask("If the following text is a question that could be answered with a web search, answer with a relevant search term. Answer with only the terms as a quoted string, or \"none\" if the question is inappropriate. Do not answer anything after the quoted string.\n\n" + message, personality)
-        print(reflection)
-        matches = re.search(r'"([^"]+)"', reflection)
-        if(matches is not None and matches.group(1) != "none") :
-            ws.send("Searching for \""+matches.group(1)+"\" ... ")
-            query = matches.group(1) + " site:" + (" OR site:".join(rag_spec['rag_domain'].split('|')))
-            results = DDGS().text(query)
-            if(results) :
-                top_article = results[0]
-                rag_source_description = "The page \""+top_article['title']+"\" at "+ top_article['href'] +" says:\n"
-                url = top_article['href']
-                ws.send("["+ top_article['title'] +"](" + url + "):\n\n")
+    
 
     chat_session = []
 
