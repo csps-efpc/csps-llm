@@ -94,8 +94,6 @@ def gpt_socket(personality):
     sessionkey = uuid.uuid4().urn
     rag_source_description = ""
     rag_spec = rag.get_model_spec(personality)
-    if(rag_spec['rag_domain']) :
-        rag_domain = rag_spec['rag_domain']
     ## TODO: make this bit modular.
     if(message.startswith("|SESSION|")):
         s = message[9:].split("""|/SESSION|""",1)
@@ -111,8 +109,6 @@ def gpt_socket(personality):
         message = s[1]
         rag_domain = s[0]
         ws.send("Searching for an answer...")
-
-    if(rag_domain):
         reflection = ask("If the following text is a question that could be answered with a web search, answer with a relevant search term. Answer with only the terms as a quoted string, or \"none\" if the question is inappropriate. Do not answer anything after the quoted string.\n\n" + message, personality)
         print(reflection)
         matches = re.search(r'"([^"]+)"', reflection)
