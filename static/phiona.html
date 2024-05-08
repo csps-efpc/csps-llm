@@ -25,7 +25,30 @@
       <div class="dropdown dropdown-top" id="context_menu">
         <div tabindex="0" role="button" class="btn join-item" id="context_button">&#x2795;</div>
         <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52">
-          <li><a onclick="text_input_modal.showModal()">Text...</a></li>
+          <li>
+            <div class="form-control">
+              <label class="label cursor-pointer">
+                <input type="radio" name="radio-10" class="radio checked:bg-green-500" checked />
+                <span class="label-text"><a onclick="text_input_modal.showModal()">Custom Text...</a></span>
+              </label>
+            </div>
+          </li>
+          <li>
+            <div class="form-control">
+              <label class="label cursor-pointer">
+                <input type="radio" name="radio-10" class="radio checked:bg-red-500" id="wikipedia-rag-checkbox" />
+                <span class="label-text">Refer to Wikipedia</span>
+              </label>
+            </div>
+          </li>
+          <li>
+            <div class="form-control">
+              <label class="label cursor-pointer">
+                <input type="radio" name="radio-10" class="radio checked:bg-blue-500" id="goc-rag-checkbox" />
+                <span class="label-text">Refer to GoC</span>
+              </label>
+            </div>
+          </li>
           <!-- <li><a>File...</a></li> -->
         </ul>
       </div>

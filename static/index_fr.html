@@ -25,10 +25,34 @@
       <div class="dropdown dropdown-top" id="context_menu">
         <div tabindex="0" role="button" class="btn join-item" id="context_button">&#x2795;</div>
         <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52">
-          <li><a onclick="text_input_modal.showModal()">Texte...</a></li>
+          <li>
+            <div class="form-control">
+              <label class="label cursor-pointer">
+                <input type="radio" name="radio-10" class="radio checked:bg-green-500" checked />
+                <span class="label-text"><a onclick="text_input_modal.showModal()">Texte fourni...</a></span>
+              </label>
+            </div>
+          </li>
+          <li>
+            <div class="form-control">
+              <label class="label cursor-pointer">
+                <input type="radio" name="radio-10" class="radio checked:bg-red-500" id="wikipedia-rag-checkbox" />
+                <span class="label-text">Consulter wikipedia</span>
+              </label>
+            </div>
+          </li>
+          <li>
+            <div class="form-control">
+              <label class="label cursor-pointer">
+                <input type="radio" name="radio-10" class="radio checked:bg-blue-500" id="goc-rag-checkbox" />
+                <span class="label-text">Consulter GdC</span>
+              </label>
+            </div>
+          </li>
           <!-- <li><a>File...</a></li> -->
         </ul>
       </div>
+
       <input type="text" class="input input-bordered join-item grow" id="prompt" />
       <button id="listen-button" class="btn btn-active join-item" hidden>Écouter &#x1F399;</button>
       <input type="checkbox" id="speech-toggle" aria-label="Parler &#x1F5E3;" name="speech"
@@ -106,7 +130,7 @@
     botImage.parentElement.removeChild(botImage);
     // Set up the first interaction
     window.addEventListener("load", function (event) {
-      introSpeech("Bonjour, je m'appelle Chuchotte. Je suis un Grand Modèle de Langage qui travaille pour l'EFPC. Je ne suis autorisée à traiter que des informations non classifiées, et si vous utilisez ce que j'écris, veillez à ce que les gens sachent que c'est une IA qui l'a écrit. Comment puis-je vous aider aujourd'hui ?");
+      introSpeech("Bonjour, je m'appelle Chuchote. Je suis un Grand Modèle de Langage qui travaille pour l'EFPC. Je ne suis autorisée à traiter que des informations non classifiées, et si vous utilisez ce que j'écris, veillez à ce que les gens sachent que c'est une IA qui l'a écrit. Comment puis-je vous aider aujourd'hui ?");
     });
   </script>
 </body>
