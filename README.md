@@ -40,7 +40,7 @@ Once you've got the prerequisites, reinstall the llama_cpp library with CUDA sup
 CMAKE_ARGS="-DLLAMA_CUDA=on" pip install llama_cpp_python --upgrade --force-reinstall --no-cache-dir
 ```
 
-A device that can do CUDA capability 6.1 or better *really* helps (that's Pascal, GTX 1000, or better). The "Whisper" demo at the CSPS uses a single GTX 1070.
+A device that can do CUDA capability 6.1 or better *really* helps (that's Pascal, GTX 1000, or better). The "Whisper" demo at the CSPS uses a single GTX 1060.
 
 Brave implementers with other GPUs, extremely new CPUs, or other fancy hardware are encouraged to check out the awesome work at https://github.com/abetlen/llama-cpp-python and to let us know how you make out.
 
@@ -60,6 +60,11 @@ Similarly, custom context can be used with if a session begins with something li
 ```
 |CONTEXT|Your context goes here|/CONTEXT| Your prompt goes here.
 ```
+
+Sessions starting with `|RAG|somedomainname.com|/RAG|` will search for supporting content among the public-facing content on the given domain.
+
+If using the provided UI, the RAG powers can be invoked from the "+" button in the bottom-left corner.
+
 ## Endpoints
 The service offers three endpoints:
 ```
@@ -92,6 +97,7 @@ Nothing makes us happier than constructive feedback and well-formed PRs - if you
 * ~~Add true RAG - medium~~
 * Make the RSS/Atom RAG retriever configurable at runtime - medium
 * Add server-side RAG fact databases - medium
+* ~~Add Internet RAG fact databases - medium~~
 * ~~Move model configuration to environment variables configured at runtime, with sane defaults - trivial~~
 * ~~- AND - Move model configuration to being attributes of "personalities", and make them hot-swap during execution. - easy~~
 * Finish the a11y work, particularly around `aria-live`. - moderate
