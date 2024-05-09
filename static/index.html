@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/daisyui@4.4.20/dist/full.min.css" />
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/turndown/dist/turndown.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/markdown-it@14.0.0/dist/markdown-it.min.js"></script>
     <script src="js/main.js"></script>
 </head>
@@ -26,6 +27,12 @@
                 <label class="label cursor-pointer">
                   <input type="radio" name="radio-10" class="radio checked:bg-green-500" checked />
                   <span class="label-text"><a onclick="text_input_modal.showModal()">Custom Text...</a></span> 
+                </label>
+              </div></li>
+              <li><div class="form-control">
+                <label class="label cursor-pointer">
+                  <input type="radio" name="radio-10" class="radio checked:bg-yellow-500" id="clipboard-rag-checkbox" />
+                  <span class="label-text">Refer to clipboard</span> 
                 </label>
               </div></li>
               <li><div class="form-control">

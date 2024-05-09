@@ -11,6 +11,26 @@ var utteranceQueue = [];
 var micEmoji = 'Listen \u{1F399}';
 var earEmoji = 'Listening... \u{1F442}';
 
+async function getClipboardText() {
+
+    const clipboardContents = await navigator.clipboard.read();
+    for (const item of clipboardContents) {
+        if (item.types.includes("text/html")) {
+            const blob = await item.getType("text/html");
+            const blobText = await blob.text();
+            var turndownService = new TurndownService()
+            return turndownService.turndown(blobText);
+        } else if (!item.types.includes("text/plain")) {
+            const blob = await item.getType("text/plain");
+            return await blob.text();
+        } else {
+            throw new Error("Clipboard does not contain textual data.");
+        }
+    }
+
+}
+
+
 /// Figure out the relative address to the webscket port for the given named personality.
 makeSocketAddress = function (personality) {
     protocol = (window.location.protocol == "http:" ? "ws" : "wss");
@@ -87,7 +107,7 @@ createWebSocket = function (prompt) {
     };
     return ws;
 }
-sendPrompt = function () {
+sendPrompt = async function () {
     contextElement.hidden = true;
     var promptElement = document.getElementById('prompt');
     newBotImage = document.getElementById("botImage").cloneNode(true);
@@ -143,6 +163,9 @@ sendPrompt = function () {
             nextMessage = "|SESSION|" + window.llmSessionId + "|/SESSION|" + promptElement.value;
         } else if (window.firstContextText) {
             nextMessage = "|CONTEXT|" + window.firstContextText + "|/CONTEXT|" + promptElement.value;
+        } else if (document.getElementById('clipboard-rag-checkbox').checked) {
+            ragText = await getClipboardText();
+            nextMessage = "|CONTENT|" + ragText + "|/CONTENT|" + promptElement.value;
         } else if (document.getElementById('wikipedia-rag-checkbox').checked) {
             nextMessage = "|RAG|wikipedia.org|/RAG|" + promptElement.value;
         } else if (document.getElementById('goc-rag-checkbox').checked) {
