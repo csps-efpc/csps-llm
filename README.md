@@ -95,6 +95,7 @@ Nothing makes us happier than constructive feedback and well-formed PRs - if you
 * ~~Auto-download of models from HuggingFace - trivial~~
 * ~~Add more public RSS/Atom sources as RAG feeds - easy~~
 * ~~Add true RAG - medium~~
+* Add self-RAG - medium
 * Make the RSS/Atom RAG retriever configurable at runtime - medium
 * Add server-side RAG fact databases - medium
 * ~~Add Internet RAG fact databases - medium~~
