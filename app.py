@@ -83,8 +83,6 @@ def root_redir():
 def gpt_socket(personality):
     ws = Server.accept(request.environ)
     now = datetime.now()
-    time_prompt = """Today's date is {0}. The current time is {1}.
-""".format(now.strftime("%A, %B %-d, %Y"), now.strftime("%I:%M %p %Z"))
     # We receive and parse the first user prompt.
     message = ws.receive()
     folded = message.casefold()

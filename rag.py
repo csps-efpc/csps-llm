@@ -97,7 +97,7 @@ def get_rag_state(personality, model, url, user_prefix = '', rag_prefix='Conside
 # Function to get the current date and time as a prompt-part
 def getDateTimeText():
     now = datetime.now()
-    return """\n\n Today's date is {0}. The current time is {1}.""".format(now.strftime("%A, %B %-d, %Y"), now.strftime("%I:%M %p %Z"))
+    return """\n\n Today's date is {0}. The current time is {1}.""".format(now.strftime("%A, %B %d, %Y"), now.strftime("%I:%M %p %Z"))
 
 # Function to fetch text from a URL, parsing HTML and feed formats
 def fetchUrlText(url, max_url_content_length):
