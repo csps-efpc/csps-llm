@@ -109,3 +109,4 @@ Nothing makes us happier than constructive feedback and well-formed PRs - if you
 * Write a webhook binding for Slack/Discord - medium
 * Make installation auto-detect the best back-end available, and configure it automatically. - hard
 * Add a feature to the user interface to expose which model is being used, per TBS guidance. - easy
+* Set up date formatting to be platform independent - trivial
