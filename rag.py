@@ -14,7 +14,7 @@ personality_cache = {}
 
 # Define default values for various parameters
 default_llm_local_file=os.environ.get("LLM_MODEL_FILE", None)
-default_llm_hf_repo=os.environ.get("LLM_HUGGINGFACE_REPO", "tsunemoto/bagel-dpo-7b-v0.4-GGUF")
+default_llm_hf_repo=os.environ.get("LLM_HUGGINGFACE_REPO", "mradermacher/bagel-8b-v1.0-GGUF")
 default_llm_hf_filename=os.environ.get("LLM_HUGGINGFACE_FILE", "*Q4_K_M.gguf")
 default_llm_gpu_layers=int(os.environ.get("LLM_GPU_LAYERS", "-1")) # -1 for "the whole thing, if supported"
 default_llm_context_window=int(os.environ.get("LLM_CONTEXT_WINDOW", "2048"))
