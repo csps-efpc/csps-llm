@@ -1,5 +1,5 @@
 # csps-llm
-A base for Government of Canada LLM services like chatbots, RAGs, and batch processors. This is the engine behind the CSPS' "Whisper" and "Chuchotte" demo services.
+A base for Government of Canada LLM services like chatbots, RAGs, and batch processors. This is the engine behind the CSPS' "Whisper" and "Chuchote", "Red PJs", "Saul", and "Phiona" demo services.
 
 **Please Note:** - the contents of this repo have not (yet) been endorsed by an architecture review board or other governance body. Any use of artificial intelligence by GoC users needs to comply with the appropriate TBS and departmental policies.
 
@@ -45,7 +45,7 @@ A device that can do CUDA capability 6.1 or better *really* helps (that's Pascal
 Brave implementers with other GPUs, extremely new CPUs, or other fancy hardware are encouraged to check out the awesome work at https://github.com/abetlen/llama-cpp-python and to let us know how you make out.
 
 ### Personalities
-The service supports the creation of an arbitrary number of "personalities" with their own endpoints, which are implemented as system prompts. Implementers are encouraged to experiment with their own system prompts, as well as the creation of GPT-like applications by stuffing the personalities with the most common facts that their chatbots are asked for. The models recommended above have an effective window of 4000 tokens for this type of applicaiton, but you can plug in whatever model you like! 
+The service supports the creation of an arbitrary number of "personalities" with their own endpoints, which are implemented as system prompts. Implementers are encouraged to experiment with their own system prompts, as well as the creation of GPT-like applications by stuffing the personalities with the most common facts that their chatbots are asked for. Most of the models recommended above have an effective window of 4000 tokens for this type of applicaiton, but you can plug in whatever model you like! 
 
 ### RAG powers
 
