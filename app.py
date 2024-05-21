@@ -119,6 +119,9 @@ def gpt_socket(personality):
                 rag_source_description = "The page \""+top_article['title']+"\" at "+ top_article['href'] +" says:\n"
                 url = top_article['href']
                 ws.send("["+ top_article['title'] +"](" + url + "):\n\n")
+            else:
+                ws.send("Couldn't find a suitable reference.")
+                ws.send("\n")
     elif(message.startswith("http")):
         s = message.split(" ",1)
         message = s[1]
@@ -176,6 +179,30 @@ def gpt_socket(personality):
     chat_session = []
 
     try:
+        if(sessionkey in __cached_sessions) :
+            chat_session = __cached_sessions.get(sessionkey, '')
+            chat_session.append({"role": "user", "content": message})
+        else :
+            first_prompt = ''
+            if(personality == 'phiona') : 
+                chat_session.append({"role": "user", "content": rag.get_personality_prefix(personality)})
+            else:
+                chat_session.append({"role": "system", "content": rag.get_personality_prefix(personality)})
+            if(url is not None):
+                text = rag.fetchUrlText(url, rag_spec['rag_length']) 
+                self_eval = ask("Consider the following content: \n\n" + text + "\n\nDoes the content respond to the question \""+message+"\"?", force_boolean=True)
+                if(self_eval == 'true') :
+                    ws.send("Content is relevant.")
+                    ws.send("\n\n")
+                else:
+                    ws.send("Content is irrelevant. Guessing.")
+                    ws.send("\n\n")
+                    text = None
+            if(text is not None) :
+                first_prompt += 'Consider the following content:\n' + text + '\nGiven the preceding content, '
+            first_prompt += message
+            chat_session.append({"role": "user", "content": first_prompt})
+
         if(not lock.acquire(blocking=False)):
             print("Blocking for pre-parsing lock")
             ws.send("(Currently helping another user...)")
@@ -188,22 +215,7 @@ def gpt_socket(personality):
                 time.sleep(0.5)
                 return ''
         llm = getLlm(personality)
-        if(sessionkey in __cached_sessions) :
-            chat_session = __cached_sessions.get(sessionkey, '')
-            chat_session.append({"role": "user", "content": message})
-        else :
-            first_prompt = ''
-            if(personality == 'phiona') : 
-                chat_session.append({"role": "user", "content": rag.get_personality_prefix(personality)})
-            else:
-                chat_session.append({"role": "system", "content": rag.get_personality_prefix(personality)})
-            if(url is not None):
-                text = rag.fetchUrlText(url, rag_spec['rag_length']) 
-            if(text is not None) :
-                first_prompt += 'Consider the following content:\n' + text + '\nGiven the preceding content, '
-            first_prompt += message
-            chat_session.append({"role": "user", "content": first_prompt})
-
+        
         print(chat_session)
         stream = llm.create_chat_completion(
             chat_session,
@@ -249,20 +261,34 @@ def gpt(personality):
     print(prompt)
     return flask.Response(ask(prompt, personality), mimetype="text/plain")
 
-def ask(prompt, personality="whisper"):
+def ask(prompt, personality="whisper", chat_context = [], force_boolean = False):
     lock.acquire()
     llm=getLlm(personality)
-    messages=[]
-    if(personality == 'phiona') : 
-        messages.append({"role": "user", "content": rag.get_personality_prefix(personality)})
-    else:
-        messages.append({"role": "system", "content": rag.get_personality_prefix(personality)})
+    messages = chat_context.copy()
+    if(not messages) :
+        if(personality == 'phiona') : 
+            messages.append({"role": "user", "content": rag.get_personality_prefix(personality)})
+        else:
+            messages.append({"role": "system", "content": rag.get_personality_prefix(personality)})
     messages.append({"role": "user", "content": prompt})
+
+    response_format = None
+    if(force_boolean) :
+        response_format = {
+            "type": "json_object",
+            "schema": {
+                "$id": "https://example.com/person.schema.json",
+                "$schema": "https://json-schema.org/draft/2020-12/schema",
+                "title": "is_answer_yes",
+                "type": "boolean"
+            }
+        }
 
     result=llm.create_chat_completion(
         messages=messages,
         temperature=0.7,
-        stop=stopTokens
+        stop=stopTokens,
+        response_format=response_format        
     )
     lock.release()
     return result["choices"][0]["message"]["content"]
@@ -310,3 +336,4 @@ if __name__ == "__main__":
     app.run(host="0.0.0.0")
 
 # debug=True
+
