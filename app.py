@@ -196,7 +196,7 @@ def gpt_socket(personality):
             chat_session.append({"role": "user", "content": message})
         else :
             first_prompt = ''
-            if(personality == 'phiona') : 
+            if('Phi-3' in rag_spec['hf_repo'] or 'Mistral-7B-Instruct-v0.3' in rag_spec['hf_repo']) : 
                 chat_session.append({"role": "user", "content": rag.get_personality_prefix(personality)})
             else:
                 chat_session.append({"role": "system", "content": rag.get_personality_prefix(personality)})
