@@ -106,8 +106,7 @@ def gpt_socket(personality):
         s = message[5:].split("""|/RAG|""",1)
         message = s[1]
         rag_domain = s[0]
-        ws.send("Searching for an answer...")
-        reflection = ask("If the following text is a question that could be answered with a web search, answer with a relevant search term. Answer with only the terms as a quoted string, or \"none\" if the question is inappropriate. Do not answer anything after the quoted string.\n\n" + message, personality)
+        reflection = ask("If the following text is a question that could be answered with a web search, answer with a relevant search term. Answer with only the terms surrounded by \" characters, or \"none\" if the question is inappropriate. Do not answer anything after the quoted string.\n\n" + message, personality)
         print(reflection)
         matches = re.search(r'"([^"]+)"', reflection)
         if(matches is not None and matches.group(1) != "none") :
@@ -115,13 +114,26 @@ def gpt_socket(personality):
             query = matches.group(1) + " site:" + (" OR site:".join(rag_domain.split('|')))
             results = DDGS().text(query)
             if(results) :
-                top_article = results[0]
-                rag_source_description = "The page \""+top_article['title']+"\" at "+ top_article['href'] +" says:\n"
-                url = top_article['href']
-                ws.send("["+ top_article['title'] +"](" + url + "):\n\n")
+                for i, result in enumerate(results, start = 1) :
+                    if(i < 3 and text is None) :
+                        possible_text = rag.fetchUrlText(results[i]['href'], rag_spec['rag_length'])
+                        ws.send("Evaluating search result "+ str(i) + "...")
+                        ws.send("\n\n")
+                        self_eval = ask("Consider the following content: \n\n" + possible_text + "\n\nDoes the content answer the request \""+message+"\"?", force_boolean=True)
+                        if(self_eval == 'true') :
+                            ws.send("Content is relevant: ["+ results[i]['title'] +"](" + results[i]['href'] + "):")
+                            ws.send("\n\n")
+                            rag_source_description = "The page \""+results[i]['title']+"\" at "+ results[i]['href'] +" says:\n"
+                            text = possible_text
+                            print("Accepting the page \""+results[i]['title']+"\" at "+ results[i]['href'] +" as relevant.")
+                        else:
+                            print("Discarding the page \""+results[i]['title']+"\" at "+ results[i]['href'] +" as irrelevant.")
             else:
                 ws.send("Couldn't find a suitable reference.")
-                ws.send("\n")
+                ws.send("\n\n")
+        else:
+            ws.send("No search necessary.")
+            ws.send("\n\n")
     elif(message.startswith("http")):
         s = message.split(" ",1)
         message = s[1]
@@ -189,15 +201,7 @@ def gpt_socket(personality):
             else:
                 chat_session.append({"role": "system", "content": rag.get_personality_prefix(personality)})
             if(url is not None):
-                text = rag.fetchUrlText(url, rag_spec['rag_length']) 
-                self_eval = ask("Consider the following content: \n\n" + text + "\n\nDoes the content respond to the question \""+message+"\"?", force_boolean=True)
-                if(self_eval == 'true') :
-                    ws.send("Content is relevant.")
-                    ws.send("\n\n")
-                else:
-                    ws.send("Content is irrelevant. Guessing.")
-                    ws.send("\n\n")
-                    text = None
+                text = rag.fetchUrlText(url, rag_spec['rag_length'])
             if(text is not None) :
                 first_prompt += 'Consider the following content:\n' + text + '\nGiven the preceding content, '
             first_prompt += message
