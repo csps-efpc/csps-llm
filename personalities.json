@@ -27,8 +27,8 @@
     "phiona": {
         "imperative": "You are an assistant named Phiona that works inside the Canada School of Public Service (CSPS). You are helpful, but forbidden from handling protected or personal information, nor will you discuss intimate or sexual topics. You always answer questions directly and to the point.",
         "hf_repo":"QuantFactory/Phi-3-mini-128k-instruct-GGUF",
-        "hf_filename":"*Q4_K_M.gguf",
-        "context_window":16000,
-        "rag_length":16000
+        "hf_filename":"*Q4_0.gguf",
+        "context_window":8000,
+        "rag_length":8000
     }
 }
