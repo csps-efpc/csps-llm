@@ -50,24 +50,26 @@ def getLlm(personality):
         del __cached_llm
         gc.collect()
     llm = None
-    llm_spec = rag.get_model_spec(personality)
-    if(llm_spec['local_file'] is not None) :
+    model_spec = rag.get_model_spec(personality)
+    if(model_spec['local_file'] is not None) :
         llm = Llama(
-            model_path=llm_spec['local_file'], 
-            n_gpu_layers=llm_spec['gpu_layers'], 
-            n_threads=llm_spec['cpu_threads'], 
+            model_path=model_spec['local_file'], 
+            n_gpu_layers=model_spec['gpu_layers'], 
+            n_threads=model_spec['cpu_threads'], 
             numa=False, 
-            n_ctx=llm_spec['context_window'],
+            n_ctx=model_spec['context_window'],
+            flash_attn=model_spec(['flash_attention'] == 'true')
         )
     else:
         llm = Llama.from_pretrained(
-            repo_id=llm_spec['hf_repo'],
-            filename=llm_spec['hf_filename'],
+            repo_id=model_spec['hf_repo'],
+            filename=model_spec['hf_filename'],
             verbose=True,
-            n_gpu_layers=llm_spec['gpu_layers'], 
-            n_threads=llm_spec['cpu_threads'], 
+            n_gpu_layers=model_spec['gpu_layers'], 
+            n_threads=model_spec['cpu_threads'], 
             numa=False, 
-            n_ctx=llm_spec['context_window']
+            n_ctx=model_spec['context_window'],
+            flash_attn=True
         )
     __cached_llm = llm
     __cached_personality = personality
@@ -91,7 +93,7 @@ def gpt_socket(personality):
     rag_domain = None
     sessionkey = uuid.uuid4().urn
     rag_source_description = ""
-    rag_spec = rag.get_model_spec(personality)
+    model_spec = rag.get_model_spec(personality)
     ## TODO: make this bit modular.
     if(message.startswith("|SESSION|")):
         s = message[9:].split("""|/SESSION|""",1)
@@ -116,7 +118,7 @@ def gpt_socket(personality):
             if(results) :
                 for i, result in enumerate(results, start = 1) :
                     if(i < 3 and text is None) :
-                        possible_text = rag.fetchUrlText(results[i]['href'], rag_spec['rag_length'])
+                        possible_text = rag.fetchUrlText(results[i]['href'], model_spec['rag_length'])
                         ws.send("Evaluating search result "+ str(i) + "...")
                         ws.send("\n\n")
                         self_eval = ask("Consider the following content: \n\n" + possible_text + "\n\nDoes the content answer the request \""+message+"\"?", force_boolean=True)
@@ -196,12 +198,12 @@ def gpt_socket(personality):
             chat_session.append({"role": "user", "content": message})
         else :
             first_prompt = ''
-            if('Phi-3' in rag_spec['hf_repo'] or 'Mistral-7B-Instruct-v0.3' in rag_spec['hf_repo']) : 
+            if('Phi-3' in model_spec['hf_repo'] or 'Mistral-7B-Instruct-v0.3' in model_spec['hf_repo']) : 
                 chat_session.append({"role": "user", "content": rag.get_personality_prefix(personality)})
             else:
                 chat_session.append({"role": "system", "content": rag.get_personality_prefix(personality)})
             if(url is not None):
-                text = rag.fetchUrlText(url, rag_spec['rag_length'])
+                text = rag.fetchUrlText(url, model_spec['rag_length'])
             if(text is not None) :
                 first_prompt += 'Consider the following content:\n' + text + '\nGiven the preceding content, '
             first_prompt += message
@@ -223,7 +225,7 @@ def gpt_socket(personality):
         print(chat_session)
         stream = llm.create_chat_completion(
             chat_session,
-            max_tokens=rag_spec['context_window'],
+            max_tokens=model_spec['context_window'],
             stop=stopTokens,
             stream=True,
             temperature=temperature
@@ -267,13 +269,15 @@ def gpt(personality):
 
 def ask(prompt, personality="whisper", chat_context = [], force_boolean = False):
     lock.acquire()
+    model_spec = rag.get_model_spec(personality)
     llm=getLlm(personality)
     messages = chat_context.copy()
     if(not messages) :
-        if(personality == 'phiona') : 
+        if('Phi-3' in model_spec['hf_repo'] or 'Mistral-7B-Instruct-v0.3' in model_spec['hf_repo']) : 
             messages.append({"role": "user", "content": rag.get_personality_prefix(personality)})
         else:
             messages.append({"role": "system", "content": rag.get_personality_prefix(personality)})
+
     messages.append({"role": "user", "content": prompt})
 
     response_format = None
@@ -306,6 +310,7 @@ def toil(personality):
     if('text' in request_context):
         rag_text = request_context['text']
     lock.acquire()
+    model_spec = rag.get_model_spec(personality)
     llm=getLlm(personality)
     response_format = None
     if('schema' in request_context) :
@@ -317,15 +322,18 @@ def toil(personality):
 
     if(rag_text is not None):
         prompt = "Consider the following text: " + rag_text + "\n\nGiven the preceding text, " + prompt
-    
+
+    messages = []
+
+    if('Phi-3' in model_spec['hf_repo'] or 'Mistral-7B-Instruct-v0.3' in model_spec['hf_repo']) : 
+        messages.append({"role": "user", "content": rag.get_personality_prefix(personality)})
+    else:
+        messages.append({"role": "system", "content": rag.get_personality_prefix(personality)})
+
+    messages.append({"role": "user", "content": prompt})
+
     result=llm.create_chat_completion(
-        messages=[
-            {
-                "role": "system",
-                "content": system_prompt,
-            },
-            {"role": "user", "content": prompt},
-        ],
+        messages=messages,
         response_format=response_format,
         temperature=0.7,
     )
