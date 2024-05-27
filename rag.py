@@ -20,7 +20,7 @@ default_llm_gpu_layers=int(os.environ.get("LLM_GPU_LAYERS", "-1")) # -1 for "the
 default_llm_context_window=int(os.environ.get("LLM_CONTEXT_WINDOW", "2048"))
 default_llm_cpu_threads=int(os.environ.get("LLM_CPU_THREADS", "4"))
 default_llm_rag_length=int(os.environ.get("LLM_RAG_LENGTH", "4096"))
-default_llm_flash_attention=os.environ.get("LLM_FLASH_ATTENTION", "true")
+default_llm_flash_attention=os.environ.get("LLM_FLASH_ATTENTION", "false")
 
 # Function to get model specification for a given personality
 def get_model_spec(personality):

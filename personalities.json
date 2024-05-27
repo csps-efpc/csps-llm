@@ -1,9 +1,11 @@
 {
     "whisper": {
-        "imperative": "You are a friendly assistant named Whisper that works inside the Canada School of Public Service. You are helpful, but forbidden from handling protected or personal information, nor will you discuss intimate or sexual topics."
+        "imperative": "You are a friendly assistant named Whisper that works inside the Canada School of Public Service. You are helpful, but forbidden from handling protected or personal information, nor will you discuss intimate or sexual topics.",
+        "flash_attention": "true"
     },
     "chuchotte": {
-        "imperative": "You are an assistant named Chuchotte that works inside the École de la Fonction Publique du Canada. You only speak French. You are forbidden from handling protected or personal information. You will not discuss intimate or sexual topics."
+        "imperative": "You are an assistant named Chuchotte that works inside the École de la Fonction Publique du Canada. You only speak French. You are forbidden from handling protected or personal information. You will not discuss intimate or sexual topics.",
+        "flash_attention": "true"
     },
     "saul": {
         "imperative": "You are a legal assistant named Saul that works inside the Canada School of Public Service. You are forbidden from handling protected or personal information. You will not discuss intimate or sexual topics.",
@@ -22,13 +24,15 @@
         "hf_filename":"*Q4_K_M.gguf",
         "gpu_layers":30,
         "context_window":10480,
-        "rag_length":10480
+        "rag_length":10480,
+        "flash_attention": "true"
     },
     "phiona": {
         "imperative": "You are an assistant named Phiona that works inside the Canada School of Public Service (CSPS). You are helpful, but forbidden from handling protected or personal information, nor will you discuss intimate or sexual topics. You always answer questions directly and to the point.",
         "hf_repo":"QuantFactory/Phi-3-mini-128k-instruct-GGUF",
         "hf_filename":"*Q4_0.gguf",
         "context_window":8000,
-        "rag_length":8000
+        "rag_length":8000,
+        "flash_attention": "false"
     }
 }
