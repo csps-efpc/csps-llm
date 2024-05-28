@@ -6,9 +6,11 @@ import rag
 from flask import redirect, render_template, request
 from simple_websocket import Server, ConnectionClosed
 from llama_cpp import Llama
+from stable_diffusion_cpp import StableDiffusion
 import threading
 import uuid
 import time
+import io
 from datetime import datetime
 from duckduckgo_search import DDGS
 
@@ -266,6 +268,54 @@ def gpt(personality):
     prompt = request.args["prompt"]
     print(prompt)
     return flask.Response(ask(prompt, personality), mimetype="text/plain")
+
+@app.route("/stablediffusion/generate", methods=["GET", "POST"])
+def stablediffusion():
+    global __cached_llm
+    seed = request.args["seed"]
+    seed_value = 42
+    prompt = request.args["prompt"]
+    output = None
+    if(seed) :
+        seed_value = int(seed)
+    if(not lock.acquire(blocking=False)):
+            print("Blocking for pre-parsing lock")
+            if( not lock.acquire(blocking=True, timeout=120)) :
+                print("Session timeout for image generation")
+                time.sleep(0.5)
+                return ''
+    # ensure that the LLM model is unloaded for the duration of the lock.
+    if(__cached_llm is not None) :
+        del __cached_llm
+        gc.collect()
+    sd = None
+    try:
+        #Instantiate the model
+        sd = StableDiffusion(
+            model_path="../sd.gguf",
+            vae_path="../sdxl_vae.safetensors"
+        )
+        images = sd.txt_to_img(
+            prompt=prompt,
+            sample_steps = 20,
+            seed=seed_value
+        )
+        output = io.BytesIO()
+        images[-1].save(output, "PNG")
+        output.flush()
+        output.seek(0)
+    except Exception as e:
+        print(e)
+        pass;
+    if(sd):
+        #Clear the stable diffusion model from memory
+        del sd
+        gc.collect()
+
+    if(lock.locked()):
+        lock.release()
+
+    return flask.send_file(output, mimetype="image/png", download_name="image.png")
 
 def ask(prompt, personality="whisper", chat_context = [], force_boolean = False):
     lock.acquire()

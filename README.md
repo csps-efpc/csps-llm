@@ -7,7 +7,7 @@ A base for Government of Canada LLM services like chatbots, RAGs, and batch proc
 
 Given a base install of both Python 3 and `pip`, install dependencies with:
 ```
-pip install flask simple_websocket llama_cpp_python feedparser requests bs4 huggingface_hub duckduckgo_search
+pip install flask simple_websocket llama_cpp_python stable_diffusion_cpp feedparser requests bs4 huggingface_hub duckduckgo_search
 ```
 As an absolute minimum, you'll need 12GB of RAM and as much local on-disk storage to work with a 7-billion parmeter model. To be able to reasonably work with your model, you'll need an AVX2-capable CPU with four real cores (not hyperthreaded).
 
@@ -34,7 +34,7 @@ If you have a CUDA-capable GPU, you can make the endpoint use it by following a 
 * Make sure you have NVidia's proprietary drivers installed for your GPU.
 * Make sure you have the CUDA toolkit installed. Typically `sudo apt install nvidia-cuda-toolkit`.
 
-Once you've got the prerequisites, reinstall the llama_cpp library with CUDA support:
+Once you've got the prerequisites, reinstall the llama_cpp and stable_diffusion_cpp libraries with CUDA support:
 
 ```
 CMAKE_ARGS="-DLLAMA_CUDA=on" pip install llama_cpp_python --upgrade --force-reinstall --no-cache-dir
