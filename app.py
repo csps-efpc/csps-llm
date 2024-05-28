@@ -69,7 +69,7 @@ def getLlm(personality):
             n_threads=model_spec['cpu_threads'], 
             numa=False, 
             n_ctx=model_spec['context_window'],
-            flash_attn=True
+            flash_attn=model_spec(['flash_attention'] == 'true')
         )
     __cached_llm = llm
     __cached_personality = personality
