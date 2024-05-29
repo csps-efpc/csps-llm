@@ -37,7 +37,7 @@ If you have a CUDA-capable GPU, you can make the endpoint use it by following a 
 Once you've got the prerequisites, reinstall the llama_cpp and stable_diffusion_cpp libraries with CUDA support:
 
 ```
-CMAKE_ARGS="-DLLAMA_CUDA=on" pip install llama_cpp_python --upgrade --force-reinstall --no-cache-dir
+CMAKE_ARGS="-DLLAMA_CUDA=on -DSD_CUBLAS=on" ~/python/bin/pip install llama_cpp_python stable_diffusion_cpp_python --upgrade --force-reinstall --no-cache-dir
 ```
 
 A device that can do CUDA capability 6.1 or better *really* helps (that's Pascal, GTX 1000, or better). The "Whisper" demo at the CSPS uses a single GTX 1060.
