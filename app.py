@@ -45,12 +45,13 @@ def getLlm(personality):
     if not lock.locked():
         #The method has been called by a thread not holding the lock.
         raise Error('Attempted to control the LLM without holding the exclusivity lock.')
-    if(personality == __cached_personality):
-    #    __cached_llm.reset()
-        return __cached_llm
+    
     if(__cached_llm is not None) :
-        del __cached_llm
-        gc.collect()
+        if(personality == __cached_personality):
+            return __cached_llm
+        else :
+            __cached_llm = None
+            gc.collect()
     llm = None
     model_spec = rag.get_model_spec(personality)
     if(model_spec['local_file'] is not None) :
@@ -285,8 +286,8 @@ def stablediffusion():
                 time.sleep(0.5)
                 return ''
     # ensure that the LLM model is unloaded for the duration of the lock.
-    if(__cached_llm is not None) :
-        del __cached_llm
+    if(__cached_llm) :
+        __cached_llm = None
         gc.collect()
     sd = None
     try:
