@@ -8,13 +8,19 @@
   <link href="css/main.css" rel="stylesheet" />
   <!-- CDN resources -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/daisyui@4.4.20/dist/full.min.css" />
+  <link href="https://cdn.jsdelivr.net/npm/daisyui@4.11.1/dist/full.min.css" rel="stylesheet" type="text/css" />
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/turndown/dist/turndown.js"></script>
+
   <script src="https://cdn.jsdelivr.net/npm/markdown-it@14.0.0/dist/markdown-it.min.js"></script>
   <script src="js/main.js"></script>
   <script>
     window.personality = "chuchotte";
+    window.persona = "A semirealistic close-up against a white background of a pale young androgynous woman with dark purple hair tied back wearing white futuristic clothing";
+    window.persona_seed = 2;
+    window.persona_voice="fr_FR%2Fm-ailabs_low%23nadine_eckert_boulet";
   </script>
+
 </head>
 
 
@@ -57,6 +63,14 @@
               </label>
             </div>
           </li>
+          <li>
+            <div class="form-control">
+              <label class="label cursor-pointer">
+                <input type="checkbox"  class="checkbox checked:bg-purple-500" id="emotional-affect" />
+                <span class="label-text">Emotions visibles</span>
+              </label>
+            </div>
+          </li>
           <!-- <li><a>File...</a></li> -->
         </ul>
       </div>
@@ -89,7 +103,7 @@
     </div>
   </dialog>
   <hr />
-  <img id="botImage" src="img/agent.svg" width="3em" height="3em" />
+  <img id="botImage" src="img/whisper.png" width="3em" height="3em" />
   <div id="dialogue">
 
   </div>

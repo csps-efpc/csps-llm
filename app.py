@@ -1,16 +1,22 @@
 # Import necessary libraries
 import gc
 import re
+import PIL.Image
+import PIL.features
 import flask
 import rag
 from flask import redirect, render_template, request
 from simple_websocket import Server, ConnectionClosed
 from llama_cpp import Llama
+from llama_cpp.llama_chat_format import NanoLlavaChatHandler
 from stable_diffusion_cpp import StableDiffusion
+from PIL import Image
+import PIL
 import threading
 import uuid
 import time
 import io
+import base64
 from datetime import datetime
 from duckduckgo_search import DDGS
 
@@ -19,7 +25,7 @@ app = flask.Flask(__name__) #, static_url_path=''
 lock = threading.Lock()
 
 # Global settings and constants
-stopTokens = ["<|assistant|>", "<|user|>", "<|end|>", "[/INST]","[INST]","</s>","User:", "Assistant:", "[/ASK]", "[INFO]"]
+stopTokens = ["<|assistant|>", "<|user|>", "<|end|>", "[/INST]","[INST]","</s>","User:", "Assistant:", "[/ASK]", "[INFO]", "<</SYS>>"]
 temperature = 0.8
 session_cache_size = 100
 
@@ -50,8 +56,9 @@ def getLlm(personality):
         if(personality == __cached_personality):
             return __cached_llm
         else :
-            __cached_llm = None
+            del __cached_llm
             gc.collect()
+            __cached_llm = None
     llm = None
     model_spec = rag.get_model_spec(personality)
     if(model_spec['local_file'] is not None) :
@@ -78,7 +85,16 @@ def getLlm(personality):
     __cached_personality = personality
     return llm
 
-# Flask route to bounnce users to the default UI
+# Unload any cached models
+def freeLlm():
+    global __cached_llm
+    if(__cached_llm) :
+        del __cached_llm
+        gc.collect()
+        __cached_llm = None
+        time.sleep(0.5)
+
+# Flask route to bounce users to the default UI
 @app.route('/')
 def root_redir():
     return redirect("/static/index.html", code=302)
@@ -267,12 +283,62 @@ def gpt_socket(personality):
 @app.route("/gpt/<personality>", methods=["GET", "POST"])
 def gpt(personality):
     prompt = request.args["prompt"]
+    messages = None
+    if('session' in request.args and request.args['session'] in __cached_sessions):
+        messages = __cached_sessions.get(request.args['session'], '')
+
     print(prompt)
-    return flask.Response(ask(prompt, personality), mimetype="text/plain")
+    return flask.Response(ask(prompt, personality, chat_context=messages), mimetype="text/plain")
+
+@app.route("/llava/describe", methods=["POST"])
+def llava_describe():
+    print(request)
+    print(str(request.content_length) + "/" + str(request.max_content_length))
+    #print(request.data)
+    the_file = io.BytesIO(request.data)
+    image = Image.open(the_file, formats=['PNG', "JPEG"])
+    output = io.BytesIO()
+    image.save(output, "JPEG")
+    output.flush()
+    output.seek(0)
+    base64_utf8_str = base64.b64encode(output.read()).decode('utf-8')
+    dataurl = f'data:image/jpeg;base64,{base64_utf8_str}'
+    if(not lock.acquire(blocking=False)):
+            print("Blocking for model lock")
+            if( not lock.acquire(blocking=True, timeout=120)) :
+                print("Session timeout for image description")
+                time.sleep(0.5)
+                return ''
+    freeLlm()
+    chat_handler = NanoLlavaChatHandler(clip_model_path="../nanollava-mmproj-f16.gguf")
+    llm = Llama(
+        model_path="../nanollava-text-model-f16.gguf",
+        chat_handler=chat_handler,
+        n_ctx=2048
+    )
+    completion = llm.create_chat_completion(
+        messages=[
+            {"role":"system", "content": "You are an assistant that describes images in great detail."},
+            {"role":"user", "content": [
+                {"type":"text", "text":"Include as much detail about people as you can. In as much detail as possible, what's in this image?"},
+                {"type":"image_url", "image_url":dataurl}
+            ]}
+        ]
+    )
+    # The abomination on the next line is necessary to force the chat handler to free GPU 
+    # resources. The built-in catch code only waits for the end of the Python process.
+    chat_handler._llava_cpp.clip_free(chat_handler.clip_ctx)
+    
+    del chat_handler
+    del llm
+    gc.collect()
+    returnable = completion["choices"][0]["message"]["content"]
+    if(lock.locked()):
+        lock.release()
+    return returnable
 
 @app.route("/stablediffusion/generate", methods=["GET", "POST"])
 def stablediffusion():
-    global __cached_llm
     seed = request.args["seed"]
     seed_value = 42
     prompt = request.args["prompt"]
@@ -285,21 +351,18 @@ def stablediffusion():
                 print("Session timeout for image generation")
                 time.sleep(0.5)
                 return ''
-    # ensure that the LLM model is unloaded for the duration of the lock.
-    if(__cached_llm) :
-        __cached_llm = None
-        gc.collect()
+    freeLlm()
     sd = None
     try:
         #Instantiate the model
         sd = StableDiffusion(
             model_path="../sd.gguf",
-            vae_path="../sdxl_vae.safetensors"
+            vae_path="../sdxl_vae.gguf"
         )
         images = sd.txt_to_img(
             prompt=prompt,
             sample_steps = 20,
-            seed=seed_value
+            seed=seed_value,
         )
         output = io.BytesIO()
         images[-1].save(output, "PNG")
@@ -394,6 +457,7 @@ def toil(personality):
     else:
         return flask.Response(result["choices"][0]["message"]["content"], mimetype="application/json")
 
+app.config["MAX_CONTENT_LENGTH"] = 1024*1024*1024
 # Start the Flask server
 if __name__ == "__main__":
     app.run(host="0.0.0.0")

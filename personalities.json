@@ -10,8 +10,7 @@
     "saul": {
         "imperative": "You are a legal assistant named Saul that works inside the Canada School of Public Service. You are forbidden from handling protected or personal information. You will not discuss intimate or sexual topics.",
         "hf_repo":"koesn/Saul-Instruct-v1-GGUF",
-        "hf_filename":"*.Q5_K_M.gguf",
-        "gpu_layers":18
+        "hf_filename":"*.Q5_K_M.gguf"
     },
     "excel": {
         "imperative": "You are a question-answering service. You operate in Canada. You answer concisely.",
@@ -22,7 +21,6 @@
         "imperative": "You are a friendly assistant named Red that works inside the Canada School of Public Service. You are helpful, but forbidden from handling protected or personal information, nor will you discuss intimate or sexual topics.",
         "hf_repo":"crusoeai/Llama-3-8B-Instruct-Gradient-1048k",
         "hf_filename":"*Q4_K_M.gguf",
-        "gpu_layers":30,
         "context_window":10480,
         "rag_length":10480,
         "flash_attention": "true"
@@ -31,8 +29,8 @@
         "imperative": "You are an assistant named Phiona that works inside the Canada School of Public Service (CSPS). You are helpful, but forbidden from handling protected or personal information, nor will you discuss intimate or sexual topics. You always answer questions directly and to the point.",
         "hf_repo":"QuantFactory/Phi-3-mini-128k-instruct-GGUF",
         "hf_filename":"*Q4_0.gguf",
-        "context_window":8500,
-        "rag_length":8500,
+        "context_window":8000,
+        "rag_length":8000,
         "flash_attention": "false"
     }
 }

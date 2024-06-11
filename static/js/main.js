@@ -15,15 +15,44 @@ async function getClipboardText() {
 
     const clipboardContents = await navigator.clipboard.read();
     for (const item of clipboardContents) {
-        if (item.types.includes("text/html")) {
+        if (item.types.includes("image/png")) {
+            dialogueElement = document.getElementById('dialogue');
+            const blob = await item.getType("image/png");
+            objectURL = URL.createObjectURL(blob);
+            img = document.createElement("img");
+            img.setAttribute("style", "width: 10em");
+            img.setAttribute("src", objectURL);
+            chatElement = document.createElement('div');
+            chatElement.classList.add('chat');
+            chatElement.classList.add('chat-end');
+            //userTextElement.classList.add('user');
+            img.classList.add('animate__animated');
+            img.classList.add('animate__fadeInUp');
+            img.classList.add('animate__delay-2s');
+            img.classList.add('chat-bubble');
+            img.classList.add('chat-bubble-accent');
+            chatElement.append(img);
+            dialogueElement.append(chatElement);
+            var url = new URL('../../llava/describe', window.location);
+            const response = await fetch(url, {
+                method: "POST",
+                headers: {
+                  "Content-Type": "image/png",
+                },
+                body: blob,
+              });
+            desc = await response.text();
+            img.setAttribute("alt", desc);
+            return desc;
+        } else if (item.types.includes("text/html")) {
             const blob = await item.getType("text/html");
             const blobText = await blob.text();
             var turndownService = new TurndownService()
             return turndownService.turndown(blobText);
-        } else if (!item.types.includes("text/plain")) {
+        } else if (item.types.includes("text/plain")) {
             const blob = await item.getType("text/plain");
             return await blob.text();
-        } else {
+        } else  {
             throw new Error("Clipboard does not contain textual data.");
         }
     }
@@ -41,12 +70,11 @@ addUtterance = function () {
     if (speechAccumulator) {
         var encodedText = encodeURIComponent(speechAccumulator);
         if (document.getElementById("speech-toggle").checked) {
-            // alternate voice: currentAudio = new Audio("https://psx-xsp.csps-efpc.ca/tts?&voice=en_US%2Fvctk_low%23p283&noiseScale=0.667&noiseW=0.8&lengthScale=1&ssml=false&audioTarget=client&text=" + encodedText);
-            if (document.documentElement.getAttribute("lang") == "fr") {
-                currentAudio = new Audio("https://psx-xsp.csps-efpc.ca/tts?&voice=fr_FR%2Fm-ailabs_low%23nadine_eckert_boulet&noiseScale=0.667&noiseW=0.8&lengthScale=1&ssml=false&audioTarget=client&text=" + encodedText);
-            } else {
-                currentAudio = new Audio("https://psx-xsp.csps-efpc.ca/tts?&voice=en_US%2Fhifi-tts_low%2392&noiseScale=0.667&noiseW=0.8&lengthScale=1&ssml=false&audioTarget=client&text=" + encodedText);
-            }
+            persona_voice = window.persona_voice ? window.persona_voice : "en_US%2Fhifi-tts_low%2392";
+            var url = new URL('/tts/', window.location);
+            url.search = new URLSearchParams({ voice: persona_voice, noiseScale: 0.667, noiseW: 0.8, lengthScale: 1, ssml: false, audioTarget: "client", text: speechAccumulator})
+            currentAudio = new Audio(url);
+            
             utteranceQueue.push(currentAudio);
             speechAccumulator = "";
             if (utteranceQueue.length == 1) {
@@ -72,6 +100,26 @@ nextUtterance = function () {
     }
 }
 
+loadEmotionalAffect = async function () {
+    var personality = window.personality ? window.personality : "whisper";
+    var url = new URL('../../gpt/' + personality, window.location);
+    url.search = new URLSearchParams({ session: window.llmSessionId, prompt: "In no more than two English words, name the emotions this brings up." }).toString();
+
+    fetch(url).then((resp) => resp.text()).then((text) => renderEmotionalAffect(window.persona + ", looking " + text + " at the camera."));
+}
+
+renderEmotionalAffect = function (affect) {
+    var url = new URL('../../stablediffusion/generate', window.location);
+    url.search = new URLSearchParams({ seed: (window.persona_seed ? window.persona_seed : "13"), prompt: affect }).toString();
+
+    window.lastBotImage.src = url;
+}
+
+needsEmotionalAffect = function () {
+    var control = document.getElementById("emotional-affect");
+    return (control && control.checked);
+}
+
 createWebSocket = function (prompt) {
     var personality = window.personality ? window.personality : "whisper";
     var ws = new WebSocket(makeSocketAddress(personality));
@@ -88,6 +136,8 @@ createWebSocket = function (prompt) {
             addUtterance();
             window.llmSessionId = token.substring(5, token.length - 1)
             ws.close();
+            if(needsEmotionalAffect())
+            loadEmotionalAffect();
             // Do any UI work that marks the end of the interaction here.
         } else {
             textAccumulator += token;
@@ -111,7 +161,7 @@ sendPrompt = async function () {
     contextElement.hidden = true;
     var promptElement = document.getElementById('prompt');
     newBotImage = document.getElementById("botImage").cloneNode(true);
-
+    window.lastBotImage = newBotImage;
     dialogueElement = document.getElementById('dialogue');
     var userTextElement = document.createElement('div');
     chatElement = document.createElement('div');
@@ -131,30 +181,6 @@ sendPrompt = async function () {
     chatElement.classList.add('animate__fadeIn');
     chatElement.classList.add('animate__delay-1s');
 
-
-
-    chatElement = document.createElement('div');
-    chatElement.classList.add('chat');
-    chatElement.classList.add('chat-start');
-    dialogueElement.append(chatElement);
-    avatarHolderElement = document.createElement('div');
-    avatarHolderElement.classList.add("w-10");
-    avatarHolderElement.classList.add("rounded-full");
-    avatarHolderElement.append(newBotImage);
-    avatarElement = document.createElement('div');
-    avatarElement.classList.add('chat-image');
-    avatarElement.classList.add('avatar');
-    avatarElement.append(avatarHolderElement);
-    chatElement.append(avatarElement);
-    outputElement = document.createElement('div');
-    outputElement.classList.add('chat-bubble');
-    outputElement.classList.add('chat-bubble-primary');
-    outputElement.classList.add('prose');
-    chatElement.append(outputElement);
-    chatElement.classList.add('animate__animated');
-    chatElement.classList.add('animate__fadeIn');
-    chatElement.classList.add('animate__delay-2s');
-    outputElement.append(thinkerElement);
     if (socket && socket.readyState == 1) {
         socket.send(promptElement.value);
     } else {
@@ -173,6 +199,30 @@ sendPrompt = async function () {
         }
         socket = createWebSocket(nextMessage)
     }
+
+    chatElement = document.createElement('div');
+    chatElement.classList.add('chat');
+    chatElement.classList.add('chat-start');
+    dialogueElement.append(chatElement);
+    avatarHolderElement = document.createElement('div');
+    avatarHolderElement.classList.add(needsEmotionalAffect() ? "w-32" : "w-10");
+    avatarHolderElement.classList.add("rounded-full");
+    avatarHolderElement.append(newBotImage);
+    avatarElement = document.createElement('div');
+    avatarElement.classList.add('chat-image');
+    avatarElement.classList.add('avatar');
+    avatarElement.append(avatarHolderElement);
+    chatElement.append(avatarElement);
+    outputElement = document.createElement('div');
+    outputElement.classList.add('chat-bubble');
+    outputElement.classList.add('chat-bubble-primary');
+    outputElement.classList.add('prose');
+    chatElement.append(outputElement);
+    chatElement.classList.add('animate__animated');
+    chatElement.classList.add('animate__fadeIn');
+    chatElement.classList.add('animate__delay-2s');
+    outputElement.append(thinkerElement);
+    
     promptElement.value = '';
     textAccumulator = "";
     userTextElement.scrollIntoView(false);
@@ -208,7 +258,7 @@ introSpeech = function (firstPhrase) {
     avatarElement.classList.add('chat-image');
     avatarElement.classList.add('avatar');
     avatarHolderElement = document.createElement('div');
-    avatarHolderElement.classList.add("w-10");
+    avatarHolderElement.classList.add(needsEmotionalAffect() ? "w-32" : "w-10");
     avatarHolderElement.classList.add("rounded-full");
     avatarHolderElement.append(botImage);
     avatarElement.append(avatarHolderElement);
