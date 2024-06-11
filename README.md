@@ -88,6 +88,11 @@ An HTTP POST-only endpoint that accepts JSON-coded requests of the form:
 }
 ```
 The service will return a well-formed JSON object in every case, and will comply with the provided schema if it's there.
+```
+/stablediffusion/generate
+```
+An HTTP GET-only endpoint that accepts prompts and returns images. The two required parameters "prompt" and "seed" set the conditions to be used for generation.
+Users must place a valid quantized stable diffusion model at the path ../sd.gguf relative to the application directory.
 
 ## Contributions
 Nothing makes us happier than constructive feedback and well-formed PRs - if you're looking to contribute, some areas where we'd love help:
@@ -95,7 +100,7 @@ Nothing makes us happier than constructive feedback and well-formed PRs - if you
 * ~~Auto-download of models from HuggingFace - trivial~~
 * ~~Add more public RSS/Atom sources as RAG feeds - easy~~
 * ~~Add true RAG - medium~~
-* Add self-RAG - medium
+* ~~Add self-RAG - medium~~
 * Make the RSS/Atom RAG retriever configurable at runtime - medium
 * Add server-side RAG fact databases - medium
 * ~~Add Internet RAG fact databases - medium~~
@@ -110,3 +115,8 @@ Nothing makes us happier than constructive feedback and well-formed PRs - if you
 * Make installation auto-detect the best back-end available, and configure it automatically. - hard
 * Add a feature to the user interface to expose which model is being used, per TBS guidance. - easy
 * Set up date formatting to be platform independent - trivial
+* ~~Bind Stable Diffusion - hard~~
+* Bind LLAVA as an image recognizer - hard
+* Add image sanitizer conditions and a clipboard binding for images to the UI. - medium
+* Add client-media capture of images to the mobile UI. - medium
+* Upgrade TTS engine from mimic-3 to Piper
