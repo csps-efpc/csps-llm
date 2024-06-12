@@ -68,13 +68,12 @@ makeSocketAddress = function (personality) {
 
 addUtterance = function () {
     if (speechAccumulator) {
+        var personality = window.personality ? window.personality : "whisper";
         var encodedText = encodeURIComponent(speechAccumulator);
         if (document.getElementById("speech-toggle").checked) {
-            persona_voice = window.persona_voice ? window.persona_voice : "en_US%2Fhifi-tts_low%2392";
-            var url = new URL('/tts/', window.location);
-            url.search = new URLSearchParams({ voice: persona_voice, noiseScale: 0.667, noiseW: 0.8, lengthScale: 1, ssml: false, audioTarget: "client", text: speechAccumulator})
+            var url = new URL('/tts/'+personality, window.location);
+            url.search = new URLSearchParams({ text: speechAccumulator })
             currentAudio = new Audio(url);
-            
             utteranceQueue.push(currentAudio);
             speechAccumulator = "";
             if (utteranceQueue.length == 1) {

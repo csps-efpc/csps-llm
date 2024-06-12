@@ -1,6 +1,7 @@
 # Import necessary libraries
 import gc
 import re
+import os
 import PIL.Image
 import PIL.features
 import flask
@@ -13,6 +14,7 @@ from stable_diffusion_cpp import StableDiffusion
 from PIL import Image
 import PIL
 import threading
+import subprocess
 import uuid
 import time
 import io
@@ -23,6 +25,7 @@ from duckduckgo_search import DDGS
 # Initialize the Flask app and a thread lock for the LLM model
 app = flask.Flask(__name__) #, static_url_path=''
 lock = threading.Lock()
+tts_lock = threading.Lock()
 
 # Global settings and constants
 stopTokens = ["<|assistant|>", "<|user|>", "<|end|>", "[/INST]","[INST]","</s>","User:", "Assistant:", "[/ASK]", "[INFO]", "<</SYS>>"]
@@ -279,6 +282,38 @@ def gpt_socket(personality):
     time.sleep(0.5)
     return ''
 
+# Flask route for handling tts requests
+@app.route("/tts/<personality>", methods=["GET"])
+def tts(personality):
+    prompt = request.args["text"]
+    model_spec = rag.get_model_spec(personality)
+    model_path = model_spec["voice"]
+    filename = str(uuid.uuid1())
+    if(not tts_lock.acquire(blocking=False)):
+            print("Blocking for TTS lock")
+            if( not tts_lock.acquire(blocking=True, timeout=120)) :
+                print("Session timeout for TTS")
+                time.sleep(0.5)
+                return ''
+    process = subprocess.Popen([
+        "/home/jturner/python/bin/python",
+        "-m",
+        "piper",
+        "-m",
+        model_path,
+        "-c",
+        model_path+".json",
+        "-f",
+        filename], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    wav, errs = process.communicate(prompt.encode())
+    process.wait()
+    f = open(filename, mode ="rb")
+    data = f.read()
+    f.close()
+    os.remove(filename)
+    tts_lock.release()
+    return flask.Response(data, mimetype="audio/wav")
+
 # Flask route for handling plain old webservice endpoints
 @app.route("/gpt/<personality>", methods=["GET", "POST"])
 def gpt(personality):
@@ -410,7 +445,8 @@ def ask(prompt, personality="whisper", chat_context = [], force_boolean = False)
         messages=messages,
         temperature=0.7,
         stop=stopTokens,
-        response_format=response_format        
+        response_format=response_format,
+        max_tokens=model_spec['context_window']        
     )
     lock.release()
     return result["choices"][0]["message"]["content"]
