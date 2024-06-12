@@ -21,6 +21,7 @@ default_llm_context_window=int(os.environ.get("LLM_CONTEXT_WINDOW", "2048"))
 default_llm_cpu_threads=int(os.environ.get("LLM_CPU_THREADS", "4"))
 default_llm_rag_length=int(os.environ.get("LLM_RAG_LENGTH", "4096"))
 default_llm_flash_attention=os.environ.get("LLM_FLASH_ATTENTION", "false")
+default_llm_voice=os.environ.get("LLM_VOICE", "../en_US-hfc_female-medium.onnx")
 
 # Function to get model specification for a given personality
 def get_model_spec(personality):
@@ -33,6 +34,7 @@ def get_model_spec(personality):
         'rag_length': default_llm_rag_length,
         'rag_domain': None,
         'flash_attention': default_llm_flash_attention,
+        'voice': default_llm_voice,
         'cpu_threads': default_llm_cpu_threads
     }
     # Update the returnable dictionary with personality-specific values if they exist
@@ -52,6 +54,8 @@ def get_model_spec(personality):
         returnable['rag_length'] = personalities[personality]['rag_length'] 
     if 'cpu_threads' in personalities[personality] :
         returnable['cpu_threads'] = personalities[personality]['cpu_threads'] 
+    if 'voice' in personalities[personality] :
+        returnable['voice'] = personalities[personality]['voice'] 
     return returnable
     
 # Function to get the personality prefix
