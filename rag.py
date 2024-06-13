@@ -31,7 +31,6 @@ def get_model_spec(personality):
         'gpu_layers': default_llm_gpu_layers,
         'context_window': default_llm_context_window,
         'rag_length': default_llm_rag_length,
-        'rag_domain': None,
         'flash_attention': default_llm_flash_attention,
         'cpu_threads': default_llm_cpu_threads
     }
@@ -46,8 +45,6 @@ def get_model_spec(personality):
         returnable['gpu_layers'] = personalities[personality]['gpu_layers'] 
     if 'context_window' in personalities[personality] :
         returnable['context_window'] = personalities[personality]['context_window'] 
-    if 'rag_domain' in personalities[personality] :
-        returnable['rag_domain'] = personalities[personality]['rag_domain'] 
     if 'rag_length' in personalities[personality] :
         returnable['rag_length'] = personalities[personality]['rag_length'] 
     if 'cpu_threads' in personalities[personality] :

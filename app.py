@@ -262,12 +262,19 @@ def gpt_socket(personality):
     time.sleep(0.5)
     return ''
 
+@app.route("/describe/<personality>", methods=["GET"])
+def describe(personality):
+    model_spec = rag.get_model_spec(personality)
+    return(model_spec)
+
 # Flask route for handling plain old webservice endpoints
 @app.route("/gpt/<personality>", methods=["GET", "POST"])
 def gpt(personality):
     prompt = request.args["prompt"]
     print(prompt)
     return flask.Response(ask(prompt, personality), mimetype="text/plain")
+
+
 
 @app.route("/stablediffusion/generate", methods=["GET", "POST"])
 def stablediffusion():
