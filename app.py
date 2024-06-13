@@ -282,6 +282,14 @@ def gpt_socket(personality):
     time.sleep(0.5)
     return ''
 
+@app.route("/describe/<personality>", methods=["GET"])
+def describe(personality):
+    model_spec = rag.get_model_spec(personality)
+    del model_spec["cpu_threads"]
+    del model_spec["gpu_layers"]
+    del model_spec["flash_attention"]
+    return(model_spec)
+
 # Flask route for handling tts requests
 @app.route("/tts/<personality>", methods=["GET"])
 def tts(personality):

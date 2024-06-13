@@ -267,6 +267,13 @@ introSpeech = function (firstPhrase) {
     outputElement.classList.add('chat-bubble-primary');
 
     outputElement.append(document.createTextNode(firstPhrase));
+    outputElement.append(document.createElement("br"));
+    descriptionButton = document.createElement("button");
+    descriptionButton.classList.add("btn");
+    descriptionButton.classList.add("btn-ghost");
+    descriptionButton.textContent = "Details..."
+    descriptionButton.onclick = showModelInformation;
+    outputElement.append(descriptionButton);
     // outputElement.classList.add('bot');
     dialogueElement.append(chatElement);
     chatElement.append(outputElement);
@@ -275,5 +282,40 @@ introSpeech = function (firstPhrase) {
     outputElement.classList.add('animate__delay-2s');
 }
 
+showModelInformation = async function () {
+    const response = await fetch("../describe/" + window.personality);
+    const jsonData = await response.json();
 
+    // Create table
+    var table = document.createElement("table");
+    table.classList.add("table");
+    table.classList.add("w-full");
+
+    // Create table body
+    var tbody = document.createElement("tbody");
+
+    // Add data
+    for (var key in jsonData) {
+        var tr = document.createElement("tr");
+
+        var tdKey = document.createElement("th");
+        tdKey.textContent = key;
+        tr.appendChild(tdKey);
+
+        var tdValue = document.createElement("td");
+        tdValue.textContent = jsonData[key];
+        tr.appendChild(tdValue);
+
+        tbody.appendChild(tr);
+    }
+
+    document.getElementById('descriptionName').textContent = window.personality;
+    document.getElementById('description').textContent = '';
+    document.getElementById('description').appendChild(table);
+    table.appendChild(tbody);
+
+
+    document.getElementById("descriptionDialog").showModal();
+
+}
 //socket = createWebSocket();
