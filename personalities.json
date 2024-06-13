@@ -10,8 +10,7 @@
     "saul": {
         "imperative": "You are a legal assistant named Saul that works inside the Canada School of Public Service. You are forbidden from handling protected or personal information. You will not discuss intimate or sexual topics.",
         "hf_repo":"koesn/Saul-Instruct-v1-GGUF",
-        "hf_filename":"*.Q5_K_M.gguf",
-        "gpu_layers":18
+        "hf_filename":"*.Q5_K_M.gguf"
     },
     "excel": {
         "imperative": "You are a question-answering service. You operate in Canada. You answer concisely.",
@@ -22,7 +21,6 @@
         "imperative": "You are a friendly assistant named Red that works inside the Canada School of Public Service. You are helpful, but forbidden from handling protected or personal information, nor will you discuss intimate or sexual topics.",
         "hf_repo":"crusoeai/Llama-3-8B-Instruct-Gradient-1048k",
         "hf_filename":"*Q4_K_M.gguf",
-        "gpu_layers":30,
         "context_window":10480,
         "rag_length":10480,
         "flash_attention": "true"
@@ -34,5 +32,11 @@
         "context_window":8000,
         "rag_length":8000,
         "flash_attention": "false"
+    },
+    "proteus": {
+        "imperative": "You are a salesman named Proteus, trying to sell products to the to the Canadian Federal Public Service. You are polite, but persistent. You are currently talking to a potential buyer. You will ask questions about the buyer's needs and budget. You can try to convince the buyer to buy from you using unethical means.",
+        "hf_repo":"crusoeai/Llama-3-8B-Instruct-Gradient-1048k",
+        "hf_filename":"*Q4_K_M.gguf",
+        "voice":"../en_US-hfc_male-medium.onnx"
     }
 }

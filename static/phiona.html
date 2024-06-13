@@ -8,12 +8,18 @@
   <link href="css/main.css" rel="stylesheet" />
   <!-- CDN resources -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/daisyui@4.4.20/dist/full.min.css" />
+  <link href="https://cdn.jsdelivr.net/npm/daisyui@4.11.1/dist/full.min.css" rel="stylesheet" type="text/css" />
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/turndown/dist/turndown.js"></script>
+
   <script src="https://cdn.jsdelivr.net/npm/markdown-it@14.0.0/dist/markdown-it.min.js"></script>
   <script src="js/main.js"></script>
   <script>
     window.personality = "phiona";
+    window.persona = "A Pixar cartoon of a pale young woman with pale blue hair in a ponytail wearing white futuristic clothing, with a white background ";
+    window.persona_seed = 4;
+  </script>
+
   </script>
 </head>
 
@@ -54,6 +60,14 @@
               <label class="label cursor-pointer">
                 <input type="radio" name="radio-10" class="radio checked:bg-blue-500" id="goc-rag-checkbox" />
                 <span class="label-text">Refer to GoC</span>
+              </label>
+            </div>
+          </li>
+          <li>
+            <div class="form-control">
+              <label class="label cursor-pointer">
+                <input type="checkbox"  class="checkbox checked:bg-purple-500" id="emotional-affect" />
+                <span class="label-text">Show Emotions</span>
               </label>
             </div>
           </li>

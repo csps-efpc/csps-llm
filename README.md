@@ -7,7 +7,7 @@ A base for Government of Canada LLM services like chatbots, RAGs, and batch proc
 
 Given a base install of both Python 3 and `pip`, install dependencies with:
 ```
-pip install flask simple_websocket llama_cpp_python stable_diffusion_cpp feedparser requests bs4 huggingface_hub duckduckgo_search
+pip install flask simple_websocket llama_cpp_python stable_diffusion_cpp_python feedparser requests bs4 huggingface_hub duckduckgo_search
 ```
 As an absolute minimum, you'll need 12GB of RAM and as much local on-disk storage to work with a 7-billion parmeter model. To be able to reasonably work with your model, you'll need an AVX2-capable CPU with four real cores (not hyperthreaded).
 
@@ -37,7 +37,7 @@ If you have a CUDA-capable GPU, you can make the endpoint use it by following a 
 Once you've got the prerequisites, reinstall the llama_cpp and stable_diffusion_cpp libraries with CUDA support:
 
 ```
-CMAKE_ARGS="-DLLAMA_CUDA=on" pip install llama_cpp_python --upgrade --force-reinstall --no-cache-dir
+CMAKE_ARGS="-DLLAMA_CUDA=on -DSD_CUBLAS=on" ~/python/bin/pip install llama_cpp_python stable_diffusion_cpp_python --upgrade --force-reinstall --no-cache-dir
 ```
 
 A device that can do CUDA capability 6.1 or better *really* helps (that's Pascal, GTX 1000, or better). The "Whisper" demo at the CSPS uses a single GTX 1060.
@@ -88,6 +88,11 @@ An HTTP POST-only endpoint that accepts JSON-coded requests of the form:
 }
 ```
 The service will return a well-formed JSON object in every case, and will comply with the provided schema if it's there.
+```
+/stablediffusion/generate
+```
+An HTTP GET-only endpoint that accepts prompts and returns images. The two required parameters "prompt" and "seed" set the conditions to be used for generation.
+Users must place a valid quantized stable diffusion model at the path ../sd.gguf relative to the application directory.
 
 ## Contributions
 Nothing makes us happier than constructive feedback and well-formed PRs - if you're looking to contribute, some areas where we'd love help:
@@ -95,7 +100,7 @@ Nothing makes us happier than constructive feedback and well-formed PRs - if you
 * ~~Auto-download of models from HuggingFace - trivial~~
 * ~~Add more public RSS/Atom sources as RAG feeds - easy~~
 * ~~Add true RAG - medium~~
-* Add self-RAG - medium
+* ~~Add self-RAG - medium~~
 * Make the RSS/Atom RAG retriever configurable at runtime - medium
 * Add server-side RAG fact databases - medium
 * ~~Add Internet RAG fact databases - medium~~
@@ -110,3 +115,8 @@ Nothing makes us happier than constructive feedback and well-formed PRs - if you
 * Make installation auto-detect the best back-end available, and configure it automatically. - hard
 * Add a feature to the user interface to expose which model is being used, per TBS guidance. - easy
 * Set up date formatting to be platform independent - trivial
+* ~~Bind Stable Diffusion - hard~~
+* Bind LLAVA as an image recognizer - hard
+* Add image sanitizer conditions and a clipboard binding for images to the UI. - medium
+* Add client-media capture of images to the mobile UI. - medium
+* Upgrade TTS engine from mimic-3 to Piper
