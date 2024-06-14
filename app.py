@@ -357,7 +357,7 @@ def llava_describe():
     llm = Llama(
         model_path="../nanollava-text-model-f16.gguf",
         chat_handler=chat_handler,
-        n_ctx=2048
+        n_ctx=4096
     )
     completion = llm.create_chat_completion(
         messages=[
