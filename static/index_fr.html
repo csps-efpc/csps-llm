@@ -18,7 +18,7 @@
     window.personality = "chuchotte";
     window.persona = "A semirealistic close-up against a white background of a pale young androgynous woman with dark purple hair tied back wearing white futuristic clothing";
     window.persona_seed = 2;
-    window.persona_voice="fr_FR%2Fm-ailabs_low%23nadine_eckert_boulet";
+    window.persona_voice = "fr_FR%2Fm-ailabs_low%23nadine_eckert_boulet";
   </script>
 
 </head>
@@ -66,7 +66,7 @@
           <li>
             <div class="form-control">
               <label class="label cursor-pointer">
-                <input type="checkbox"  class="checkbox checked:bg-purple-500" id="emotional-affect" />
+                <input type="checkbox" class="checkbox checked:bg-purple-500" id="emotional-affect" />
                 <span class="label-text">Emotions visibles</span>
               </label>
             </div>
@@ -98,6 +98,19 @@
           <!-- if there is a button in form, it will close the modal -->
           <button class="btn" id="text_context_ok">OK</button>
           <button class="btn">Annuler</button>
+        </form>
+      </div>
+    </div>
+  </dialog>
+  <dialog id="descriptionDialog" class="modal">
+    <div class="modal-box">
+      <h3 id="descriptionName"class="font-bold text-lg"></h3>
+      <div id="description"></div>
+      <p class="py-4">Appuyez sur la touche ESC ou cliquez sur le bouton ci-dessous pour fermer.</p>
+      <div class="modal-action">
+        <form method="dialog">
+          <!-- if there is a button in form, it will close the modal -->
+          <button class="btn">Fermer</button>
         </form>
       </div>
     </div>
