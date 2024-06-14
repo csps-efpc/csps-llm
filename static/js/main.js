@@ -257,7 +257,7 @@ introSpeech = function (firstPhrase) {
     avatarElement.classList.add('chat-image');
     avatarElement.classList.add('avatar');
     avatarHolderElement = document.createElement('div');
-    avatarHolderElement.classList.add(needsEmotionalAffect() ? "w-32" : "w-10");
+    avatarHolderElement.classList.add("w-32");
     avatarHolderElement.classList.add("rounded-full");
     avatarHolderElement.append(botImage);
     avatarElement.append(avatarHolderElement);
