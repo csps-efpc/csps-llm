@@ -7,7 +7,7 @@ A base for Government of Canada LLM services like chatbots, RAGs, and batch proc
 
 Given a base install of both Python 3 and `pip`, install dependencies with:
 ```
-pip install flask simple_websocket llama_cpp_python stable_diffusion_cpp_python feedparser requests bs4 huggingface_hub duckduckgo_search
+pip install flask simple_websocket llama_cpp_python stable_diffusion_cpp_python feedparser requests bs4 huggingface_hub duckduckgo_search piper_tts
 ```
 As an absolute minimum, you'll need 12GB of RAM and as much local on-disk storage to work with a 7-billion parmeter model. To be able to reasonably work with your model, you'll need an AVX2-capable CPU with four real cores (not hyperthreaded).
 
@@ -113,10 +113,11 @@ Nothing makes us happier than constructive feedback and well-formed PRs - if you
 * Write a webhook binding for MS Teams - medium
 * Write a webhook binding for Slack/Discord - medium
 * Make installation auto-detect the best back-end available, and configure it automatically. - hard
-* Add a feature to the user interface to expose which model is being used, per TBS guidance. - easy
+* ~~Add a feature to the user interface to expose which model is being used, per TBS guidance. - easy~~
 * Set up date formatting to be platform independent - trivial
 * ~~Bind Stable Diffusion - hard~~
-* Bind LLAVA as an image recognizer - hard
-* Add image sanitizer conditions and a clipboard binding for images to the UI. - medium
+* ~~Bind LLAVA as an image recognizer - hard~~
+* Add image sanitizer conditions
+* ~~Add a clipboard binding for images to the UI. - medium~~
 * Add client-media capture of images to the mobile UI. - medium
-* Upgrade TTS engine from mimic-3 to Piper
+* ~~Upgrade TTS engine from mimic-3 to Piper~~
