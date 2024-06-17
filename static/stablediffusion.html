@@ -1,0 +1,73 @@
+<html lang="en" data-theme="cupcake">
+
+<head>
+    <title>Whisper image generation</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- local resources -->
+    <link href="css/main.css" rel="stylesheet" />
+    <!-- CDN resources -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@4.11.1/dist/full.min.css" rel="stylesheet" type="text/css" />
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body>
+    <div class="footer">
+        <div class="w-full flex join">
+            <label class="input input-bordered flex items-center gap-2 join-item grow">Prompt<input class="grow"
+                    type="text" id="prompt" /></label>
+            <label class="input input-bordered flex items-center gap-2 join-item">Seed<input type="number" id="seed"
+                    value="1" /></label>
+        </div>
+    </div>
+    <div class="w-full h-full grid place-content-center">
+        <div id="imageHolder">
+            Image goes here.
+        </div>
+    </div>
+
+</body>
+<script>
+    // Bind the "enter" keystroke.
+    document.getElementById("prompt").addEventListener("keypress", function (event) {
+        if (event.key === "Enter") {
+            event.preventDefault();
+            sendPrompt();
+        }
+    });
+    document.getElementById("seed").addEventListener("change", function (event) {
+        sendPrompt();
+    });
+
+    function loadImage(url) {
+        return new Promise((resolve, reject) => {
+            const image = new Image();
+            image.onload = () => resolve(image);
+            image.onerror = () => reject(new Error(`Image load failed for ${url}`));
+            image.src = url;
+        });
+    }
+
+    function sendPrompt() {
+        var prompt = document.getElementById("prompt").value;
+        var seed = document.getElementById("seed").value;
+        var imageHolder = document.getElementById("imageHolder");
+        imageHolder.innerHTML = "";
+        var spinner = document.createElement("span");
+        spinner.classList.add("loading", "loading-spinner", "loading-lg");
+        imageHolder.appendChild(spinner);
+        var url = new URL('../stablediffusion/generate', window.location);
+        url.search = new URLSearchParams({ prompt: prompt, seed: seed });
+        loadImage(url)
+            .then(image => {
+                imageHolder.innerHTML = "";
+                imageHolder.appendChild(image);
+            })
+            .catch(error => {
+                console.error(error);
+            });
+    }
+
+</script>
+
+</html>
