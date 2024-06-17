@@ -1,0 +1,68 @@
+<html lang="en" data-theme="cupcake">
+
+<head>
+    <title>Whisper speech synthesis</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- local resources -->
+    <link href="css/main.css" rel="stylesheet" />
+    <!-- CDN resources -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@4.11.1/dist/full.min.css" rel="stylesheet" type="text/css" />
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body>
+    <div class="footer">
+        <div class="w-full flex join">
+            <label class="input input-bordered flex items-center gap-2 join-item grow">Text<input class="grow"
+                    type="text" id="prompt" /></label>
+            <select class="select select-bordered max-w-xs" id="voice">
+                <option value="whisper">default</option>
+                <option>saul</option>
+                <option>chuchote</option>
+            </select>
+        </div>
+    </div>
+    <div class="w-full h-full grid place-content-center">
+        <div id="mediaHolder">
+            Audio goes here.
+        </div>
+    </div>
+
+</body>
+<script>
+    // Bind the "enter" keystroke.
+    document.getElementById("prompt").addEventListener("keypress", function (event) {
+        if (event.key === "Enter") {
+            event.preventDefault();
+            sendPrompt();
+        }
+    });
+    document.getElementById("voice").addEventListener("change", function (event) {
+        sendPrompt();
+    });
+
+    function sendPrompt() {
+        var prompt = document.getElementById("prompt").value;
+        var voice = document.getElementById("voice").value;
+        var mediaHolder = document.getElementById("mediaHolder");
+        mediaHolder.innerHTML = "";
+        var spinner = document.createElement("span");
+        spinner.classList.add("loading", "loading-spinner", "loading-lg");
+        mediaHolder.appendChild(spinner);
+        var url = new URL('../tts/' + voice, window.location);
+        url.search = new URLSearchParams({ text: prompt });
+
+        const audio = new Audio();
+        audio.controls = true;
+        audio.preload = "auto";
+        audio.autoplay = true;
+        audio.src = url;
+
+        mediaHolder.innerHTML = "";
+        mediaHolder.appendChild(audio);
+    }
+
+</script>
+
+</html>
