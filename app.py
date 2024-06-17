@@ -1,4 +1,5 @@
 # Import necessary libraries
+import sys
 import gc
 import re
 import os
@@ -303,8 +304,9 @@ def tts(personality):
                 print("Session timeout for TTS")
                 time.sleep(0.5)
                 return ''
+    # TODO: make this figure out where the Flask process has been invoked from.
     process = subprocess.Popen([
-        "/home/jturner/python/bin/python",
+        sys.executable,
         "-m",
         "piper",
         "-m",
