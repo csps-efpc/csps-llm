@@ -18,6 +18,8 @@
                     type="text" id="prompt" /></label>
             <label class="input input-bordered flex items-center gap-2 join-item">Seed<input type="number" id="seed"
                     value="1" /></label>
+            <label class="input input-bordered flex items-center gap-2 join-item">Steps<input type="number" id="steps"
+                    value="20" /></label>
         </div>
     </div>
     <div class="w-full h-full grid place-content-center">
@@ -38,6 +40,9 @@
     document.getElementById("seed").addEventListener("change", function (event) {
         sendPrompt();
     });
+    document.getElementById("steps").addEventListener("change", function (event) {
+        sendPrompt();
+    });
 
     function loadImage(url) {
         return new Promise((resolve, reject) => {
@@ -51,13 +56,14 @@
     function sendPrompt() {
         var prompt = document.getElementById("prompt").value;
         var seed = document.getElementById("seed").value;
+        var steps = document.getElementById("steps").value;
         var imageHolder = document.getElementById("imageHolder");
         imageHolder.innerHTML = "";
         var spinner = document.createElement("span");
         spinner.classList.add("loading", "loading-spinner", "loading-lg");
         imageHolder.appendChild(spinner);
         var url = new URL('../stablediffusion/generate', window.location);
-        url.search = new URLSearchParams({ prompt: prompt, seed: seed });
+        url.search = new URLSearchParams({ prompt: prompt, seed: seed, steps: steps });
         loadImage(url)
             .then(image => {
                 imageHolder.innerHTML = "";

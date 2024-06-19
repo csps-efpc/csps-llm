@@ -3,7 +3,6 @@ import sys
 import gc
 import re
 import os
-import PIL.Image
 import PIL.features
 import flask
 import rag
@@ -12,6 +11,7 @@ from simple_websocket import Server, ConnectionClosed
 from llama_cpp import Llama
 from llama_cpp.llama_chat_format import NanoLlavaChatHandler
 from stable_diffusion_cpp import StableDiffusion
+import stable_diffusion_cpp as sd_cpp
 from PIL import Image
 import PIL
 import threading
@@ -44,9 +44,27 @@ rag_prefix = "\nConsider the following:\n"
 rag_suffix = "\nGiven the preceding text, "
 pleaseWaitText = "\n[Please note that I'm currently helping another user and will be with you as soon as they've finished.]\n"
 
+__cached_sd = None
 __cached_llm = None
 __cached_personality = None
 __cached_sessions = {}
+
+def getSd():
+    global __cached_sd
+    if not lock.locked():
+        #The method has been called by a thread not holding the lock.
+        raise Error('Attempted to control the loaded model without holding the exclusivity lock.')
+    
+    if(__cached_sd is not None) :
+        return __cached_sd
+    freeLlm()
+    #Instantiate the model
+    sd = StableDiffusion(
+        model_path="../sd.gguf",
+        vae_path="../sdxl_vae.gguf"
+    )
+    __cached_sd = sd
+    return sd
 
 # Function to get the LLM model based on the provided personality
 def getLlm(personality):
@@ -59,10 +77,7 @@ def getLlm(personality):
     if(__cached_llm is not None) :
         if(personality == __cached_personality):
             return __cached_llm
-        else :
-            del __cached_llm
-            gc.collect()
-            __cached_llm = None
+    freeLlm()    
     llm = None
     model_spec = rag.get_model_spec(personality)
     if(model_spec['local_file'] is not None) :
@@ -92,10 +107,16 @@ def getLlm(personality):
 # Unload any cached models
 def freeLlm():
     global __cached_llm
+    global __cached_sd
     if(__cached_llm) :
         del __cached_llm
         gc.collect()
         __cached_llm = None
+        time.sleep(0.5)
+    if(__cached_sd) :
+        del __cached_sd
+        gc.collect()
+        __cached_sd = None
         time.sleep(0.5)
 
 # Flask route to bounce users to the default UI
@@ -384,30 +405,28 @@ def llava_describe():
 
 @app.route("/stablediffusion/generate", methods=["GET", "POST"])
 def stablediffusion():
-    seed = request.args["seed"]
     seed_value = 42
+    steps_value = 20
+    if ('seed' in request.args): 
+        seed_value = int(request.args["seed"])
+    if ('steps' in request.args): 
+        steps_value = int(request.args["steps"])
     prompt = request.args["prompt"]
     output = None
-    if(seed) :
-        seed_value = int(seed)
     if(not lock.acquire(blocking=False)):
             print("Blocking for pre-parsing lock")
             if( not lock.acquire(blocking=True, timeout=120)) :
                 print("Session timeout for image generation")
                 time.sleep(0.5)
                 return ''
-    freeLlm()
-    sd = None
+    
     try:
-        #Instantiate the model
-        sd = StableDiffusion(
-            model_path="../sd.gguf",
-            vae_path="../sdxl_vae.gguf"
-        )
+        sd = getSd()
         images = sd.txt_to_img(
             prompt=prompt,
-            sample_steps = 20,
+            sample_steps = steps_value,
             seed=seed_value,
+            sample_method=sd_cpp.stable_diffusion_cpp.SampleMethod.EULER_A
         )
         output = io.BytesIO()
         images[-1].save(output, "PNG")
@@ -415,12 +434,7 @@ def stablediffusion():
         output.seek(0)
     except Exception as e:
         print(e)
-        pass;
-    if(sd):
-        #Clear the stable diffusion model from memory
-        del sd
-        gc.collect()
-
+        pass
     if(lock.locked()):
         lock.release()
 
