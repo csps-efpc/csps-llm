@@ -124,3 +124,5 @@ Nothing makes us happier than constructive feedback and well-formed PRs - if you
 * ~~Non-conversational multimodal demo: A Pecha-Kucha generator?~~ - 
 * Add unified logging
 * Add agentic image generation to the conversational UI
+* Add trivial user-informed agent example
+* Move the SPAs to use Flask templates, and the variables into the personalities.
