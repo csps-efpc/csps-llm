@@ -14,6 +14,7 @@ from stable_diffusion_cpp import StableDiffusion
 import stable_diffusion_cpp as sd_cpp
 from PIL import Image
 import PIL
+import unidecode
 import threading
 import subprocess
 import uuid
@@ -327,9 +328,7 @@ def tts(personality):
                 return ''
     # TODO: make this figure out where the Flask process has been invoked from.
     process = subprocess.Popen([
-        sys.executable,
-        "-m",
-        "piper",
+        "../piper/piper",
         "-m",
         model_path,
         "-c",
@@ -407,6 +406,9 @@ def llava_describe():
 def stablediffusion():
     seed_value = 42
     steps_value = 20
+    format = "PNG"
+    if ('format' in request.args): 
+        format = request.args["format"]
     if ('seed' in request.args): 
         seed_value = int(request.args["seed"])
     if ('steps' in request.args): 
@@ -423,13 +425,18 @@ def stablediffusion():
     try:
         sd = getSd()
         images = sd.txt_to_img(
-            prompt=prompt,
+            prompt=unidecode.unidecode(prompt),
             sample_steps = steps_value,
             seed=seed_value,
             sample_method=sd_cpp.stable_diffusion_cpp.SampleMethod.EULER_A
         )
         output = io.BytesIO()
-        images[-1].save(output, "PNG")
+        image = images[-1]
+        if(format == "JPEG") :
+            image = image.convert('RGB')
+            image.save(output, "JPEG")
+        else:
+            image.save(output, "PNG")
         output.flush()
         output.seek(0)
     except Exception as e:
@@ -437,7 +444,8 @@ def stablediffusion():
         pass
     if(lock.locked()):
         lock.release()
-
+    if(format == "JPEG") :
+        return flask.send_file(output, mimetype="image/jpeg", download_name="image.jpg")
     return flask.send_file(output, mimetype="image/png", download_name="image.png")
 
 def ask(prompt, personality="whisper", chat_context = [], force_boolean = False):
