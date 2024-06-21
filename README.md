@@ -121,3 +121,6 @@ Nothing makes us happier than constructive feedback and well-formed PRs - if you
 * ~~Add a clipboard binding for images to the UI. - medium~~
 * Add client-media capture of images to the mobile UI. - medium
 * ~~Upgrade TTS engine from mimic-3 to Piper~~
+* ~~Non-conversational multimodal demo: A Pecha-Kucha generator?~~ - 
+* Add unified logging
+* Add agentic image generation to the conversational UI
