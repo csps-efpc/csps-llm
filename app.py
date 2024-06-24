@@ -243,6 +243,10 @@ def gpt_socket(personality):
             chat_session.append({"role": "user", "content": message})
         else :
             first_prompt = ''
+            if("agent_rag_source" in model_spec and model_spec["agent_rag_source"] is not None):
+                if(os.path.isfile(model_spec["agent_rag_source"])):
+                    with(open(model_spec["agent_rag_source"])) as rag_file:
+                        first_prompt += rag_file.read()
             if('Phi-3' in model_spec['hf_repo'] or 'Mistral-7B-Instruct-v0.3' in model_spec['hf_repo']) : 
                 chat_session.append({"role": "user", "content": rag.get_personality_prefix(personality)})
             else:
@@ -428,6 +432,7 @@ def stablediffusion():
             prompt=unidecode.unidecode(prompt),
             sample_steps = steps_value,
             seed=seed_value,
+            # negative_prompt=rag.get_sd_negative_prompt(),
             sample_method=sd_cpp.stable_diffusion_cpp.SampleMethod.EULER_A
         )
         output = io.BytesIO()

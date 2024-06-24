@@ -102,14 +102,14 @@ nextUtterance = function () {
 loadEmotionalAffect = async function () {
     var personality = window.personality ? window.personality : "whisper";
     var url = new URL('../../gpt/' + personality, window.location);
-    url.search = new URLSearchParams({ session: window.llmSessionId, prompt: "In no more than two English words, name the emotions this brings up." }).toString();
+    url.search = new URLSearchParams({ session: window.llmSessionId, prompt: "What is an appropriate 2-word emotional response to this conversation? Use a gerund verb and an adverb. Respond with only 2 words." }).toString();
 
-    fetch(url).then((resp) => resp.text()).then((text) => renderEmotionalAffect(window.persona + ", looking " + text + " at the camera."));
+    fetch(url).then((resp) => resp.text()).then((text) => renderEmotionalAffect(window.persona + ", " + text + " at the camera."));
 }
 
 renderEmotionalAffect = function (affect) {
     var url = new URL('../../stablediffusion/generate', window.location);
-    url.search = new URLSearchParams({ seed: (window.persona_seed ? window.persona_seed : "13"), prompt: affect, steps:12 }).toString();
+    url.search = new URLSearchParams({ seed: (window.persona_seed ? window.persona_seed : "13"), prompt: affect, steps:15 }).toString();
 
     window.lastBotImage.src = url;
 }
@@ -191,9 +191,9 @@ sendPrompt = async function () {
         } else if (document.getElementById('clipboard-rag-checkbox').checked) {
             ragText = await getClipboardText();
             nextMessage = "|CONTENT|" + ragText + "|/CONTENT|" + promptElement.value;
-        } else if (document.getElementById('wikipedia-rag-checkbox').checked) {
+        } else if (document.getElementById('wikipedia-rag-checkbox') && document.getElementById('wikipedia-rag-checkbox').checked) {
             nextMessage = "|RAG|wikipedia.org|/RAG|" + promptElement.value;
-        } else if (document.getElementById('goc-rag-checkbox').checked) {
+        } else if (document.getElementById('goc-rag-checkbox') && document.getElementById('goc-rag-checkbox').checked) {
             nextMessage = "|RAG|canada.ca|gc.ca|/RAG|" + promptElement.value;
         }
         socket = createWebSocket(nextMessage)

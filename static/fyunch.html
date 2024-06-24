@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="cupcake">
+<html lang="en" data-theme="wireframe">
 
 <head>
-  <title>Whisper</title>
+  <title>Fyunch</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <!-- local resources -->
   <link href="css/main.css" rel="stylesheet" />
@@ -14,9 +14,9 @@
   <script src="https://cdn.jsdelivr.net/npm/markdown-it@14.0.0/dist/markdown-it.min.js"></script>
   <script src="js/main.js"></script>
   <script>
-    window.personality = "whisper";
-    window.persona = "A simple comic illustration on a white background of the face of a pale androgynous person with a long purple ponytail wearing a white blouse";
-    window.persona_seed = 3;
+    window.personality = "fyunch";
+    window.persona = "A Pixar image on a white background of a middle aged white man with an extended goatee and a bald head and glasses wearing a white t-shirt";
+    window.persona_seed = 2;
   </script>
 </head>
 
@@ -47,23 +47,7 @@
           <li>
             <div class="form-control">
               <label class="label cursor-pointer">
-                <input type="radio" name="radio-10" class="radio checked:bg-red-500" id="wikipedia-rag-checkbox" />
-                <span class="label-text">Refer to Wikipedia</span>
-              </label>
-            </div>
-          </li>
-          <li>
-            <div class="form-control">
-              <label class="label cursor-pointer">
-                <input type="radio" name="radio-10" class="radio checked:bg-blue-500" id="goc-rag-checkbox" />
-                <span class="label-text">Refer to GoC</span>
-              </label>
-            </div>
-          </li>
-          <li>
-            <div class="form-control">
-              <label class="label cursor-pointer">
-                <input type="checkbox"  class="checkbox checked:bg-purple-500" id="emotional-affect" />
+                <input type="checkbox"  class="checkbox checked:bg-purple-500" id="emotional-affect" checked/>
                 <span class="label-text">Show Emotions</span>
               </label>
             </div>
@@ -112,7 +96,7 @@
     </div>
   </dialog>
   <hr />
-  <img id="botImage" src="img/whisper.png" width="3em" height="3em" />
+  <img id="botImage" src="img/fyunch.png" width="3em" height="3em" />
   <div id="dialogue">
 
   </div>
@@ -161,7 +145,7 @@
     botImage.parentElement.removeChild(botImage);
     // Set up the first interaction
     window.addEventListener("load", function (event) {
-      introSpeech("Hello, my name is Whisper. I'm a Large Language Model that works for the CSPS. I'm only allowed to handle unclassified information, and if you use anything I write, please make sure that people know that an AI wrote it. How can I help you today?");
+      introSpeech("Hello, my name is Fyunch. I'm an assistant to Josh Turner that's here to help people with information about him and his work.");
     });
   </script>
 </body>
