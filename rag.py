@@ -21,12 +21,16 @@ default_llm_context_window=int(os.environ.get("LLM_CONTEXT_WINDOW", "2048"))
 default_llm_cpu_threads=int(os.environ.get("LLM_CPU_THREADS", "4"))
 default_llm_rag_length=int(os.environ.get("LLM_RAG_LENGTH", "4096"))
 default_llm_flash_attention=os.environ.get("LLM_FLASH_ATTENTION", "false")
+default_ui_style=os.environ.get("UI_STYLE", "light")
 default_llm_voice=os.environ.get("LLM_VOICE", "../en_US-hfc_female-medium.onnx")
 # A basic set of things we'd prefer not to generate. 
 default_sd_negative_prompt=os.environ.get("SD_NEGATIVE_PROMPT", "scary, nipple, naked, low quality, extra fingers, mutated hands, watermark, signature")
 
 def get_sd_negative_prompt():
     return default_sd_negative_prompt
+
+def personality_exists(personality):
+    return personality in personalities
 
 # Function to get model specification for a given personality
 def get_model_spec(personality):
@@ -39,29 +43,21 @@ def get_model_spec(personality):
         'rag_length': default_llm_rag_length,
         'flash_attention': default_llm_flash_attention,
         'voice': default_llm_voice,
+        'ui_style': default_ui_style,
         'cpu_threads': default_llm_cpu_threads,
+        'persona': "A purple cat",
+        'persona_seed': "2",
+        'intro_dialogue': "",
         'agent_rag_source': None
     }
     # Update the returnable dictionary with personality-specific values if they exist
-    if 'hf_repo' in personalities[personality] :
-        returnable['hf_repo'] = personalities[personality]['hf_repo'] 
-    if 'hf_filename' in personalities[personality] :
-        returnable['hf_filename'] = personalities[personality]['hf_filename']     
-    if 'local_file' in personalities[personality] :
-        returnable['local_file'] = personalities[personality]['local_file'] 
-    if 'gpu_layers' in personalities[personality] :
-        returnable['gpu_layers'] = personalities[personality]['gpu_layers'] 
-    if 'context_window' in personalities[personality] :
-        returnable['context_window'] = personalities[personality]['context_window'] 
-    if 'rag_length' in personalities[personality] :
-        returnable['rag_length'] = personalities[personality]['rag_length'] 
-    if 'cpu_threads' in personalities[personality] :
-        returnable['cpu_threads'] = personalities[personality]['cpu_threads'] 
-    if 'voice' in personalities[personality] :
-        returnable['voice'] = personalities[personality]['voice'] 
-    if 'agent_rag_source' in personalities[personality] :
-        returnable['agent_rag_source'] = personalities[personality]['agent_rag_source'] 
+    for property in ['intro_dialogue', 'hf_repo', 'hf_filename', 'local_file', 'gpu_layers', 'context_window', 'rag_length', 'cpu_threads', 'voice', 'ui_style', 'agent_rag_source', 'persona', 'persona_seed']:
+        patch_property(property, personality, returnable) 
     return returnable
+
+def patch_property(property, personality, returnable):
+    if property in personalities[personality] :
+        returnable[property] = personalities[personality][property]
     
 # Function to get the personality prefix
 def get_personality_prefix(personality, system_prefix = '', system_suffix = '', include_time = True):

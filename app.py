@@ -6,7 +6,7 @@ import os
 import PIL.features
 import flask
 import rag
-from flask import redirect, render_template, request
+from flask import redirect, render_template, request, abort
 from simple_websocket import Server, ConnectionClosed
 from llama_cpp import Llama
 from llama_cpp.llama_chat_format import NanoLlavaChatHandler
@@ -123,7 +123,15 @@ def freeLlm():
 # Flask route to bounce users to the default UI
 @app.route('/')
 def root_redir():
-    return redirect("/static/index.html", code=302)
+    return redirect("/chat/whisper", code=302)
+    
+# Flask route for handling websocket connections for user conversations
+@app.route("/chat/<personality>")
+def render_chat(personality):
+    if(rag.personality_exists(personality)):
+        return render_template('chat.html', personality = personality, model_spec=rag.get_model_spec(personality))
+    else :
+        return abort(404)
     
 # Flask route for handling websocket connections for user conversations
 @app.route("/gpt-socket/<personality>", websocket=True)
@@ -315,6 +323,9 @@ def describe(personality):
     del model_spec["cpu_threads"]
     del model_spec["gpu_layers"]
     del model_spec["flash_attention"]
+    del model_spec["intro_dialogue"]
+    del model_spec["persona"]
+    del model_spec["persona_seed"]
     return(model_spec)
 
 # Flask route for handling tts requests

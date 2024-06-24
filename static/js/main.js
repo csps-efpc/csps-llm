@@ -248,39 +248,6 @@ startDictation = function () {
         };
     }
 }
-introSpeech = function (firstPhrase) {
-    var dialogueElement = document.getElementById('dialogue');
-    chatElement = document.createElement('div');
-    chatElement.classList.add('chat');
-    chatElement.classList.add('chat-start');
-    avatarElement = document.createElement('div');
-    avatarElement.classList.add('chat-image');
-    avatarElement.classList.add('avatar');
-    avatarHolderElement = document.createElement('div');
-    avatarHolderElement.classList.add("w-32");
-    avatarHolderElement.classList.add("rounded-full");
-    avatarHolderElement.append(botImage);
-    avatarElement.append(avatarHolderElement);
-    chatElement.append(avatarElement);
-    outputElement = document.createElement('div');
-    outputElement.classList.add('chat-bubble');
-    outputElement.classList.add('chat-bubble-primary');
-
-    outputElement.append(document.createTextNode(firstPhrase));
-    outputElement.append(document.createElement("br"));
-    descriptionButton = document.createElement("button");
-    descriptionButton.classList.add("btn");
-    descriptionButton.classList.add("btn-ghost");
-    descriptionButton.textContent = "Details..."
-    descriptionButton.onclick = showModelInformation;
-    outputElement.append(descriptionButton);
-    // outputElement.classList.add('bot');
-    dialogueElement.append(chatElement);
-    chatElement.append(outputElement);
-    outputElement.classList.add('animate__animated');
-    outputElement.classList.add('animate__fadeIn');
-    outputElement.classList.add('animate__delay-2s');
-}
 
 showModelInformation = async function () {
     const response = await fetch("../describe/" + window.personality);
