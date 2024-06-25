@@ -107,7 +107,7 @@
         "context_window": 8000,
         "rag_length": 8000,
         "flash_attention": "false",
-        "agent_rag_source": "../josh.txt",
+        "agent_rag_source": "../llm_agent_profiles/josh.md",
         "ui_style": "cupcake",
         "ui_features": [
             "rag_clipboard",
@@ -127,7 +127,7 @@
         "context_window": 8000,
         "rag_length": 8000,
         "flash_attention": "false",
-        "agent_rag_source": "../christina.txt",
+        "agent_rag_source": "../llm_agent_profiles/christina.md",
         "ui_style": "cupcake",
         "ui_features": [
             "rag_clipboard",
@@ -147,7 +147,7 @@
         "context_window": 8000,
         "rag_length": 8000,
         "flash_attention": "false",
-        "agent_rag_source": "../martin.txt",
+        "agent_rag_source": "../llm_agent_profiles/marty.md",
         "ui_style": "cupcake",
         "ui_features": [
             "rag_clipboard",
