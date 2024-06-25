@@ -4,6 +4,11 @@
         "flash_attention": "true",
         "hf_repo": "lmstudio-community/Mistral-7B-Instruct-v0.3-GGUF",
         "ui_style": "cupcake",
+        "ui_features": [
+            "rag_clipboard",
+            "rag_wikipedia",
+            "ui_emotions"
+        ],
         "persona": "A simple comic illustration on a white background of the face of a pale androgynous person with a long purple ponytail wearing a white blouse",
         "persona_seed": 2,
         "intro_dialogue": "Hello, my name is Whisper. I'm a Large Language Model that works for the CSPS. I'm only allowed to handle unclassified information, and if you use anything I write, please make sure that people know that an AI wrote it. How can I help you today?"
@@ -14,6 +19,11 @@
         "flash_attention": "true",
         "voice": "../fr_FR-upmc-medium.onnx",
         "ui_style": "cupcake",
+        "ui_features": [
+            "rag_clipboard",
+            "rag_wikipedia",
+            "ui_emotions"
+        ],
         "persona": "A simple comic illustration on a white background of the face of a pale androgynous person with a long purple ponytail wearing a white blouse",
         "persona_seed": 2,
         "intro_dialogue": ""
@@ -24,8 +34,13 @@
         "hf_filename": "*.Q5_K_M.gguf",
         "voice": "../en_US-hfc_male-medium.onnx",
         "ui_style": "cupcake",
+        "ui_features": [
+            "rag_clipboard",
+            "rag_wikipedia",
+            "ui_emotions"
+        ],
         "persona": "A Pixar cartoon against a white background of a clean-shaven middle-aged man with grey hair and glasses, wearing a white shirt and a brown vest",
-        "persona_seed": 13,    
+        "persona_seed": 13,
         "intro_dialogue": "Hi there, I'm Ben Coudonc - a legally-tuned Large Language Model that works for the CSPS. I'm only allowed to handle unclassified information, and if you use anything I write, please make sure that people know that an AI wrote it. Nothing I write should be treated as legal advice. How can I help you today?"
     },
     "excel": {
@@ -42,8 +57,13 @@
         "rag_length": 10480,
         "flash_attention": "true",
         "ui_style": "cupcake",
+        "ui_features": [
+            "rag_clipboard",
+            "rag_wikipedia",
+            "ui_emotions"
+        ],
         "persona": "A photo close-up against a white background of a young black woman with an afro hairstyle wearing red flannel pyjamas",
-        "persona_seed": 42,    
+        "persona_seed": 42,
         "intro_dialogue": "Hello, my name is Red. I'm a Large Language Model with RAG powers that works for the CSPS. I'm only allowed to handle unclassified information, and if you use anything I write, please make sure that people know that an AI wrote it. Note that I use an internet search engine to help find your answers, and that the topic of your query is sent to DuckDuckGo, a privacy-aware search engine. How can I help you today?"
     },
     "phiona": {
@@ -54,6 +74,12 @@
         "rag_length": 8000,
         "flash_attention": "false",
         "ui_style": "cupcake",
+        "ui_features": [
+            "rag_clipboard",
+            "rag_wikipedia",
+            "rag_goc",
+            "ui_emotions"
+        ],
         "persona": "A Pixar cartoon of a pale young woman with pale blue hair in a ponytail wearing white futuristic clothing, with a white background",
         "persona_seed": 4,
         "intro_dialogue": "Hello, my name is Phiona. I'm a Large Language Model that works for the CSPS. I'm only allowed to handle unclassified information, and if you use anything I write, please make sure that people know that an AI wrote it. How can I help you today?"
@@ -65,11 +91,15 @@
         "voice": "../en_US-hfc_male-medium.onnx",
         "flash_attention": "true",
         "ui_style": "cupcake",
-        "persona":"A Pixar cartoon on a white background of an Indian man with a clean shave and slick haircut wearing a charcoal business suit",
-        "persona_seed":3,
+        "ui_features": [
+            "ui_emotions",
+            "ui_emotions_default"
+        ],
+        "persona": "A Pixar cartoon on a white background of an Indian man with a clean shave and slick haircut wearing a charcoal business suit",
+        "persona_seed": 3,
         "intro_dialogue": "Hello, my name is Proteus. I'm a role-playing Large Language Model that works for the CSPS. I'm going to play the role of a salesperson for this interaction. If you use anything I write, please make sure that people know that an AI wrote it. What can I interest you in?"
     },
-    "fyunch": {
+    "joshua.turner@csps-efpc.gc.ca": {
         "imperative": "You are an informational assistant named Fyunch, standing in for a human named Josh Turner. The user you're conversing with has questions to ask, and Josh has provided you with information that you can use to answer them. If the user's questions reach outside the information you're given, you will direct them to get in contact with Josh.",
         "hf_repo": "QuantFactory/Phi-3-mini-128k-instruct-GGUF",
         "hf_filename": "*Q4_0.gguf",
@@ -79,8 +109,14 @@
         "flash_attention": "false",
         "agent_rag_source": "../josh.txt",
         "ui_style": "cupcake",
+        "ui_features": [
+            "rag_clipboard",
+            "rag_wikipedia",
+            "ui_emotions",
+            "ui_emotions_default"
+        ],
         "intro_dialogue": "Hello, my name is Fyunch. I'm an assistant to Josh Turner that's here to help people with information about him and his work.",
-        "persona":"A Pixar image on a white background of a middle aged white man with an extended goatee and a bald head and glasses wearing a white t-shirt",
-        "persona_seed":2
+        "persona": "A Pixar image on a white background of a middle aged white man with an extended goatee and a bald head and glasses wearing a white t-shirt",
+        "persona_seed": 2
     }
 }

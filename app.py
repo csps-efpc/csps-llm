@@ -129,7 +129,12 @@ def root_redir():
 @app.route("/chat/<personality>")
 def render_chat(personality):
     if(rag.personality_exists(personality)):
-        return render_template('chat.html', personality = personality, model_spec=rag.get_model_spec(personality))
+        print(rag.get_model_spec(personality)['ui_features'])
+        return render_template('chat.html', 
+                               personality = personality, 
+                               model_spec=rag.get_model_spec(personality), 
+                               ui_features=rag.get_model_spec(personality)['ui_features']
+                               )
     else :
         return abort(404)
     
@@ -325,6 +330,9 @@ def describe(personality):
     del model_spec["flash_attention"]
     del model_spec["intro_dialogue"]
     del model_spec["persona"]
+    del model_spec["ui_style"]
+    del model_spec["imperative"]
+    del model_spec["ui_features"]
     del model_spec["persona_seed"]
     return(model_spec)
 

@@ -6,12 +6,15 @@ import os
 from bs4 import BeautifulSoup
 from datetime import datetime
 
-# Load personalities from a JSON file
-personalities = json.load(open("personalities.json"))
-
-# Initialize a dictionary to cache personalities
-personality_cache = {}
-
+# Load personalities from JSON files
+personalities = {}
+personalities_directory = os.fsencode("./personalities.d")
+    
+for personality_file in os.listdir(personalities_directory):
+    personality_filename = os.fsdecode(personality_file)
+    if personality_filename.endswith(".json"): 
+        personalities.update(json.load(open("./personalities.d/"+personality_filename)))
+        
 # Define default values for various parameters
 default_llm_local_file=os.environ.get("LLM_MODEL_FILE", None)
 default_llm_hf_repo=os.environ.get("LLM_HUGGINGFACE_REPO", "mradermacher/bagel-8b-v1.0-GGUF")
@@ -22,6 +25,7 @@ default_llm_cpu_threads=int(os.environ.get("LLM_CPU_THREADS", "4"))
 default_llm_rag_length=int(os.environ.get("LLM_RAG_LENGTH", "4096"))
 default_llm_flash_attention=os.environ.get("LLM_FLASH_ATTENTION", "false")
 default_ui_style=os.environ.get("UI_STYLE", "light")
+default_ui_features=os.environ.get("UI_FEATURES", "").split(";")
 default_llm_voice=os.environ.get("LLM_VOICE", "../en_US-hfc_female-medium.onnx")
 # A basic set of things we'd prefer not to generate. 
 default_sd_negative_prompt=os.environ.get("SD_NEGATIVE_PROMPT", "scary, nipple, naked, low quality, extra fingers, mutated hands, watermark, signature")
@@ -44,6 +48,7 @@ def get_model_spec(personality):
         'flash_attention': default_llm_flash_attention,
         'voice': default_llm_voice,
         'ui_style': default_ui_style,
+        'ui_features': default_ui_features,
         'cpu_threads': default_llm_cpu_threads,
         'persona': "A purple cat",
         'persona_seed': "2",
@@ -51,13 +56,8 @@ def get_model_spec(personality):
         'agent_rag_source': None
     }
     # Update the returnable dictionary with personality-specific values if they exist
-    for property in ['intro_dialogue', 'hf_repo', 'hf_filename', 'local_file', 'gpu_layers', 'context_window', 'rag_length', 'cpu_threads', 'voice', 'ui_style', 'agent_rag_source', 'persona', 'persona_seed']:
-        patch_property(property, personality, returnable) 
+    returnable.update(personalities[personality])
     return returnable
-
-def patch_property(property, personality, returnable):
-    if property in personalities[personality] :
-        returnable[property] = personalities[personality][property]
     
 # Function to get the personality prefix
 def get_personality_prefix(personality, system_prefix = '', system_suffix = '', include_time = True):
@@ -69,18 +69,6 @@ def get_personality_prefix(personality, system_prefix = '', system_suffix = '', 
         personality_prefix = personality_prefix + getDateTimeText()
     personality_prefix = personality_prefix + system_suffix
     return personality_prefix
-
-# Function to get a personality state
-def get_personality_state(personality, model, system_prefix = '', system_suffix = ''):
-    """Retrieves the model state for the given personality, calculating it if necessary."""
-    if(personality not in personality_cache.keys() and personality in personalities.keys() and 'imperative' in personalities[personality].keys()) :
-            personality_prefix = get_personality_prefix(personality, system_prefix, system_suffix)
-            print("Caching personality for " + personality + "...")
-            model.reset()
-            model.eval(model.tokenize(personality_prefix.encode()))
-            state = model.save_state()
-            personality_cache[personality] = state;     
-    return personality_cache[personality]
 
 # Function to get RAG prefix
 def get_rag_prefix(personality, url, rag_prefix='Consider the following content:\n', rag_suffix='\nGiven the preceding content, ', system_prefix="", system_suffix="", max_url_content_length = 4096, prompt_prefix="", rag_text = None):
