@@ -469,8 +469,8 @@ def stablediffusion():
     if(lock.locked()):
         lock.release()
     if(format == "JPEG") :
-        return flask.send_file(output, mimetype="image/jpeg", download_name="image.jpg")
-    return flask.send_file(output, mimetype="image/png", download_name="image.png")
+        return flask.send_file(output, mimetype="image/jpeg", download_name="image.jpg", max_age=3600)
+    return flask.send_file(output, mimetype="image/png", download_name="image.png", max_age=3600)
 
 def ask(prompt, personality="whisper", chat_context = [], force_boolean = False):
     lock.acquire()
