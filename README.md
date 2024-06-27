@@ -84,14 +84,15 @@ An HTTP POST-only endpoint that accepts JSON-coded requests of the form:
 ```json
 {
     "prompt": "The prompt for the model.",
-    "schema": { An optional https://json-schema.org/ format definition }
+    "schema": { An optional https://json-schema.org/ format definition },
+    "text": "Either an http URL from which to fetch content, or raw text content to use as context."
 }
 ```
 The service will return a well-formed JSON object in every case, and will comply with the provided schema if it's there.
 ```
 /stablediffusion/generate
 ```
-An HTTP GET-only endpoint that accepts prompts and returns images. The two required parameters "prompt" and "seed" set the conditions to be used for generation.
+An HTTP GET-only endpoint that accepts prompts and returns images. The two required parameters "prompt" and "seed" set the conditions to be used for generation. An optional "steps" parameter will set how many generation steps will be undertaken, defaulting to 20. The image will be returned in PNG format, unless a "format" parameter with the value "JPEG" is sent. 
 Users must place a valid quantized stable diffusion model at the path ../sd.gguf relative to the application directory.
 
 ## Contributions
