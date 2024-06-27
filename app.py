@@ -510,13 +510,17 @@ def ask(prompt, personality="whisper", chat_context = [], force_boolean = False)
 # Flask route for handling 'toil' requests having JSON bodies
 @app.route("/toil/<personality>", methods=["POST"])
 def toil(personality):
+    model_spec = rag.get_model_spec(personality)
     request_context = request.json
     prompt = request_context["prompt"]
     rag_text = None
     if('text' in request_context):
-        rag_text = request_context['text']
+        if(request_context['text'].startswith("http://") or request_context['text'].startswith("https://")):
+            rag_text = rag.fetchUrlText(request_context['text'], model_spec['rag_length'])
+        else:
+            rag_text = request_context['text']
     lock.acquire()
-    model_spec = rag.get_model_spec(personality)
+   
     llm=getLlm(personality)
     response_format = None
     if('schema' in request_context) :
