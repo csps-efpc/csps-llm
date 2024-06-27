@@ -102,7 +102,7 @@ Nothing makes us happier than constructive feedback and well-formed PRs - if you
 * ~~Add true RAG - medium~~
 * ~~Add self-RAG - medium~~
 * Make the RSS/Atom RAG retriever configurable at runtime - medium
-* Add server-side RAG fact databases - medium
+* Add server-side RAG fact databases - medium -- Initial implementation complete; ie. GPT-style context stuffing.
 * ~~Add Internet RAG fact databases - medium~~
 * ~~Move model configuration to environment variables configured at runtime, with sane defaults - trivial~~
 * ~~- AND - Move model configuration to being attributes of "personalities", and make them hot-swap during execution. - easy~~
@@ -114,15 +114,19 @@ Nothing makes us happier than constructive feedback and well-formed PRs - if you
 * Write a webhook binding for Slack/Discord - medium
 * Make installation auto-detect the best back-end available, and configure it automatically. - hard
 * ~~Add a feature to the user interface to expose which model is being used, per TBS guidance. - easy~~
-* Set up date formatting to be platform independent - trivial
+* ~~Set up date formatting to be platform independent - trivial~~
 * ~~Bind Stable Diffusion - hard~~
 * ~~Bind LLAVA as an image recognizer - hard~~
-* Add image sanitizer conditions
+* ~~Add image sanitizer conditions~~
 * ~~Add a clipboard binding for images to the UI. - medium~~
 * Add client-media capture of images to the mobile UI. - medium
 * ~~Upgrade TTS engine from mimic-3 to Piper~~
 * ~~Non-conversational multimodal demo: A Pecha-Kucha generator?~~ - 
 * Add unified logging
 * Add agentic image generation to the conversational UI
-* Add trivial user-informed agent example
-* Move the SPAs to use Flask templates, and the variables into the personalities.
+* ~~Add trivial user-informed agent example~~
+* ~~Move the SPAs to use Flask templates, and the variables into the personalities.~~
+* ~~Pechakucha generator.~~
+* Document-informed presentation generator.
+* Add instrumentation for cache hits/misses, and associated timings.
+* Add personality feature: conversation summarization & reporting
