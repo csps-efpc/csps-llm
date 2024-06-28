@@ -1,0 +1,189 @@
+<html lang="en" data-theme="cupcake">
+
+<head>
+    <title>Whisper Pecha Kucha</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- local resources -->
+    <link href="css/main.css" rel="stylesheet" />
+    <!-- CDN resources -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@4.11.1/dist/full.min.css" rel="stylesheet" type="text/css" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        window.personality = "whisper";
+        window.persona = "A simple comic illustration on a white background of the face of a pale androgynous person with long purple ponytail in a white blouse ";
+        window.persona_seed = 3;
+    </script>
+</head>
+
+<body>
+    <div class="footer">
+        <div class="w-full flex p-2 gap-2 join">
+            <label class="input input-bordered flex items-center gap-2 join-item grow">Prompt<input class="grow"
+                    type="text" id="prompt" value="https://www.cbc.ca/webfeed/rss/rss-topstories"/></label>
+            <label class="input input-bordered flex items-center gap-2 join-item">Seed<input type="number" id="seed"
+                    value="1" /></label>
+        </div>
+    </div>
+    <div class="flex p-2 gap-2 w-full h-full place-content-center">
+        <div id="imageHolder" class="flex-auto w-64">
+            Imagined images go here.
+        </div>
+        <div id="presenterHolder" class="flex-initial w-64">
+            Text goes here
+        </div>
+
+    </div>
+    </div>
+
+</body>
+<script>
+    // Bind the "enter" keystroke.
+    document.getElementById("prompt").addEventListener("keypress", function (event) {
+        if (event.key === "Enter") {
+            event.preventDefault();
+            sendPrompt();
+        }
+    });
+    document.getElementById("seed").addEventListener("change", function (event) {
+        sendPrompt();
+    });
+
+    function loadResources(url, type) {
+        return new Promise((resolve, reject) => {
+            let resource;
+
+            if (type === 'image') {
+                resource = new Image();
+                resource.onload = resolve;
+                resource.onerror = reject;
+                resource.src = url;
+            } else if (type === 'audio') {
+                resource = new Audio();
+                resource.onloadedmetadata = resolve;
+                resource.onerror = reject;
+                resource.src = url;
+            }
+        });
+    }
+
+    function displayAndPlay(item) {
+
+        // Display images and audio
+        var imageHolder = document.getElementById("imageHolder");
+        var presenterHolder = document.getElementById("presenterHolder");
+        imageHolder.innerHTML = "";
+        presenterHolder.innerHTML = "";
+        image1 = document.createElement('img');
+        image1.setAttribute('src', window.preso[item].image1);
+        image1.setAttribute('alt', window.preso[item].imagePrompt);
+        image1.classList.add('grow');
+        image1.classList.add('animate__animated');
+        image1.classList.add('animate__fadeIn');
+        image1.classList.add('animate__delay-1s');
+        image2 = document.createElement('img');
+        image2.classList.add('animate__animated');
+        image2.classList.add('animate__fadeInDown');
+        image2.setAttribute('src', window.preso[item].image2);
+        image2.classList.add('grow');
+        audio1 = new Audio(window.preso[item].audio1);
+        audio1.autoplay = true;
+        audio1.controls = true;
+        imageHolder.append(image1);
+        imageHolder.append(document.createTextNode(preso[item].imagePrompt));
+        presenterHolder.append(image2);
+        presenterHolder.append(audio1);
+        presenterHolder.append(document.createTextNode("[ " + (item + 1) + " / " + preso.length + " ] "));
+        presenterHolder.append(document.createTextNode(preso[item].voiceover));
+
+        // When audio ends, load next resource
+        document.querySelector('audio').onended = () => {
+            window.slideIndex++;
+            if (window.slideIndex < window.preso.length) {
+                preloadAndDisplay(window.slideIndex);
+            }
+        };
+    }
+
+    function preloadAndDisplay(index) {
+        // Preload images and audio
+        item = window.preso[index];
+
+        item.image1 = new URL('../stablediffusion/generate', window.location);
+        item.image1.search = new URLSearchParams({ seed: document.getElementById("seed").value, prompt: item.imagePrompt })
+        item.image2 = new URL('../stablediffusion/generate', window.location);
+        item.image2.search = new URLSearchParams({ steps: 12, seed: (window.persona_seed ? window.persona_seed : "13"), prompt: window.persona + " " + item.posture })
+        item.audio1 = new URL('../tts/' + window.personality, window.location);
+        item.audio1.search = new URLSearchParams({ text: item.voiceover });
+
+
+        Promise.all([
+            loadResources(item.image1, 'image'),
+            loadResources(item.image2, 'image'),
+            loadResources(item.audio1, 'audio')
+        ]).then(() => {
+            // When all resources are loaded, display and play
+            displayAndPlay(index);
+        });
+    }
+
+    async function sendPrompt() {
+        var prompt = document.getElementById("prompt").value;
+        var seed = document.getElementById("seed").value;
+        var imageHolder = document.getElementById("imageHolder");
+        imageHolder.innerHTML = "";
+        var spinner = document.createElement("span");
+        spinner.classList.add("loading", "loading-spinner", "loading-lg");
+        imageHolder.appendChild(spinner);
+        var url = new URL('../toil/phiona', window.location);
+        payload = {
+            "prompt": "Create a 30-second newscast based on the provided stories. Respond in JSON format. The top-level Array will hold between 5 and 10 stories, with one Object per story. For each story, the 'voiceover' field will contain two or three sentences to be spoken by the newscaster. The 'imagePrompt' field will contain an AI image-generation prompt to create a background image suitable for the information in the story. The 'posture' field will contain a short description of the a pose and facial expression, starting with a gerund like 'pointing' or 'looking'. Be certain to include a final story wrapping up the broadcast.",
+            "text": prompt,
+            "schema": {
+                "$schema": "http://json-schema.org/draft-06/schema#",
+                "type": "array",
+                "items": {
+                    "$ref": "#/definitions/storyElement"
+                },
+                "definitions": {
+                    "storyElement": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "properties": {
+                            "voiceover": {
+                                "type": "string"
+                            },
+                            "imagePrompt": {
+                                "type": "string"
+                            },
+                            "posture": {
+                                "type": "string"
+                            }
+                        },
+                        "required": [
+                            "imagePrompt",
+                            "posture",
+                            "voiceover"
+                        ],
+                        "title": "storyElement"
+                    }
+                }
+            }
+        };
+        response = await fetch(url, {
+            method: "POST",
+            body: JSON.stringify(payload),
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            }
+        });
+        window.preso = await response.json();
+        console.log(window.preso);
+        window.slideIndex = 0;
+        preloadAndDisplay(0);
+    }
+
+</script>
+
+</html>
