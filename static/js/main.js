@@ -109,7 +109,7 @@ loadEmotionalAffect = async function () {
 
 renderEmotionalAffect = function (affect) {
     var url = new URL('../../stablediffusion/generate', window.location);
-    url.search = new URLSearchParams({ seed: (window.persona_seed ? window.persona_seed : "13"), prompt: affect, steps:20 }).toString();
+    url.search = new URLSearchParams({ seed: (window.persona_seed ? window.persona_seed : "13"), prompt: affect, steps:20, format:"JPEG" }).toString();
 
     window.lastBotImage.src = url;
 }
