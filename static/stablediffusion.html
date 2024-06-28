@@ -63,7 +63,7 @@
         spinner.classList.add("loading", "loading-spinner", "loading-lg");
         imageHolder.appendChild(spinner);
         var url = new URL('../stablediffusion/generate', window.location);
-        url.search = new URLSearchParams({ prompt: prompt, seed: seed, steps: steps });
+        url.search = new URLSearchParams({ prompt: prompt, seed: seed, steps: steps, format:"JPEG" });
         loadImage(url)
             .then(image => {
                 imageHolder.innerHTML = "";
