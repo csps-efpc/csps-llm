@@ -446,26 +446,50 @@ def stablediffusion():
                 return ''
     
     try:
-        sd = getSd()
-        images = sd.txt_to_img(
-            prompt=unidecode.unidecode(prompt),
-            sample_steps = steps_value,
-            seed=seed_value,
-            # negative_prompt=rag.get_sd_negative_prompt(),
-            sample_method=sd_cpp.stable_diffusion_cpp.SampleMethod.EULER_A
-        )
-        output = io.BytesIO()
-        image = images[-1]
-        if(format == "JPEG") :
-            image = image.convert('RGB')
-            image.save(output, "JPEG")
-        else:
-            image.save(output, "PNG")
-        output.flush()
-        output.seek(0)
+    #    sd = getSd()
+    #    images = sd.txt_to_img(
+    #        prompt=unidecode.unidecode(prompt),
+    #        sample_steps = steps_value,
+    #        seed=seed_value,
+    #        # negative_prompt=rag.get_sd_negative_prompt(),
+    #        sample_method=sd_cpp.stable_diffusion_cpp.SampleMethod.EULER_A
+    #    )
+    #    output = io.BytesIO()
+    #    image = images[-1]
+    #    if(format == "JPEG") :
+    #        image = image.convert('RGB')
+    #        image.save(output, "JPEG")
+    #    else:
+    #        image.save(output, "PNG")
+    #    output.flush()
+    #    output.seek(0)
+    # The code below can be replaced by the code above if the sd.cpp folks ever address https://github.com/leejet/stable-diffusion.cpp/issues/288
+        filename = str(uuid.uuid1())+".png"
+        process = subprocess.Popen([
+            "../sd",
+            "-m",
+            "../sd.gguf",
+            "--vae",
+            "../sdxl_vae.safetensors",
+            "-p",
+            unidecode.unidecode(prompt),
+            "--steps",
+            str(steps_value),
+            "-s",
+            str(seed_value),
+            "-o",
+            filename])
+        process.wait()
+        f = open(filename, mode ="rb")
+        output = io.BytesIO(initial_bytes=f.read())
+        f.close()
+        os.remove(filename)
+
     except Exception as e:
         print(e)
         pass
+
+
     if(lock.locked()):
         lock.release()
     if(format == "JPEG") :
