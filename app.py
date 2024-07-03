@@ -429,6 +429,8 @@ def llava_describe():
 def stablediffusion():
     seed_value = 42
     steps_value = 20
+    width = 512
+    height = 512
     format = "PNG"
     if ('format' in request.args): 
         format = request.args["format"]
@@ -436,6 +438,10 @@ def stablediffusion():
         seed_value = int(request.args["seed"])
     if ('steps' in request.args): 
         steps_value = int(request.args["steps"])
+    if ('width' in request.args): 
+        width = int(request.args["width"])
+    if ('height' in request.args): 
+        height = int(request.args["height"])
     prompt = request.args["prompt"]
     output = None
     if(not lock.acquire(blocking=False)):
@@ -451,7 +457,9 @@ def stablediffusion():
     #        prompt=unidecode.unidecode(prompt),
     #        sample_steps = steps_value,
     #        seed=seed_value,
-    #        # negative_prompt=rag.get_sd_negative_prompt(),
+    #        width=width,
+    #        height=height,
+    #        negative_prompt=rag.get_sd_negative_prompt(),
     #        sample_method=sd_cpp.stable_diffusion_cpp.SampleMethod.EULER_A
     #    )
     #    output = io.BytesIO()
@@ -477,6 +485,10 @@ def stablediffusion():
             str(steps_value),
             "-s",
             str(seed_value),
+            "-H",
+            str(height),
+            "-W",
+            str(width),
             "-o",
             filename])
         process.wait()
