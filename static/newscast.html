@@ -1,7 +1,7 @@
 <html lang="en" data-theme="cupcake">
 
 <head>
-    <title>Whisper Pecha Kucha</title>
+    <title>Whisper Newsdesk</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- local resources -->
     <link href="css/main.css" rel="stylesheet" />
@@ -19,18 +19,32 @@
 <body>
     <div class="footer">
         <div class="w-full flex p-2 gap-2 join">
-            <label class="input input-bordered flex items-center gap-2 join-item grow">Prompt<input class="grow"
-                    type="text" id="prompt" value="https://www.cbc.ca/webfeed/rss/rss-topstories"/></label>
+            <label class="input input-bordered flex items-center gap-2 join-item grow">Feed<select id="prompt"
+                    id="prompt">
+                    <option value="https://www.cbc.ca/webfeed/rss/rss-topstories" />CBC Top Stories</option>
+                    <option value="https://www.cbc.ca/webfeed/rss/rss-sports" />CBC Sports</option>
+                    <option value="https://www.cbc.ca/webfeed/rss/rss-world" />CBC World News</option>
+                    <option value="https://www.cbc.ca/webfeed/rss/rss-canada" />CBC National News</option>
+                    <option value="https://www.cbc.ca/webfeed/rss/rss-politics" />CBC Political News</option>
+                    <option value="https://www.cbc.ca/webfeed/rss/rss-canada-ottawa" />CBC Ottawa News</option>
+                    <option value="https://rss.nytimes.com/services/xml/rss/nyt/HomePage.xml" />New York Times</option>
+                    <option value="http://feeds.bbci.co.uk/news/rss.xml" />BBC Top Stories</option>
+                    <option value="https://www.reutersagency.com/feed/?taxonomy=best-topics&post_type=best" />Reuters
+                    </option>
+
+                </select></label>
+
             <label class="input input-bordered flex items-center gap-2 join-item">Seed<input type="number" id="seed"
                     value="1" /></label>
+            <button id="go-button" class="input input-bordered flex items-center gap-2 join-item btn btn-primary">Go</button>
         </div>
     </div>
     <div class="flex p-2 gap-2 w-full h-full place-content-center">
         <div id="imageHolder" class="flex-auto w-64">
-            Imagined images go here.
+            
         </div>
         <div id="presenterHolder" class="flex-initial w-64">
-            Text goes here
+            
         </div>
 
     </div>
@@ -38,15 +52,9 @@
 
 </body>
 <script>
-    // Bind the "enter" keystroke.
-    document.getElementById("prompt").addEventListener("keypress", function (event) {
-        if (event.key === "Enter") {
-            event.preventDefault();
+    // Bind the "go" button.
+    document.getElementById("go-button").addEventListener("click", function (event) {
             sendPrompt();
-        }
-    });
-    document.getElementById("seed").addEventListener("change", function (event) {
-        sendPrompt();
     });
 
     function loadResources(url, type) {
@@ -94,7 +102,10 @@
         presenterHolder.append(image2);
         presenterHolder.append(audio1);
         presenterHolder.append(document.createTextNode("[ " + (item + 1) + " / " + preso.length + " ] "));
-        presenterHolder.append(document.createTextNode(preso[item].voiceover));
+        headlineElement = document.createElement("h3");
+        headlineElement.append(document.createTextNode(preso[item].headline));
+        presenterHolder.append(headlineElement);
+        presenterHolder.append(document.createTextNode(preso[item].story));
 
         // When audio ends, load next resource
         document.querySelector('audio').onended = () => {
@@ -110,11 +121,11 @@
         item = window.preso[index];
 
         item.image1 = new URL('../stablediffusion/generate', window.location);
-        item.image1.search = new URLSearchParams({ seed: document.getElementById("seed").value, prompt: item.imagePrompt })
+        item.image1.search = new URLSearchParams({ seed: document.getElementById("seed").value, prompt: item.imagePrompt, width: 768 })
         item.image2 = new URL('../stablediffusion/generate', window.location);
-        item.image2.search = new URLSearchParams({ steps: 12, seed: (window.persona_seed ? window.persona_seed : "13"), prompt: window.persona + " " + item.posture })
+        item.image2.search = new URLSearchParams({ width: 384, height: 384, steps: 20, seed: (window.persona_seed ? window.persona_seed : "13"), prompt: window.persona + " " + item.posture })
         item.audio1 = new URL('../tts/' + window.personality, window.location);
-        item.audio1.search = new URLSearchParams({ text: item.voiceover });
+        item.audio1.search = new URLSearchParams({ text: item.story });
 
 
         Promise.all([
@@ -137,7 +148,7 @@
         imageHolder.appendChild(spinner);
         var url = new URL('../toil/phiona', window.location);
         payload = {
-            "prompt": "Create a 30-second newscast based on the provided stories. Respond in JSON format. The top-level Array will hold between 5 and 10 stories, with one Object per story. For each story, the 'voiceover' field will contain two or three sentences to be spoken by the newscaster. The 'imagePrompt' field will contain an AI image-generation prompt to create a background image suitable for the information in the story. The 'posture' field will contain a short description of the a pose and facial expression, starting with a gerund like 'pointing' or 'looking'. Be certain to include a final story wrapping up the broadcast.",
+            "prompt": "Create a 30-second newscast based on the provided stories. Respond in JSON format. The top-level Array will hold between 5 and 10 stories, with one Object per story. For each story, the 'headline' field will contain a title for the story to be spoken by the newscaster. The 'story' field will contain a summary of the story itself. The 'imagePrompt' field will contain an AI image-generation prompt to create a background image suitable for the information in the story. The 'posture' field will contain a short description of the a pose and facial expression, starting with a gerund like 'pointing' or 'looking'. Be certain to include a final story wrapping up the broadcast.",
             "text": prompt,
             "schema": {
                 "$schema": "http://json-schema.org/draft-06/schema#",
@@ -150,7 +161,10 @@
                         "type": "object",
                         "additionalProperties": false,
                         "properties": {
-                            "voiceover": {
+                            "headline": {
+                                "type": "string"
+                            },
+                            "story": {
                                 "type": "string"
                             },
                             "imagePrompt": {
@@ -163,7 +177,8 @@
                         "required": [
                             "imagePrompt",
                             "posture",
-                            "voiceover"
+                            "headline",
+                            "story"
                         ],
                         "title": "storyElement"
                     }
