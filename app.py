@@ -481,6 +481,8 @@ def stablediffusion():
             "../sdxl_vae.safetensors",
             "-p",
             unidecode.unidecode(prompt),
+            "-n",
+            rag.get_sd_negative_prompt(),
             "--steps",
             str(steps_value),
             "-s",
