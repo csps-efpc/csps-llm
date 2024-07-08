@@ -24,6 +24,9 @@ import base64
 from datetime import datetime
 from duckduckgo_search import DDGS
 
+# Feature Flags
+SD_IN_PROCESS = True
+
 # Initialize the Flask app and a thread lock for the LLM model
 app = flask.Flask(__name__) #, static_url_path=''
 lock = threading.Lock()
@@ -62,7 +65,9 @@ def getSd():
     #Instantiate the model
     sd = StableDiffusion(
         model_path="../sd.gguf",
-        vae_path="../sdxl_vae.gguf"
+        vae_path="../sdxl_vae.gguf",
+        vae_decode_only=True,
+        vae_tiling=True
     )
     __cached_sd = sd
     return sd
@@ -452,52 +457,54 @@ def stablediffusion():
                 return ''
     
     try:
-    #    sd = getSd()
-    #    images = sd.txt_to_img(
-    #        prompt=unidecode.unidecode(prompt),
-    #        sample_steps = steps_value,
-    #        seed=seed_value,
-    #        width=width,
-    #        height=height,
-    #        negative_prompt=rag.get_sd_negative_prompt(),
-    #        sample_method=sd_cpp.stable_diffusion_cpp.SampleMethod.EULER_A
-    #    )
-    #    output = io.BytesIO()
-    #    image = images[-1]
-    #    if(format == "JPEG") :
-    #        image = image.convert('RGB')
-    #        image.save(output, "JPEG")
-    #    else:
-    #        image.save(output, "PNG")
-    #    output.flush()
-    #    output.seek(0)
-    # The code below can be replaced by the code above if the sd.cpp folks ever address https://github.com/leejet/stable-diffusion.cpp/issues/288
-        filename = str(uuid.uuid1())+".png"
-        process = subprocess.Popen([
-            "../sd",
-            "-m",
-            "../sd.gguf",
-            "--vae",
-            "../sdxl_vae.safetensors",
-            "-p",
-            unidecode.unidecode(prompt),
-            "-n",
-            rag.get_sd_negative_prompt(),
-            "--steps",
-            str(steps_value),
-            "-s",
-            str(seed_value),
-            "-H",
-            str(height),
-            "-W",
-            str(width),
-            "-o",
-            filename])
-        process.wait()
-        f = open(filename, mode ="rb")
-        output = io.BytesIO(initial_bytes=f.read())
-        f.close()
-        os.remove(filename)
+        output = io.BytesIO()
+        if SD_IN_PROCESS:
+            sd = getSd()
+            images = sd.txt_to_img(
+                prompt=unidecode.unidecode(prompt),
+                sample_steps = steps_value,
+                seed=seed_value,
+                width=width,
+                height=height,
+                negative_prompt=rag.get_sd_negative_prompt(),
+                sample_method=sd_cpp.stable_diffusion_cpp.SampleMethod.EULER_A
+            )
+            image = images[-1]
+            if(format == "JPEG") :
+                image = image.convert('RGB')
+                image.save(output, "JPEG")
+            else:
+                image.save(output, "PNG")
+            output.flush()
+            output.seek(0)
+    # The code below can be completely replaced by the code above if the sd.cpp folks ever address https://github.com/leejet/stable-diffusion.cpp/issues/288
+        else:
+            filename = str(uuid.uuid1())+".png"
+            process = subprocess.Popen([
+                "../sd",
+                "-m",
+                "../sd.gguf",
+                "--vae",
+                "../sdxl_vae.gguf",
+                "-p",
+                unidecode.unidecode(prompt),
+                "-n",
+                rag.get_sd_negative_prompt(),
+                "--steps",
+                str(steps_value),
+                "-s",
+                str(seed_value),
+                "-H",
+                str(height),
+                "-W",
+                str(width),
+                "-o",
+                filename])
+            process.wait()
+            f = open(filename, mode ="rb")
+            output = io.BytesIO(initial_bytes=f.read())
+            f.close()
+            os.remove(filename)
 
     except Exception as e:
         print(e)

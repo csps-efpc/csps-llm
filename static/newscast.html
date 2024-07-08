@@ -121,7 +121,7 @@
         item = window.preso[index];
 
         item.image1 = new URL('../stablediffusion/generate', window.location);
-        item.image1.search = new URLSearchParams({ seed: document.getElementById("seed").value, prompt: item.imagePrompt, width: 768 })
+        item.image1.search = new URLSearchParams({ seed: document.getElementById("seed").value, prompt: item.imagePrompt, width: 512 })
         item.image2 = new URL('../stablediffusion/generate', window.location);
         item.image2.search = new URLSearchParams({ width: 384, height: 384, steps: 20, seed: (window.persona_seed ? window.persona_seed : "13"), prompt: window.persona + " " + item.posture })
         item.audio1 = new URL('../tts/' + window.personality, window.location);
@@ -148,7 +148,7 @@
         imageHolder.appendChild(spinner);
         var url = new URL('../toil/phiona', window.location);
         payload = {
-            "prompt": "Create a 30-second newscast based on the provided stories. Respond in JSON format. The top-level Array will hold between 5 and 10 stories, with one Object per story. For each story, the 'headline' field will contain a title for the story to be spoken by the newscaster. The 'story' field will contain a summary of the story itself. The 'imagePrompt' field will contain an AI image-generation prompt to create a background image suitable for the information in the story. The 'posture' field will contain a short description of the a pose and facial expression, starting with a gerund like 'pointing' or 'looking'. Be certain to include a final story wrapping up the broadcast.",
+            "prompt": "Create a 30-second newscast based on the provided stories. Respond in JSON format. The top-level Array will hold between 5 and 10 stories, with one Object per story. For each story, the 'headline' field will contain a title for the story to be spoken by the newscaster. The 'story' field will contain a summary of the story itself. The 'imagePrompt' field will contain a detailed AI image-generation prompt to create a background image suitable for the information in the story. The image-generation prompt should not describe a map. The 'posture' field will contain a short description of the a pose and facial expression, starting with a gerund like 'pointing' or 'looking'. Be certain to include a final story wrapping up the broadcast.",
             "text": prompt,
             "schema": {
                 "$schema": "http://json-schema.org/draft-06/schema#",

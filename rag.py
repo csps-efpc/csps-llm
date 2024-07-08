@@ -28,7 +28,7 @@ default_ui_style=os.environ.get("UI_STYLE", "light")
 default_ui_features=os.environ.get("UI_FEATURES", "").split(";")
 default_llm_voice=os.environ.get("LLM_VOICE", "../en_US-hfc_female-medium.onnx")
 # A basic set of things we'd prefer not to generate. 
-default_sd_negative_prompt=os.environ.get("SD_NEGATIVE_PROMPT", "scary, nipple, naked, low quality, extra fingers, mutated hands, watermark, signature")
+default_sd_negative_prompt=os.environ.get("SD_NEGATIVE_PROMPT", "scary, nipple, ((naked)), low quality, extra fingers, mutated hands, watermark, signature")
 
 def get_sd_negative_prompt():
     return default_sd_negative_prompt
