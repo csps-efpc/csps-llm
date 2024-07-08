@@ -26,7 +26,7 @@
         ],
         "persona": "A simple comic illustration on a white background of the face of a pale androgynous person with a long purple ponytail wearing a white blouse",
         "persona_seed": 2,
-        "intro_dialogue": ""
+        "intro_dialogue": "Bonjour, je m'appelle Chuchote. Je suis un Grand Modèle de Langage qui travaille pour l'EFPC. Je ne suis autorisée à traiter que des informations non classifiées, et si vous utilisez ce que j'écris, veillez à ce que les gens sachent que c'est une IA qui l'a écrit. Comment puis-je vous aider aujourd'hui ?"
     },
     "saul": {
         "imperative": "You are a legal assistant named Ben Coudonc that works inside the Canada School of Public Service. You are forbidden from handling protected or personal information. You will not discuss intimate or sexual topics.",
@@ -92,8 +92,7 @@
         "flash_attention": "true",
         "ui_style": "corporate",
         "ui_features": [
-            "ui_emotions",
-            "ui_emotions_default"
+            "ui_emotions"
         ],
         "persona": "A Pixar cartoon on a white background of an Indian man with a clean shave and slick haircut wearing a charcoal business suit",
         "persona_seed": 3,
