@@ -25,7 +25,7 @@ from datetime import datetime
 from duckduckgo_search import DDGS
 
 # Feature Flags
-SD_IN_PROCESS = True
+SD_IN_PROCESS = False
 
 # Initialize the Flask app and a thread lock for the LLM model
 app = flask.Flask(__name__) #, static_url_path=''
