@@ -57,7 +57,7 @@ def getSd():
     global __cached_sd
     if not lock.locked():
         #The method has been called by a thread not holding the lock.
-        raise Error('Attempted to control the loaded model without holding the exclusivity lock.')
+        raise Exception('Attempted to control the loaded model without holding the exclusivity lock.')
     
     if(__cached_sd is not None) :
         return __cached_sd
@@ -78,7 +78,7 @@ def getLlm(personality):
     global __cached_personality
     if not lock.locked():
         #The method has been called by a thread not holding the lock.
-        raise Error('Attempted to control the LLM without holding the exclusivity lock.')
+        raise Exception('Attempted to control the LLM without holding the exclusivity lock.')
     
     if(__cached_llm is not None) :
         if(personality == __cached_personality):
