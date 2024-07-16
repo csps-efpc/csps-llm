@@ -265,7 +265,7 @@ def gpt_socket(personality):
                 if(os.path.isfile(model_spec["agent_rag_source"])):
                     with(open(model_spec["agent_rag_source"])) as rag_file:
                         first_prompt += rag_file.read()
-            if('Phi-3' in model_spec['hf_repo'] or 'Mistral-7B-Instruct-v0.3' in model_spec['hf_repo']) : 
+            if('Phi-3' in model_spec['hf_repo'] or 'Mistral-7B-Instruct-v0.3' in model_spec['hf_repo'] or 'OLMo-7B-Instruct' in model_spec['hf_repo']) : 
                 chat_session.append({"role": "user", "content": rag.get_personality_prefix(personality)})
             else:
                 chat_session.append({"role": "system", "content": rag.get_personality_prefix(personality)})
