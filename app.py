@@ -523,7 +523,7 @@ def ask(prompt, personality="whisper", chat_context = [], force_boolean = False)
     llm=getLlm(personality)
     messages = chat_context.copy()
     if(not messages) :
-        if('Phi-3' in model_spec['hf_repo'] or 'Mistral-7B-Instruct-v0.3' in model_spec['hf_repo']) : 
+        if('Phi-3' in model_spec['hf_repo'] or 'Mistral-7B-Instruct-v0.3' in model_spec['hf_repo'] or 'OLMo-7B-Instruct' in model_spec['hf_repo']) : 
             messages.append({"role": "user", "content": rag.get_personality_prefix(personality)})
         else:
             messages.append({"role": "system", "content": rag.get_personality_prefix(personality)})
