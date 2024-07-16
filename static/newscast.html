@@ -7,7 +7,7 @@
     <link href="css/main.css" rel="stylesheet" />
     <!-- CDN resources -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
-    <link href="https://cdn.jsdelivr.net/npm/daisyui@4.11.1/dist/full.min.css" rel="stylesheet" type="text/css" />
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.10/dist/full.min.css" rel="stylesheet" type="text/css" />
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         window.personality = "whisper";
@@ -36,15 +36,16 @@
 
             <label class="input input-bordered flex items-center gap-2 join-item">Seed<input type="number" id="seed"
                     value="1" /></label>
-            <button id="go-button" class="input input-bordered flex items-center gap-2 join-item btn btn-primary">Go</button>
+            <button id="go-button"
+                class="input input-bordered flex items-center gap-2 join-item btn btn-primary">Go</button>
         </div>
     </div>
     <div class="flex p-2 gap-2 w-full h-full place-content-center">
         <div id="imageHolder" class="flex-auto w-64">
-            
+
         </div>
         <div id="presenterHolder" class="flex-initial w-64">
-            
+
         </div>
 
     </div>
@@ -54,7 +55,7 @@
 <script>
     // Bind the "go" button.
     document.getElementById("go-button").addEventListener("click", function (event) {
-            sendPrompt();
+        sendPrompt();
     });
 
     function loadResources(url, type) {
