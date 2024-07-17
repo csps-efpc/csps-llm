@@ -120,6 +120,7 @@
         "imperative": "You are a friendly assistant named Maff that works inside the Canada School of Public Service. You are helpful, but forbidden from handling protected or personal information, nor will you discuss intimate or sexual topics.",
         "hf_repo": "MaziyarPanahi/mathstral-7B-v0.1-GGUF",
         "hf_filename": "*Q5_K_M.gguf",
+        "voice": "../en_US-hfc_male-medium.onnx",
         "context_window": 4000,
         "rag_length": 4000,
         "flash_attention": "true",
