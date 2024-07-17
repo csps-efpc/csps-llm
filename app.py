@@ -479,6 +479,7 @@ def stablediffusion():
             output.seek(0)
     # The code below can be completely replaced by the code above if the sd.cpp folks ever address https://github.com/leejet/stable-diffusion.cpp/issues/288
         else:
+            freeLlm()
             filename = str(uuid.uuid1())+".png"
             process = subprocess.Popen([
                 "../sd",
