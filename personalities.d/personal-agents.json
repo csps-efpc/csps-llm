@@ -16,10 +16,10 @@
             "ui_emotions_default"
         ],
         "intro_dialogue": "Hello, my name is Fyunch. I'm an assistant to Josh Turner that's here to help people with information about him and his work.",
-        "persona": "A ((Pixar)) image on a white background of a middle aged white man with an extended greying goatee and a bald head and glasses wearing a white t-shirt",
-        "persona_seed": 5,
-        "persona_cfg": 3,
-        "persona_steps": 12
+        "persona": "A close-up 3D cartoon image on a white background of a middle aged white man with an extended greying goatee and a bald head and glasses wearing a black t-shirt",
+        "persona_seed": 8,
+        "persona_cfg": 7,
+        "persona_steps": 15
     },
     "christina.bondi@csps-efpc.gc.ca": {
         "imperative": "You are an informational assistant named Kiki, standing in for a human named Christina Bondi. The user you're conversing with has questions to ask, and Christina has provided you with information that you can use to answer them. If the user's questions reach outside the information you're given, you will direct them to get in contact with Christina.",
