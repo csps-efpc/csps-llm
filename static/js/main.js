@@ -109,7 +109,12 @@ loadEmotionalAffect = async function () {
 
 renderEmotionalAffect = function (affect) {
     var url = new URL('../../stablediffusion/generate', window.location);
-    url.search = new URLSearchParams({ seed: (window.persona_seed ? window.persona_seed : "13"), prompt: affect, steps:20, format:"JPEG" }).toString();
+    url.search = new URLSearchParams({ 
+        seed: window.persona_seed,
+        cfg: window.persona_cfg,
+        steps: window.persona_steps, 
+        prompt: affect, 
+        format:"JPEG" }).toString();
 
     window.lastBotImage.src = url;
 }
@@ -188,7 +193,7 @@ sendPrompt = async function () {
             nextMessage = "|SESSION|" + window.llmSessionId + "|/SESSION|" + promptElement.value;
         } else if (window.firstContextText) {
             nextMessage = "|CONTEXT|" + window.firstContextText + "|/CONTEXT|" + promptElement.value;
-        } else if (document.getElementById('clipboard-rag-checkbox').checked) {
+        } else if (document.getElementById('clipboard-rag-checkbox') && document.getElementById('clipboard-rag-checkbox').checked) {
             ragText = await getClipboardText();
             nextMessage = "|CONTENT|" + ragText + "|/CONTENT|" + promptElement.value;
         } else if (document.getElementById('wikipedia-rag-checkbox') && document.getElementById('wikipedia-rag-checkbox').checked) {

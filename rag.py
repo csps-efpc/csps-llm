@@ -52,6 +52,8 @@ def get_model_spec(personality):
         'cpu_threads': default_llm_cpu_threads,
         'persona': "A purple cat",
         'persona_seed': "2",
+        'persona_cfg': "5",
+        'persona_steps': "20",
         'intro_dialogue': "",
         'agent_rag_source': None
     }

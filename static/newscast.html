@@ -122,9 +122,9 @@
         item = window.preso[index];
 
         item.image1 = new URL('../stablediffusion/generate', window.location);
-        item.image1.search = new URLSearchParams({ seed: document.getElementById("seed").value, prompt: item.imagePrompt, width: 512 })
+        item.image1.search = new URLSearchParams({ seed: document.getElementById("seed").value, cfg: 3, steps: 10, prompt: item.imagePrompt, width: 768 })
         item.image2 = new URL('../stablediffusion/generate', window.location);
-        item.image2.search = new URLSearchParams({ width: 384, height: 384, steps: 20, seed: (window.persona_seed ? window.persona_seed : "13"), prompt: window.persona + " " + item.posture })
+        item.image2.search = new URLSearchParams({ width: 384, height: 384, cfg:4, steps: 12, seed: (window.persona_seed ? window.persona_seed : "13"), prompt: window.persona + " " + item.posture })
         item.audio1 = new URL('../tts/' + window.personality, window.location);
         item.audio1.search = new URLSearchParams({ text: item.story });
 

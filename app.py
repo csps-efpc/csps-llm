@@ -434,6 +434,7 @@ def llava_describe():
 def stablediffusion():
     seed_value = 42
     steps_value = 20
+    config_value = 5
     width = 512
     height = 512
     format = "PNG"
@@ -445,6 +446,8 @@ def stablediffusion():
         steps_value = int(request.args["steps"])
     if ('width' in request.args): 
         width = int(request.args["width"])
+    if ('cfg' in request.args): 
+        config_value = float(request.args["cfg"])
     if ('height' in request.args): 
         height = int(request.args["height"])
     prompt = request.args["prompt"]
@@ -466,6 +469,7 @@ def stablediffusion():
                 seed=seed_value,
                 width=width,
                 height=height,
+                cfg_scale=config_value,
                 negative_prompt=rag.get_sd_negative_prompt(),
                 sample_method=sd_cpp.stable_diffusion_cpp.SampleMethod.EULER_A
             )
@@ -493,6 +497,8 @@ def stablediffusion():
                 rag.get_sd_negative_prompt(),
                 "--steps",
                 str(steps_value),
+                "--cfg-scale",
+                str(config_value),
                 "-s",
                 str(seed_value),
                 "-H",

@@ -16,8 +16,10 @@
             "ui_emotions_default"
         ],
         "intro_dialogue": "Hello, my name is Fyunch. I'm an assistant to Josh Turner that's here to help people with information about him and his work.",
-        "persona": "A Pixar image on a white background of a middle aged white man with an extended goatee and a bald head and glasses wearing a white t-shirt",
-        "persona_seed": 2
+        "persona": "A ((Pixar)) image on a white background of a middle aged white man with an extended greying goatee and a bald head and glasses wearing a white t-shirt",
+        "persona_seed": 5,
+        "persona_cfg": 3,
+        "persona_steps": 12
     },
     "christina.bondi@csps-efpc.gc.ca": {
         "imperative": "You are an informational assistant named Kiki, standing in for a human named Christina Bondi. The user you're conversing with has questions to ask, and Christina has provided you with information that you can use to answer them. If the user's questions reach outside the information you're given, you will direct them to get in contact with Christina.",
@@ -36,8 +38,10 @@
             "ui_emotions_default"
         ],
         "intro_dialogue": "Hello, my name is Kiki. I'm an assistant to Christina Bondi that's here to help people with information about her and her work.",
-        "persona": "A pixar close-up on a white background of a pale thin woman with whispy medium-length blonde hair with visible black roots and glasses with thin gold frames, sharp features, big eyes, wearing fashionable white clothing, ",
-        "persona_seed": 11
+        "persona": "A pixar close-up on a white background of a pale thin woman with whispy medium-length blonde hair with visible black roots and glasses with thin ((gold)) frames, sharp features, big eyes, wearing fashionable white clothing, ",
+        "persona_seed": 11,
+        "persona_cfg": 8,
+        "persona_steps": 15
     },
     "martin.perron@csps-efpc.gc.ca": {
         "imperative": "You are an informational assistant named Fox, standing in for a human named Martin Perron. The user you're conversing with has questions to ask, and Martin has provided you with information that you can use to answer them. If the user's questions reach outside the information you're given, you will direct them to get in contact with Martin.",
@@ -56,7 +60,10 @@
             "ui_emotions_default"
         ],
         "intro_dialogue": "Hello, my name is Fox. I'm an assistant to Martin Perron that's here to help people with information about him and his work.",
-        "persona": "A pixar close-up on a white background of a serious round-faced ginger man with slicked-back hair, freckles and a white cardigan",
-        "persona_seed": 19
-    }
+        "persona": "A pixar close-up on a white background of a serious round-faced young ginger man with slicked-back hair, freckles and a white cardigan",
+        "persona_seed": 19,
+        "persona_cfg": 7,
+        "persona_steps": 14
+        
+   }
 }

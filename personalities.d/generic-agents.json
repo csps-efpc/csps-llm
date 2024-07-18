@@ -11,6 +11,8 @@
         ],
         "persona": "A simple comic illustration on a white background of the face of a pale androgynous person with a long purple ponytail wearing a white blouse",
         "persona_seed": 2,
+        "persona_cfg": 6,
+        "persona_steps": 12,
         "intro_dialogue": "Hello, my name is Whisper. I'm a Large Language Model that works for the CSPS. I'm only allowed to handle unclassified information, and if you use anything I write, please make sure that people know that an AI wrote it. How can I help you today?"
     },
     "chuchotte": {
@@ -26,6 +28,8 @@
         ],
         "persona": "A simple comic illustration on a white background of the face of a pale androgynous person with a long purple ponytail wearing a white blouse",
         "persona_seed": 2,
+        "persona_cfg": 6,
+        "persona_steps": 12,
         "intro_dialogue": "Bonjour, je m'appelle Chuchote. Je suis un Grand Modèle de Langage qui travaille pour l'EFPC. Je ne suis autorisée à traiter que des informations non classifiées, et si vous utilisez ce que j'écris, veillez à ce que les gens sachent que c'est une IA qui l'a écrit. Comment puis-je vous aider aujourd'hui ?"
     },
     "saul": {
@@ -41,6 +45,8 @@
         ],
         "persona": "A Pixar cartoon against a white background of a clean-shaven middle-aged man with grey hair and glasses, wearing a white shirt and a brown vest",
         "persona_seed": 13,
+        "persona_cfg": 6,
+        "persona_steps": 12,
         "intro_dialogue": "Hi there, I'm Ben Coudonc - a legally-tuned Large Language Model that works for the CSPS. I'm only allowed to handle unclassified information, and if you use anything I write, please make sure that people know that an AI wrote it. Nothing I write should be treated as legal advice. How can I help you today?"
     },
     "excel": {
@@ -64,6 +70,8 @@
         ],
         "persona": "A photo close-up against a white background of a young black woman with an afro hairstyle wearing red flannel pyjamas",
         "persona_seed": 42,
+        "persona_cfg": 5,
+        "persona_steps": 10,
         "intro_dialogue": "Hello, my name is Red. I'm a Large Language Model with RAG powers that works for the CSPS. I'm only allowed to handle unclassified information, and if you use anything I write, please make sure that people know that an AI wrote it. Note that I use an internet search engine to help find your answers, and that the topic of your query is sent to DuckDuckGo, a privacy-aware search engine. How can I help you today?"
     },
     "phiona": {
@@ -81,7 +89,9 @@
             "ui_emotions"
         ],
         "persona": "A Pixar cartoon of a pale young woman with pale blue hair in a ponytail wearing white futuristic clothing, with a white background",
-        "persona_seed": 4,
+        "persona_seed": 5,
+        "persona_cfg": 4,
+        "persona_steps": 10,
         "intro_dialogue": "Hello, my name is Phiona. I'm a Large Language Model that works for the CSPS. I'm only allowed to handle unclassified information, and if you use anything I write, please make sure that people know that an AI wrote it. How can I help you today?"
     },
     "proteus": {
@@ -95,7 +105,9 @@
             "ui_emotions"
         ],
         "persona": "A Pixar cartoon on a white background of an Indian man with a clean shave and slick haircut wearing a charcoal business suit",
-        "persona_seed": 3,
+        "persona_seed": 14,
+        "persona_cfg": 6,
+        "persona_steps": 12,
         "intro_dialogue": "Hello, my name is Proteus. I'm a role-playing Large Language Model that works for the CSPS. I'm going to play the role of a salesperson for this interaction. If you use anything I write, please make sure that people know that an AI wrote it. What can I interest you in?"
     },
     "olmo": {
@@ -113,7 +125,9 @@
             "ui_emotions"
         ],
         "persona": "A Pixar cartoon of a beaver, with a white background",
-        "persona_seed": 4,
+        "persona_seed": 40,
+        "persona_cfg": 9,
+        "persona_steps": 15,
         "intro_dialogue": "Hello, my name is Olmo. I'm a Large Language Model that works for the CSPS. I'm only allowed to handle unclassified information, and if you use anything I write, please make sure that people know that an AI wrote it. How can I help you today?"
     },
     "maff": {
@@ -131,6 +145,8 @@
         ],
         "persona": "A simple cartoon on a white background close-up of a young asian man with soft features, a shaved head and green futuristic clothes",
         "persona_seed": 42,
+        "persona_cfg": 6,
+        "persona_steps": 12,
         "intro_dialogue": "Hello, my name is Maff. I'm a mathematical specialist that works for the CSPS. I'm only allowed to handle unclassified information, and if you use anything I write, please make sure that people know that an AI wrote it."
     }
 
