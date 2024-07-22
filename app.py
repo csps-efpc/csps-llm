@@ -36,6 +36,12 @@ tts_lock = threading.Lock()
 stopTokens = ["<|assistant|>", "<|user|>", "<|end|>", "[/INST]","[INST]","</s>","User:", "Assistant:", "[/ASK]", "[INFO]", "<</SYS>>"]
 temperature = 0.8
 session_cache_size = 100
+systemless_markers = [
+    'granite-8b-code-instruct',
+    'Phi-3-mini',
+    'Mistral-7B-Instruct-v0.3',
+    'OLMo-7B-Instruct'
+]
 
 # Prompt parts
 system_prefix="[INST]\n"
@@ -124,6 +130,13 @@ def freeLlm():
         gc.collect()
         __cached_sd = None
         time.sleep(0.5)
+
+def isSystemlessModel(repo_name) :
+    for marker in systemless_markers :
+        if marker in repo_name :
+            return True
+    return False
+
 
 # Flask route to bounce users to the default UI
 @app.route('/')
@@ -265,7 +278,7 @@ def gpt_socket(personality):
                 if(os.path.isfile(model_spec["agent_rag_source"])):
                     with(open(model_spec["agent_rag_source"])) as rag_file:
                         first_prompt += rag_file.read()
-            if('Phi-3' in model_spec['hf_repo'] or 'Mistral-7B-Instruct-v0.3' in model_spec['hf_repo'] or 'OLMo-7B-Instruct' in model_spec['hf_repo']) : 
+            if(isSystemlessModel(model_spec['hf_repo'])) : 
                 chat_session.append({"role": "user", "content": rag.get_personality_prefix(personality)})
             else:
                 chat_session.append({"role": "system", "content": rag.get_personality_prefix(personality)})
@@ -530,7 +543,7 @@ def ask(prompt, personality="whisper", chat_context = [], force_boolean = False)
     llm=getLlm(personality)
     messages = chat_context.copy()
     if(not messages) :
-        if('Phi-3' in model_spec['hf_repo'] or 'Mistral-7B-Instruct-v0.3' in model_spec['hf_repo'] or 'OLMo-7B-Instruct' in model_spec['hf_repo']) : 
+        if isSystemlessModel(model_spec['hf_repo']) : 
             messages.append({"role": "user", "content": rag.get_personality_prefix(personality)})
         else:
             messages.append({"role": "system", "content": rag.get_personality_prefix(personality)})
@@ -587,7 +600,7 @@ def toil(personality):
 
     messages = []
 
-    if('Phi-3' in model_spec['hf_repo'] or 'Mistral-7B-Instruct-v0.3' in model_spec['hf_repo']) : 
+    if isSystemlessModel(model_spec['hf_repo']) : 
         messages.append({"role": "user", "content": rag.get_personality_prefix(personality)})
     else:
         messages.append({"role": "system", "content": rag.get_personality_prefix(personality)})

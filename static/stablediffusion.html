@@ -20,6 +20,8 @@
                     value="1" /></label>
             <label class="input input-bordered flex items-center gap-2 join-item">Steps<input type="number" id="steps"
                     value="20" /></label>
+            <label class="input input-bordered flex items-center gap-2 join-item">Cfg<input type="number" id="cfg"
+                    value="7" /></label>
             <label class="input input-bordered flex items-center gap-2 join-item grow">Size<select id="size" id="size">
                     <option value="384" />small</option>
                     <option value="512" selected />medium</option>
@@ -63,6 +65,7 @@
         var prompt = document.getElementById("prompt").value;
         var seed = document.getElementById("seed").value;
         var steps = document.getElementById("steps").value;
+        var cfg = document.getElementById("cfg").value;
         var size = document.getElementById("size").value;
         var imageHolder = document.getElementById("imageHolder");
         imageHolder.innerHTML = "";
@@ -84,7 +87,7 @@
             width = parseInt(size);
             height = parseInt(size);
         }
-        url.search = new URLSearchParams({ prompt: prompt, seed: seed, steps: steps, format: "JPEG", width: width, height: height });
+        url.search = new URLSearchParams({ prompt: prompt, seed: seed, cfg: cfg, steps: steps, format: "JPEG", width: width, height: height });
         loadImage(url)
             .then(image => {
                 imageHolder.innerHTML = "";
