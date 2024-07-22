@@ -82,15 +82,6 @@ def get_rag_prefix(personality, url, rag_prefix='Consider the following content:
     returnable = (personality_prefix + prompt_prefix + rag_prefix + rag_text + rag_suffix) 
     return returnable
 
-# Function to get RAG state
-def get_rag_state(personality, model, url, user_prefix = '', rag_prefix='Consider the following content:\n', rag_suffix='\nGiven the preceding content, ', system_prefix="", system_suffix="", max_url_content_length = 4096, rag_text = None):
-    """Retrieves a state for the given personality that incorporates the given url as RAG context. The state will be positioned just before the user prompt."""
-    model.load_state(get_personality_state(personality, model, system_prefix, system_suffix))
-    rag_text = get_rag_prefix(personality, model, url, user_prefix = '', rag_prefix=rag_prefix, rag_suffix=rag_suffix, system_prefix=system_prefix, system_suffix=system_suffix, max_url_content_length = 4096, rag_text=rag_text)
-    model.eval(model.tokenize((rag_prefix + rag_text + rag_suffix).encode()))
-    state = model.save_state()
-    return state
-
 # Function to get the current date and time as a prompt-part
 def getDateTimeText():
     now = datetime.now()
