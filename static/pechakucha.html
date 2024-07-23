@@ -49,6 +49,17 @@
         sendPrompt();
     });
 
+    function completeAudio(audio) {
+        return new Promise((resolve, reject) => {
+            //audio.onerror = reject;
+            if(audio) {
+                audio.onended = resolve;
+            } else {
+                resolve();
+            }
+        });
+    }
+
     function loadResources(url, type) {
         return new Promise((resolve, reject) => {
             let resource;
@@ -96,28 +107,26 @@
         presenterHolder.append(document.createTextNode("[ " + (item + 1) + " / " + preso.length + " ] "));
         presenterHolder.append(document.createTextNode(preso[item].voiceover));
 
-        // When audio ends, load next resource
-        document.querySelector('audio').onended = () => {
+        if ((window.slideIndex + 1) < window.preso.length) {
             window.slideIndex++;
-            if (window.slideIndex < window.preso.length) {
-                preloadAndDisplay(window.slideIndex);
-            }
-        };
+            preloadAndDisplay(window.slideIndex, audio1);
+        }
     }
 
-    function preloadAndDisplay(index) {
+    function preloadAndDisplay(index, previousAudio) {
         // Preload images and audio
         item = window.preso[index];
 
         item.image1 = new URL('../stablediffusion/generate', window.location);
-        item.image1.search = new URLSearchParams({ seed: document.getElementById("seed").value, prompt: item.imagePrompt })
+        item.image1.search = new URLSearchParams({ seed: document.getElementById("seed").value, cfg: 3, steps: 10, prompt: item.imagePrompt, width: 768 })
         item.image2 = new URL('../stablediffusion/generate', window.location);
-        item.image2.search = new URLSearchParams({ steps: 12, seed: (window.persona_seed ? window.persona_seed : "13"), prompt: window.persona + " " + item.posture })
+        item.image2.search = new URLSearchParams({ width: 384, height: 384, cfg:4, steps: 12, seed: (window.persona_seed ? window.persona_seed : "13"), prompt: window.persona + " " + item.posture })
         item.audio1 = new URL('../tts/' + window.personality, window.location);
         item.audio1.search = new URLSearchParams({ text: item.voiceover });
 
 
         Promise.all([
+            completeAudio(previousAudio),
             loadResources(item.image1, 'image'),
             loadResources(item.image2, 'image'),
             loadResources(item.audio1, 'audio')
@@ -147,6 +156,8 @@
                 "items": {
                     "$ref": "#/definitions/Welcome1Element"
                 },
+                "minItems": 5,
+                "maxItems": 20,
                 "definitions": {
                     "Welcome1Element": {
                         "type": "object",
