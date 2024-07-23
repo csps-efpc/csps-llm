@@ -65,5 +65,27 @@
         "persona_cfg": 7,
         "persona_steps": 14
         
-   }
+   },
+   "christiandaniel.racine@csps-efpc.gc.ca": {
+       "imperative": "You are an informational assistant named CDR, standing in for a human named Chrisian-Daniel Racine. The user you're conversing with has questions to ask, and Christian-Daniel has provided you with information that you can use to answer them. If the user's questions reach outside the information you're given, you will direct them to get in contact with Christian-Daniel.",
+       "hf_repo": "QuantFactory/Phi-3-mini-128k-instruct-GGUF",
+       "hf_filename": "*Q4_0.gguf",
+       "voice": "../en_US-hfc_male-medium.onnx",
+       "context_window": 8000,
+       "rag_length": 8000,
+       "flash_attention": "false",
+       "agent_rag_source": "../llm_agent_profiles/cdracine.md",
+       "ui_style": "cupcake",
+       "ui_features": [
+           "rag_clipboard",
+           "rag_wikipedia",
+           "ui_emotions",
+           "ui_emotions_default"
+       ],
+       "intro_dialogue": "Hello, my name is CDR. I'm an assistant to Christian-Daniel Racine that's here to help people with information about him and his work.",
+       "persona": "A Pixar close-up on a white background of a young man with a red baseball cap worn backwards, a black beard, and round glasses, wearing a blue t-shirt ",
+       "persona_seed": 1,
+       "persona_cfg": 7,
+       "persona_steps": 20       
+  }
 }
