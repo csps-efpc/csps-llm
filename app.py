@@ -352,6 +352,8 @@ def describe(personality):
     del model_spec["imperative"]
     del model_spec["ui_features"]
     del model_spec["persona_seed"]
+    del model_spec["persona_cfg"]
+    del model_spec["persona_steps"]
     return(model_spec)
 
 # Flask route for handling tts requests
