@@ -162,7 +162,7 @@
             "rag_clipboard",
             "ui_emotions"
         ],
-        "persona": "A close-up on a black background of a translucent male ((ghost)) made of circuitry looking at the camera",
+        "persona": "A close-up on a black background of a translucent male ((ghost)) made of circuitry ",
         "persona_seed": 1,
         "persona_cfg": 7,
         "persona_steps": 14,
