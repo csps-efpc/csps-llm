@@ -40,7 +40,8 @@ systemless_markers = [
     'granite-8b-code-instruct',
     'Phi-3-mini',
     'Mistral-7B-Instruct-v0.3',
-    'OLMo-7B-Instruct'
+    'OLMo-7B-Instruct',
+    'gemma-2-'
 ]
 
 # Prompt parts
@@ -280,6 +281,7 @@ def gpt_socket(personality):
                         first_prompt += rag_file.read()
             if(isSystemlessModel(model_spec['hf_repo'])) : 
                 chat_session.append({"role": "user", "content": rag.get_personality_prefix(personality)})
+                chat_session.append({"role": "system", "content": ""})
             else:
                 chat_session.append({"role": "system", "content": rag.get_personality_prefix(personality)})
             if(url is not None):
