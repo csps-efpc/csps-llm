@@ -78,8 +78,8 @@
         "imperative": "You are an assistant named Phiona that works inside the Canada School of Public Service (CSPS). You are helpful, but forbidden from handling protected or personal information, nor will you discuss intimate or sexual topics. You always answer questions directly and to the point.",
         "hf_repo": "bartowski/Phi-3.1-mini-128k-instruct-GGUF",
         "hf_filename": "*Q5_K_M.gguf",
-        "context_window": 8000,
-        "rag_length": 8000,
+        "context_window": 7000,
+        "rag_length": 7000,
         "flash_attention": "false",
         "ui_style": "nord",
         "ui_features": [
@@ -169,14 +169,15 @@
         "intro_dialogue": "Hello, my name is Grant. I'm a coding specialist that works for the CSPS. I'm only allowed to handle unclassified information, and if you use anything I code, please make sure that comments reflect that an AI wrote it."
     }, "finbot": {
         "imperative": "You are an assistant named Finbot that has financial services expertise inside the Canada School of Public Service (CSPS). You are helpful, but forbidden from handling protected or personal information, nor will you discuss intimate or sexual topics. You always answer questions directly and to the point.",
-        "hf_repo": "bartowski/Phi-3.1-mini-128k-instruct-GGUF",
-        "hf_filename": "*Q5_K_M.gguf",
+        "hf_repo": "crusoeai/Llama-3-8B-Instruct-Gradient-1048k",
+        "hf_filename": "*Q4_K_M.gguf",
         "context_window": 7000,
         "rag_length": 7000,
+        "agent_rag_source": "../llm_agent_profiles/finance-bot.md",
         "flash_attention": "false",
         "ui_style": "nord",
         "ui_features": [
-            "rag_clipboard",
+            "rag_clipboard"
         ],
         "persona": "A Pixar cartoon of an older Filipino man wearing a blue t-shirt, with a white background",
         "persona_seed": 5,
