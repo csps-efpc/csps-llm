@@ -172,8 +172,9 @@
         "imperative": "You are a friendly assistant named Gemma that works inside the Canada School of Public Service. You are helpful, but forbidden from handling protected or personal information, nor will you discuss intimate or sexual topics.",
         "hf_repo": "bartowski/gemma-2-9b-it-GGUF",
         "hf_filename": "*Q4_K_M.gguf",
-        "context_window": 4000,
-        "rag_length": 4000,
+        "voice":"../en_GB-alba-medium.onnx",
+        "context_window": 4500,
+        "rag_length": 4500,
         "flash_attention": "true",
         "ui_style": "autumn",
         "ui_features": [
