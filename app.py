@@ -606,6 +606,7 @@ def toil(personality):
 
     if isSystemlessModel(model_spec['hf_repo']) : 
         messages.append({"role": "user", "content": rag.get_personality_prefix(personality)})
+        messages.append({"role": "system", "content": ""})
     else:
         messages.append({"role": "system", "content": rag.get_personality_prefix(personality)})
 
