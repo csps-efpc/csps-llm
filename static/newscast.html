@@ -10,9 +10,9 @@
     <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.10/dist/full.min.css" rel="stylesheet" type="text/css" />
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
-        window.personality = "whisper";
-        window.persona = "A simple comic illustration on a white background of the face of a pale androgynous person with long purple ponytail in a white blouse ";
-        window.persona_seed = 3;
+            window.personality = "gemma";
+            window.persona = "A watercolor painting of an an elf maiden wearing a red ruby bindi with a white background ";
+            window.persona_seed = 2;
     </script>
 </head>
 
@@ -132,7 +132,7 @@
         item.image1 = new URL('../stablediffusion/generate', window.location);
         item.image1.search = new URLSearchParams({ seed: document.getElementById("seed").value, cfg: 3, steps: 10, prompt: item.imagePrompt, width: 768 })
         item.image2 = new URL('../stablediffusion/generate', window.location);
-        item.image2.search = new URLSearchParams({ width: 384, height: 384, cfg:4, steps: 12, seed: (window.persona_seed ? window.persona_seed : "13"), prompt: window.persona + " " + item.posture })
+        item.image2.search = new URLSearchParams({ width: 384, height: 512, cfg:4, steps: 10, seed: (window.persona_seed ? window.persona_seed : "13"), prompt: window.persona + " " + item.posture })
         item.audio1 = new URL('../tts/' + window.personality, window.location);
         item.audio1.search = new URLSearchParams({ text: item.story });
 
@@ -156,7 +156,7 @@
         var spinner = document.createElement("span");
         spinner.classList.add("loading", "loading-spinner", "loading-lg");
         imageHolder.appendChild(spinner);
-        var url = new URL('../toil/phiona', window.location);
+        var url = new URL('../toil/gemma', window.location);
         payload = {
             "prompt": "Create a 30-second newscast based on the provided stories. Respond in JSON format. The top-level Array will hold between 5 and 10 stories, with one Object per story. For each story, the 'headline' field will contain a title for the story to be spoken by the newscaster. The 'story' field will contain a summary of the story itself. The 'imagePrompt' field will contain a detailed AI image-generation prompt to create an image suitable for the information in the story. The 'posture' field will contain a short description of the a pose and facial expression, starting with a gerund like 'pointing' or 'looking'. Be certain to include a final story wrapping up the broadcast.",
             "text": prompt,
