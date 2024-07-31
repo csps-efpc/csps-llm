@@ -1,9 +1,7 @@
 # Import necessary libraries
-import sys
 import gc
 import re
 import os
-import PIL.features
 import flask
 import rag
 from flask import redirect, render_template, request, abort
@@ -13,7 +11,6 @@ from llama_cpp.llama_chat_format import NanoLlavaChatHandler
 from stable_diffusion_cpp import StableDiffusion
 import stable_diffusion_cpp as sd_cpp
 from PIL import Image
-import PIL
 import unidecode
 import threading
 import subprocess
@@ -21,6 +18,7 @@ import uuid
 import time
 import io
 import base64
+import csv
 from datetime import datetime
 from duckduckgo_search import DDGS
 
@@ -89,6 +87,7 @@ def getLlm(personality):
     
     if(__cached_llm is not None) :
         if(personality == __cached_personality):
+            logEvent(subject="cache", eventtype="cache_hit")
             return __cached_llm
     freeLlm()    
     llm = None
@@ -161,9 +160,11 @@ def render_chat(personality):
 @app.route("/gpt-socket/<personality>", websocket=True)
 def gpt_socket(personality):
     ws = Server.accept(request.environ)
+    logEvent(username=determineUser(request), ip = determineIP(request), subject="/gpt-socket/{personality}", eventtype="start_socket")
     now = datetime.now()
     # We receive and parse the first user prompt.
     message = ws.receive()
+    logEvent(username=determineUser(request), ip = determineIP(request), subject="/gpt-socket/{personality}", eventtype="message_socket")
     folded = message.casefold()
     url = None
     text = None
@@ -274,6 +275,7 @@ def gpt_socket(personality):
 
     chat_session = []
 
+    logEvent(username=determineUser(request), ip = determineIP(request), subject="/gpt-socket/{personality}", eventtype="message_socket", data=message, session_id=sessionkey)
     try:
         if(sessionkey in __cached_sessions) :
             chat_session = __cached_sessions.get(sessionkey, '')
@@ -309,7 +311,6 @@ def gpt_socket(personality):
                 return ''
         llm = getLlm(personality)
         
-        print(chat_session)
         stream = llm.create_chat_completion(
             chat_session,
             max_tokens=model_spec['context_window'],
@@ -331,8 +332,10 @@ def gpt_socket(personality):
         # We prepare the session for a subsequent user prompt, and the cycle begins anew.
         chat_session.append({"role": "assistant", "content": response});
         # TODO: if and when the cache moves out of process memory to a K-V store, the chat session will need to get written to that cache.
+        logEvent(username=determineUser(request), ip = determineIP(request), subject="/gpt-socket/{personality}", eventtype="end_socket", , session_id=sessionkey)
     except Exception as e:
         print(e)
+        logEvent(username=determineUser(request), ip = determineIP(request), subject="/gpt-socket/{personality}", eventtype="exception_socket", data=str(e), session_id=sessionkey)
         pass;
     if(lock.locked()):
         lock.release()
@@ -367,13 +370,16 @@ def describe(personality):
 @app.route("/tts/<personality>", methods=["GET"])
 def tts(personality):
     prompt = request.args["text"]
+    logEvent(username=determineUser(request), ip = determineIP(request), subject="/tts/{personality}", eventtype="start_speech")
     model_spec = rag.get_model_spec(personality)
     model_path = model_spec["voice"]
     filename = str(uuid.uuid1())
     if(not tts_lock.acquire(blocking=False)):
             print("Blocking for TTS lock")
+            logEvent(username=determineUser(request), ip = determineIP(request), subject="/tts/{personality}", eventtype="contention")
             if( not tts_lock.acquire(blocking=True, timeout=120)) :
                 print("Session timeout for TTS")
+                logEvent(username=determineUser(request), ip = determineIP(request), subject="/tts/{personality}", eventtype="contention_timeout")
                 time.sleep(0.5)
                 return ''
     # TODO: make this figure out where the Flask process has been invoked from.
@@ -391,6 +397,7 @@ def tts(personality):
     data = f.read()
     f.close()
     os.remove(filename)
+    logEvent(username=determineUser(request), ip = determineIP(request), subject="/tts/{personality}", eventtype="end_speech")
     tts_lock.release()
     return flask.Response(data, mimetype="audio/wav")
 
@@ -399,17 +406,20 @@ def tts(personality):
 def gpt(personality):
     prompt = request.args["prompt"]
     messages = None
+    session_id = ''
     if('session' in request.args and request.args['session'] in __cached_sessions):
         messages = __cached_sessions.get(request.args['session'], '')
+        session_id = request.args['session']
+    logEvent(username=determineUser(request), ip = determineIP(request), subject="/gpt/{personality}", eventtype="start_gpt", data=prompt, session_id=session_id)
 
     print(prompt)
-    return flask.Response(ask(prompt, personality, chat_context=messages), mimetype="text/plain")
+    responseText = flask.Response(ask(prompt, personality, chat_context=messages), mimetype="text/plain")
+    logEvent(username=determineUser(request), ip = determineIP(request), subject="/gpt/{personality}", eventtype="end_gpt")
+    return responseText
 
 @app.route("/llava/describe", methods=["POST"])
 def llava_describe():
-    print(request)
-    print(str(request.content_length) + "/" + str(request.max_content_length))
-    #print(request.data)
+    logEvent(username=determineUser(request), ip = determineIP(request), subject="/llava/describe", eventtype="start_description")
     the_file = io.BytesIO(request.data)
     image = Image.open(the_file, formats=['PNG', "JPEG"])
     output = io.BytesIO()
@@ -420,8 +430,10 @@ def llava_describe():
     dataurl = f'data:image/jpeg;base64,{base64_utf8_str}'
     if(not lock.acquire(blocking=False)):
             print("Blocking for model lock")
+            logEvent(username=determineUser(request), ip = determineIP(request), subject="/llava/describe", eventtype="contention")
             if( not lock.acquire(blocking=True, timeout=120)) :
                 print("Session timeout for image description")
+                logEvent(username=determineUser(request), ip = determineIP(request), subject="/llava/describe", eventtype="contention")
                 time.sleep(0.5)
                 return ''
     freeLlm()
@@ -448,12 +460,15 @@ def llava_describe():
     del llm
     gc.collect()
     returnable = completion["choices"][0]["message"]["content"]
+    logEvent(username=determineUser(request), ip = determineIP(request), subject="/llava/describe", eventtype="end_description", data=returnable)
+
     if(lock.locked()):
         lock.release()
     return returnable
 
 @app.route("/stablediffusion/generate", methods=["GET", "POST"])
 def stablediffusion():
+    logEvent(username=determineUser(request), ip = determineIP(request), subject="/stablediffusion/generate", eventtype="start_geenration", data=str(request.args))
     seed_value = 42
     steps_value = 20
     config_value = 5
@@ -476,8 +491,10 @@ def stablediffusion():
     output = None
     if(not lock.acquire(blocking=False)):
             print("Blocking for pre-parsing lock")
+            logEvent(username=determineUser(request), ip = determineIP(request), subject="/stablediffusion/generate", eventtype="contention")
             if( not lock.acquire(blocking=True, timeout=120)) :
                 print("Session timeout for image generation")
+                logEvent(username=determineUser(request), ip = determineIP(request), subject="/stablediffusion/generate", eventtype="contention_timeout")
                 time.sleep(0.5)
                 return ''
     
@@ -535,13 +552,16 @@ def stablediffusion():
             f.close()
             os.remove(filename)
 
+        logEvent(username=determineUser(request), ip = determineIP(request), subject="/stablediffusion/generate", eventtype="end_generation")
     except Exception as e:
         print(e)
+        logEvent(username=determineUser(request), ip = determineIP(request), subject="/stablediffusion/generate", eventtype="exception_generation", description=str(e))
         pass
 
 
     if(lock.locked()):
         lock.release()
+
     if(format == "JPEG") :
         return flask.send_file(output, mimetype="image/jpeg", download_name="image.jpg", max_age=3600)
     return flask.send_file(output, mimetype="image/png", download_name="image.png", max_age=3600)
@@ -580,6 +600,29 @@ def ask(prompt, personality="whisper", chat_context = [], force_boolean = False)
     )
     lock.release()
     return result["choices"][0]["message"]["content"]
+
+# Lock for synchronizing log writing. Can be removed when we get async logging.
+logLock = threading.Lock()
+
+def logEvent(username = "anon", ip = '', severity = "INFO", subject = "no_subject", eventtype = "no_event", description = "", data = "", session_id = "") :
+    with logLock:
+    # Open the CSV file in write mode
+        with open('log.csv', 'a+', newline='') as file:
+            writer = csv.writer(file)
+            # Write a single row
+            writer.writerow([datetime.now().isoformat(), severity, subject, eventtype, description, data, session_id])  # Writing data row
+
+# Get the user identifier for the given request
+def determineUser(request) :
+    if('X-Forwarded-User' in request.headers) :
+        return request.headers.get('X-Forwarded-User')
+    return 'anon' 
+
+# Get the origin IP for the given request
+def determineIP(request) :
+    if('X-Forwarded-For' in request.headers) :
+        return request.headers.get('X-Forwarded-For')
+    return request.remote_addr 
 
 # Flask route for handling 'toil' requests having JSON bodies
 @app.route("/toil/<personality>", methods=["POST"])
