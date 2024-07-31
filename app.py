@@ -181,6 +181,11 @@ def gpt_socket(personality):
         message = s[1]
         text = s[0]
         ws.send("Reading the provided context...")
+    elif(message.startswith("|CONTENT|")):
+        s = message[9:].split("""|/CONTENT|""",1)
+        message = s[1]
+        text = s[0]
+        ws.send("Reading the provided content...")
     elif(message.startswith("|RAG|")):
         s = message[5:].split("""|/RAG|""",1)
         message = s[1]
