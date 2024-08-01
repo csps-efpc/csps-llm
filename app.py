@@ -630,6 +630,7 @@ def toil(personality):
     model_spec = rag.get_model_spec(personality)
     request_context = request.json
     prompt = request_context["prompt"]
+    logEvent(username=determineUser(request), ip = determineIP(request), subject="/toil/{personality}", eventtype="start_toil", data = prompt)
     rag_text = None
     if('text' in request_context):
         if(request_context['text'].startswith("http://") or request_context['text'].startswith("https://")):
@@ -666,6 +667,9 @@ def toil(personality):
         temperature=0.7,
     )
     lock.release()
+    
+    logEvent(username=determineUser(request), ip = determineIP(request), subject="/toil/{personality}", eventtype="end_toil")
+
     if(response_format is None) :
         return flask.Response(result["choices"][0]["message"]["content"], mimetype="text/plain")
     else:
