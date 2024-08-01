@@ -9,6 +9,10 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
     <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.10/dist/full.min.css" rel="stylesheet" type="text/css" />
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/markdown-it@14.0.0/dist/markdown-it.min.js"></script>
+    <script src="https://unpkg.com/turndown/dist/turndown.js"></script>
+
+  
     <script>
             window.personality = "phiona";
             window.persona = "A Pixar cartoon of a pale young woman with pale blue hair in a ponytail wearing white futuristic clothing, with a white background ";
@@ -103,7 +107,7 @@
         presenterHolder.append(audio1);
         presenterHolder.append(document.createTextNode("[ " + (item + 1) + " / " + preso.length + " ] "));
         headlineElement = document.createElement("h3");
-        headlineElement.append(document.createTextNode(preso[item].headline));
+        headlineElement.append(document.createTextNode(preso[item].title));
         presenterHolder.append(headlineElement);
         presenterHolder.append(document.createTextNode(preso[item].story));
 
@@ -137,7 +141,6 @@
     }
 
     async function sendPrompt() {
-        var prompt = document.getElementById("prompt").value;
         var seed = document.getElementById("seed").value;
         var imageHolder = document.getElementById("imageHolder");
         imageHolder.innerHTML = "";
@@ -147,22 +150,22 @@
         var url = new URL('../toil/phiona', window.location);
         var textToUnderstand = await getClipboardText();
         payload = {
-            "prompt": "Create a 30-second presentation based on the provided content. Respond in JSON format. The top-level Array will hold between 5 and 10 scenes, with one Object per scene. For each scene, the 'headline' field will contain a title for the scene to be spoken by the newscaster. The 'story' field will contain a summary of the scene itself. The 'imagePrompt' field will contain a detailed AI image-generation prompt to create an image suitable for the information in the scene. The 'posture' field will contain a short description of the a pose and facial expression, starting with a gerund like 'pointing' or 'looking'. Be certain to include a final scene summarizing what was said.",
-            "text": prompt,
+            "prompt": "Create a 30-second presentation based on the provided content. Respond in JSON format. The top-level Array will hold between 3 and 10 scenes, with one Object per scene. For each scene, the 'title' field will contain a title for the concept to be expressed. The 'story' field will contain the explanation of the concept itself. The 'imagePrompt' field will contain a detailed AI image-generation prompt to create an image suitable for the information in the concept. The 'posture' field will contain a short description of the pose and facial expression of the person presenting the concept, starting with a gerund like 'pointing' or 'looking'. Be certain to include a final scene summarizing what was said.",
+            "text": textToUnderstand,
             "schema": {
                 "$schema": "http://json-schema.org/draft-06/schema#",
                 "type": "array",
                 "items": {
                     "$ref": "#/definitions/storyElement"
                 },
-                "minItems": 5,
-                "maxItems": 20,
+                "minItems": 3,
+                "maxItems": 10,
                 "definitions": {
                     "storyElement": {
                         "type": "object",
                         "additionalProperties": false,
                         "properties": {
-                            "headline": {
+                            "title": {
                                 "type": "string"
                             },
                             "story": {
@@ -178,7 +181,7 @@
                         "required": [
                             "imagePrompt",
                             "posture",
-                            "headline",
+                            "title",
                             "story"
                         ],
                         "title": "storyElement"
