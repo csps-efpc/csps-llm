@@ -332,7 +332,7 @@ def gpt_socket(personality):
         # We prepare the session for a subsequent user prompt, and the cycle begins anew.
         chat_session.append({"role": "assistant", "content": response});
         # TODO: if and when the cache moves out of process memory to a K-V store, the chat session will need to get written to that cache.
-        logEvent(username=determineUser(request), ip = determineIP(request), subject="/gpt-socket/{personality}", eventtype="end_socket", , session_id=sessionkey)
+        logEvent(username=determineUser(request), ip = determineIP(request), subject="/gpt-socket/{personality}", eventtype="end_socket", session_id=sessionkey)
     except Exception as e:
         print(e)
         logEvent(username=determineUser(request), ip = determineIP(request), subject="/gpt-socket/{personality}", eventtype="exception_socket", data=str(e), session_id=sessionkey)
