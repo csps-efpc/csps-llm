@@ -131,3 +131,4 @@ Nothing makes us happier than constructive feedback and well-formed PRs - if you
 * Document-informed presentation generator.
 * ~~Add instrumentation for cache hits/misses, and associated timings.~~
 * Add personality feature: conversation summarization & reporting
+* Personality caching optimization: if calls across personalities use the same model and the same config, they can share cached models all the way to the GPU, although the benefit might be negligible is there's enough RAM to keep the models in MMIO.
