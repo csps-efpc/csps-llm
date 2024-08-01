@@ -9,14 +9,14 @@ Given a base install of both Python 3 and `pip`, install dependencies with:
 ```
 pip install flask simple_websocket llama_cpp_python stable_diffusion_cpp_python feedparser requests bs4 huggingface_hub duckduckgo_search unidecode
 ```
-As an absolute minimum, you'll need 12GB of RAM and as much local on-disk storage to work with a 7-billion parmeter model. To be able to reasonably work with your model, you'll need an AVX2-capable CPU with four real cores (not hyperthreaded).
+As an absolute minimum, you'll need 8GB of free RAM and as much local on-disk storage to work with a 7-billion parameter model. To be able to reasonably work with your model, you'll need an AVX2-capable CPU with four real cores (not hyperthreaded).
 
 Once you've got the basics installed, you can start the service with:
 
 ```
 python app.py
 ```
-on the first invocation, it'll download about 4GB of model. You can then browse to `http://localhost:5000/static/index.html`.
+on the first invocation, it'll download about 5GB of model. You can then browse to `http://localhost:5000/`.
 
 ## Model config
 The choice of models can be configured at runtime using environment variables:
@@ -123,11 +123,11 @@ Nothing makes us happier than constructive feedback and well-formed PRs - if you
 * Add client-media capture of images to the mobile UI. - medium
 * ~~Upgrade TTS engine from mimic-3 to Piper~~
 * ~~Non-conversational multimodal demo: A Pecha-Kucha generator?~~ - 
-* Add unified logging
+* ~~Add unified logging~~
 * Add agentic image generation to the conversational UI
 * ~~Add trivial user-informed agent example~~
 * ~~Move the SPAs to use Flask templates, and the variables into the personalities.~~
 * ~~Pechakucha generator.~~
 * Document-informed presentation generator.
-* Add instrumentation for cache hits/misses, and associated timings.
+* ~~Add instrumentation for cache hits/misses, and associated timings.~~
 * Add personality feature: conversation summarization & reporting
