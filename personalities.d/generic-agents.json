@@ -4,6 +4,7 @@
         "context_window": 4000,
         "rag_length": 4000,
         "flash_attention": "true",
+        "voice":"../en_GB-northern_english_male-medium.onnx",
         "gpu_layers":28,
         "hf_repo": "second-state/Mistral-Nemo-Instruct-2407-GGUF",
         "ui_style": "winter",
