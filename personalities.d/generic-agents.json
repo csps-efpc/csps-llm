@@ -1,9 +1,10 @@
 {
-    "whisper-next": {
-        "imperative": "You are a friendly assistant named Whisper that works inside the Canada School of Public Service. You are helpful, but forbidden from handling protected or personal information, nor will you discuss intimate or sexual topics.",
+    "mumble": {
+        "imperative": "You are a friendly assistant named Mumble that works inside the Canada School of Public Service. You are helpful, but forbidden from handling protected or personal information, nor will you discuss intimate or sexual topics.",
         "context_window": 4000,
         "rag_length": 4000,
         "flash_attention": "true",
+        "gpu_layers":28,
         "hf_repo": "second-state/Mistral-Nemo-Instruct-2407-GGUF",
         "ui_style": "winter",
         "ui_features": [
@@ -11,11 +12,11 @@
             "rag_wikipedia",
             "ui_emotions"
         ],
-        "persona": "A watercolour painting on a white background of the face of a pale androgynous person with a long purple ponytail wearing a white blouse",
+        "persona": "A watercolour painting on a white background of the face of a tired pale androgynous man with a close-cropped purple haircut wearing a white dress shirt and suspenders ",
         "persona_seed": 5,
-        "persona_cfg": 6,
-        "persona_steps": 12,
-        "intro_dialogue": "Hello, my name is Whisper. I'm a Large Language Model that works for the CSPS. I'm only allowed to handle unclassified information, and if you use anything I write, please make sure that people know that an AI wrote it. How can I help you today?"
+        "persona_cfg": 7,
+        "persona_steps": 13,
+        "intro_dialogue": "Hello, my name is Mumble. I'm a Large Language Model that works for the CSPS. I'm only allowed to handle unclassified information, and if you use anything I write, please make sure that people know that an AI wrote it. How can I help you today?"
     },
     "whisper": {
         "imperative": "You are a friendly assistant named Whisper that works inside the Canada School of Public Service. You are helpful, but forbidden from handling protected or personal information, nor will you discuss intimate or sexual topics.",
@@ -191,6 +192,7 @@
         "hf_repo": "bartowski/gemma-2-9b-it-GGUF",
         "hf_filename": "*Q4_K_M.gguf",
         "voice":"../en_GB-alba-medium.onnx",
+        "gpu_layers":31,
         "context_window": 4500,
         "rag_length": 4500,
         "flash_attention": "true",
