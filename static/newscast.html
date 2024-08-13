@@ -156,7 +156,7 @@
         var spinner = document.createElement("span");
         spinner.classList.add("loading", "loading-spinner", "loading-lg");
         imageHolder.appendChild(spinner);
-        var url = new URL('../toil/gemma', window.location);
+        var url = new URL('../toil/' + window.personality, window.location);
         payload = {
             "prompt": "Create a 30-second newscast based on the provided stories. Respond in JSON format. The top-level Array will hold between 5 and 10 stories, with one Object per story. For each story, the 'headline' field will contain a title for the story to be spoken by the newscaster. The 'story' field will contain a summary of the story itself. The 'imagePrompt' field will contain a detailed AI image-generation prompt to create an image suitable for the information in the story. The 'posture' field will contain a short description of the a pose and facial expression, starting with a gerund like 'pointing' or 'looking'. Be certain to include a final story wrapping up the broadcast.",
             "text": prompt,
