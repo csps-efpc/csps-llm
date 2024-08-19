@@ -146,7 +146,7 @@ def isSystemlessModel(repo_name) :
 def root_redir():
     return redirect("/chat/whisper", code=302)
 
-
+# A rudimentary stats endpoint
 @app.route("/platform/stats")
 def render_stats():
     with logLock:
@@ -163,15 +163,13 @@ def render_stats():
         for index, row in enumerate(gen_events) :
             if(row[2] == 'cache_hit'):
                 gen_events[index-1][3] = "hit"
-        print(gen_events)
         cache_hits = sum(1 for i in gen_events if i[2] in ['message_socket', 'start_gpt'] and i[3] == "hit")
         cache_misses = sum(1 for i in gen_events if i[2] in ['message_socket', 'start_gpt'] and i[3] == "miss")
         for index, row in enumerate(gen_events) :
             if(row[2].startswith("end_")):
                 times.append(row[0])
                 durations.append(int(row[4]))
-        print(times) 
-        print(durations)
+
         plot = px.scatter(x=times, y=durations).to_html(include_plotlyjs="cdn")        
         
         return render_template('stats.html', 
