@@ -153,12 +153,13 @@ def render_stats():
         gen_events = []
         times = []
         durations = []
+        color_hints = []
         plot = ""
         epoch = datetime.fromtimestamp(0)
         with open('log.csv', mode='r') as file:
             reader = csv.reader(file)
             for row in reader:
-                if(row[3] in ['cache_hit', 'message_socket', 'start_gpt','end_socket','end_gpt']) :
+                if(row[3] in ['cache_hit', 'message_socket', 'start_gpt','end_socket','end_gpt','end_generation']) :
                     gen_events.append([int((datetime.fromisoformat(row[0]) - epoch).total_seconds() * 1000), row[2], row[3], 'miss', row[5]])
         for index, row in enumerate(gen_events) :
             if(row[2] == 'cache_hit'):
@@ -169,8 +170,9 @@ def render_stats():
             if(row[2].startswith("end_")):
                 times.append(row[0])
                 durations.append(int(row[4]))
+                color_hints.append(row[2])
 
-        plot = px.scatter(x=times, y=durations).to_html(include_plotlyjs="cdn")        
+        plot = px.scatter(x=times, y=durations, color=color_hints).to_html(include_plotlyjs="cdn")        
         
         return render_template('stats.html', 
                                cache_hits = cache_hits, 
