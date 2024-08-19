@@ -544,6 +544,8 @@ def stablediffusion():
                 str(height),
                 "-W",
                 str(width),
+                "--sampling-method",
+                "dpm++2s_a",
                 "-o",
                 filename])
             process.wait()
