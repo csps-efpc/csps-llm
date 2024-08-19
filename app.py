@@ -3,7 +3,6 @@ import gc
 import re
 import os
 import flask
-import rag
 from flask import redirect, render_template, request, abort
 from simple_websocket import Server, ConnectionClosed
 from llama_cpp import Llama
@@ -21,6 +20,10 @@ import base64
 import csv
 from datetime import datetime
 from duckduckgo_search import DDGS
+import plotly.express as px
+
+# Import nearby python files
+import rag
 
 # Feature Flags
 SD_IN_PROCESS = False
@@ -142,7 +145,41 @@ def isSystemlessModel(repo_name) :
 @app.route('/')
 def root_redir():
     return redirect("/chat/whisper", code=302)
-    
+
+
+@app.route("/platform/stats")
+def render_stats():
+    with logLock:
+        gen_events = []
+        times = []
+        durations = []
+        plot = ""
+        epoch = datetime.fromtimestamp(0)
+        with open('log.csv', mode='r') as file:
+            reader = csv.reader(file)
+            for row in reader:
+                if(row[3] in ['cache_hit', 'message_socket', 'start_gpt','end_socket','end_gpt']) :
+                    gen_events.append([int((datetime.fromisoformat(row[0]) - epoch).total_seconds() * 1000), row[2], row[3], 'miss', row[5]])
+        for index, row in enumerate(gen_events) :
+            if(row[2] == 'cache_hit'):
+                gen_events[index-1][3] = "hit"
+        print(gen_events)
+        cache_hits = sum(1 for i in gen_events if i[2] in ['message_socket', 'start_gpt'] and i[3] == "hit")
+        cache_misses = sum(1 for i in gen_events if i[2] in ['message_socket', 'start_gpt'] and i[3] == "miss")
+        for index, row in enumerate(gen_events) :
+            if(row[2].startswith("end_")):
+                times.append(row[0])
+                durations.append(int(row[4]))
+        print(times) 
+        print(durations)
+        plot = px.scatter(x=times, y=durations).to_html(include_plotlyjs="cdn")        
+        
+        return render_template('stats.html', 
+                               cache_hits = cache_hits, 
+                               cache_misses = cache_misses, 
+                               plot=plot
+                               )
+
 # Flask route for handling websocket connections for user conversations
 @app.route("/chat/<personality>")
 def render_chat(personality):
@@ -160,11 +197,10 @@ def render_chat(personality):
 @app.route("/gpt-socket/<personality>", websocket=True)
 def gpt_socket(personality):
     ws = Server.accept(request.environ)
-    logEvent(username=determineUser(request), ip = determineIP(request), subject="/gpt-socket/{personality}", eventtype="start_socket")
-    now = datetime.now()
+    logEvent(username=determineUser(request), ip = determineIP(request), subject="/gpt-socket/"+personality, eventtype="start_socket")
+    start = datetime.now()
     # We receive and parse the first user prompt.
     message = ws.receive()
-    logEvent(username=determineUser(request), ip = determineIP(request), subject="/gpt-socket/{personality}", eventtype="message_socket")
     folded = message.casefold()
     url = None
     text = None
@@ -275,7 +311,7 @@ def gpt_socket(personality):
 
     chat_session = []
 
-    logEvent(username=determineUser(request), ip = determineIP(request), subject="/gpt-socket/{personality}", eventtype="message_socket", data=message, session_id=sessionkey)
+    logEvent(username=determineUser(request), ip = determineIP(request), subject="/gpt-socket/"+personality, eventtype="message_socket", data=message, session_id=sessionkey)
     try:
         if(sessionkey in __cached_sessions) :
             chat_session = __cached_sessions.get(sessionkey, '')
@@ -332,10 +368,10 @@ def gpt_socket(personality):
         # We prepare the session for a subsequent user prompt, and the cycle begins anew.
         chat_session.append({"role": "assistant", "content": response});
         # TODO: if and when the cache moves out of process memory to a K-V store, the chat session will need to get written to that cache.
-        logEvent(username=determineUser(request), ip = determineIP(request), subject="/gpt-socket/{personality}", eventtype="end_socket", session_id=sessionkey)
+        logEvent(username=determineUser(request), ip = determineIP(request), subject="/gpt-socket/"+personality, eventtype="end_socket", session_id=sessionkey, data=millisSince(start))
     except Exception as e:
         print(e)
-        logEvent(username=determineUser(request), ip = determineIP(request), subject="/gpt-socket/{personality}", eventtype="exception_socket", data=str(e), session_id=sessionkey)
+        logEvent(username=determineUser(request), ip = determineIP(request), subject="/gpt-socket/"+personality, eventtype="exception_socket", data=str(e), session_id=sessionkey)
         pass;
     if(lock.locked()):
         lock.release()
@@ -369,17 +405,18 @@ def describe(personality):
 # Flask route for handling tts requests
 @app.route("/tts/<personality>", methods=["GET"])
 def tts(personality):
+    start = datetime.now()
     prompt = request.args["text"]
-    logEvent(username=determineUser(request), ip = determineIP(request), subject="/tts/{personality}", eventtype="start_speech")
+    logEvent(username=determineUser(request), ip = determineIP(request), subject="/tts/"+personality, eventtype="start_speech")
     model_spec = rag.get_model_spec(personality)
     model_path = model_spec["voice"]
     filename = str(uuid.uuid1())
     if(not tts_lock.acquire(blocking=False)):
             print("Blocking for TTS lock")
-            logEvent(username=determineUser(request), ip = determineIP(request), subject="/tts/{personality}", eventtype="contention")
+            logEvent(username=determineUser(request), ip = determineIP(request), subject="/tts/"+personality, eventtype="contention")
             if( not tts_lock.acquire(blocking=True, timeout=120)) :
                 print("Session timeout for TTS")
-                logEvent(username=determineUser(request), ip = determineIP(request), subject="/tts/{personality}", eventtype="contention_timeout")
+                logEvent(username=determineUser(request), ip = determineIP(request), subject="/tts/"+personality, eventtype="contention_timeout")
                 time.sleep(0.5)
                 return ''
     # TODO: make this figure out where the Flask process has been invoked from.
@@ -397,28 +434,30 @@ def tts(personality):
     data = f.read()
     f.close()
     os.remove(filename)
-    logEvent(username=determineUser(request), ip = determineIP(request), subject="/tts/{personality}", eventtype="end_speech")
+    logEvent(username=determineUser(request), ip = determineIP(request), subject="/tts/"+personality, eventtype="end_speech", data = str(datetime.now() - start))
     tts_lock.release()
     return flask.Response(data, mimetype="audio/wav")
 
 # Flask route for handling plain old webservice endpoints
 @app.route("/gpt/<personality>", methods=["GET", "POST"])
 def gpt(personality):
+    start = datetime.now()
     prompt = request.args["prompt"]
     messages = None
     session_id = ''
     if('session' in request.args and request.args['session'] in __cached_sessions):
         messages = __cached_sessions.get(request.args['session'], '')
         session_id = request.args['session']
-    logEvent(username=determineUser(request), ip = determineIP(request), subject="/gpt/{personality}", eventtype="start_gpt", data=prompt, session_id=session_id)
+    logEvent(username=determineUser(request), ip = determineIP(request), subject="/gpt/"+personality, eventtype="start_gpt", data=prompt, session_id=session_id)
 
     print(prompt)
     responseText = flask.Response(ask(prompt, personality, chat_context=messages), mimetype="text/plain")
-    logEvent(username=determineUser(request), ip = determineIP(request), subject="/gpt/{personality}", eventtype="end_gpt")
+    logEvent(username=determineUser(request), ip = determineIP(request), subject="/gpt/"+personality, eventtype="end_gpt", data = millisSince(start))
     return responseText
 
 @app.route("/llava/describe", methods=["POST"])
 def llava_describe():
+    start = datetime.now()
     logEvent(username=determineUser(request), ip = determineIP(request), subject="/llava/describe", eventtype="start_description")
     the_file = io.BytesIO(request.data)
     image = Image.open(the_file, formats=['PNG', "JPEG"])
@@ -460,7 +499,7 @@ def llava_describe():
     del llm
     gc.collect()
     returnable = completion["choices"][0]["message"]["content"]
-    logEvent(username=determineUser(request), ip = determineIP(request), subject="/llava/describe", eventtype="end_description", data=returnable)
+    logEvent(username=determineUser(request), ip = determineIP(request), subject="/llava/describe", eventtype="end_description", data=millisSince(start))
 
     if(lock.locked()):
         lock.release()
@@ -468,7 +507,8 @@ def llava_describe():
 
 @app.route("/stablediffusion/generate", methods=["GET", "POST"])
 def stablediffusion():
-    logEvent(username=determineUser(request), ip = determineIP(request), subject="/stablediffusion/generate", eventtype="start_geenration", data=str(request.args))
+    start = datetime.now()
+    logEvent(username=determineUser(request), ip = determineIP(request), subject="/stablediffusion/generate", eventtype="start_generation", data=str(request.args))
     seed_value = 42
     steps_value = 20
     config_value = 5
@@ -554,7 +594,7 @@ def stablediffusion():
             f.close()
             os.remove(filename)
 
-        logEvent(username=determineUser(request), ip = determineIP(request), subject="/stablediffusion/generate", eventtype="end_generation")
+        logEvent(username=determineUser(request), ip = determineIP(request), subject="/stablediffusion/generate", eventtype="end_generation", data=millisSince(start))
     except Exception as e:
         print(e)
         logEvent(username=determineUser(request), ip = determineIP(request), subject="/stablediffusion/generate", eventtype="exception_generation", description=str(e))
@@ -570,39 +610,43 @@ def stablediffusion():
 
 def ask(prompt, personality="whisper", chat_context = [], force_boolean = False):
     lock.acquire()
-    model_spec = rag.get_model_spec(personality)
-    llm=getLlm(personality)
-    messages = chat_context.copy()
-    if(not messages) :
-        if isSystemlessModel(model_spec['hf_repo']) : 
-            messages.append({"role": "user", "content": rag.get_personality_prefix(personality)})
-        else:
-            messages.append({"role": "system", "content": rag.get_personality_prefix(personality)})
+    try:
+        model_spec = rag.get_model_spec(personality)
+        llm=getLlm(personality)
+        messages = chat_context.copy()
+        if(not messages) :
+            if isSystemlessModel(model_spec['hf_repo']) : 
+                messages.append({"role": "user", "content": rag.get_personality_prefix(personality)})
+            else:
+                messages.append({"role": "system", "content": rag.get_personality_prefix(personality)})
 
-    messages.append({"role": "user", "content": prompt})
+        messages.append({"role": "user", "content": prompt})
 
-    response_format = None
-    if(force_boolean) :
-        response_format = {
-            "type": "json_object",
-            "schema": {
-                "$id": "https://example.com/person.schema.json",
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "title": "is_answer_yes",
-                "type": "boolean"
+        response_format = None
+        if(force_boolean) :
+            response_format = {
+                "type": "json_object",
+                "schema": {
+                    "$id": "https://example.com/person.schema.json",
+                    "$schema": "https://json-schema.org/draft/2020-12/schema",
+                    "title": "is_answer_yes",
+                    "type": "boolean"
+                }
             }
-        }
 
-    result=llm.create_chat_completion(
-        messages=messages,
-        temperature=0.7,
-        stop=stopTokens,
-        response_format=response_format,
-        max_tokens=model_spec['context_window']        
-    )
-    lock.release()
-    return result["choices"][0]["message"]["content"]
-
+        result=llm.create_chat_completion(
+            messages=messages,
+            temperature=0.7,
+            stop=stopTokens,
+            response_format=response_format,
+            max_tokens=model_spec['context_window']        
+        )
+        return result["choices"][0]["message"]["content"]
+    except Exception:
+        return ""
+    finally:
+        lock.release()
+    
 # Lock for synchronizing log writing. Can be removed when we get async logging.
 logLock = threading.Lock()
 
@@ -612,7 +656,7 @@ def logEvent(username = "anon", ip = '', severity = "INFO", subject = "no_subjec
         with open('log.csv', 'a+', newline='') as file:
             writer = csv.writer(file)
             # Write a single row
-            writer.writerow([datetime.now().isoformat(), severity, subject, eventtype, description, data, session_id])  # Writing data row
+            writer.writerow([datetime.now().isoformat(), severity, subject, eventtype, description, data, session_id, username, ip])  # Writing data row
 
 # Get the user identifier for the given request
 def determineUser(request) :
@@ -626,13 +670,19 @@ def determineIP(request) :
         return request.headers.get('X-Forwarded-For')
     return request.remote_addr 
 
+def millisSince(start) :
+    now = datetime.now()
+    span = now - start
+    return int(span.total_seconds() * 1000)
+
 # Flask route for handling 'toil' requests having JSON bodies
 @app.route("/toil/<personality>", methods=["POST"])
 def toil(personality):
+    start = datetime.now()
     model_spec = rag.get_model_spec(personality)
     request_context = request.json
     prompt = request_context["prompt"]
-    logEvent(username=determineUser(request), ip = determineIP(request), subject="/toil/{personality}", eventtype="start_toil", data = prompt)
+    logEvent(username=determineUser(request), ip = determineIP(request), subject="/toil/"+personality, eventtype="start_toil", data = prompt)
     rag_text = None
     if('text' in request_context):
         if(request_context['text'].startswith("http://") or request_context['text'].startswith("https://")):
@@ -670,7 +720,7 @@ def toil(personality):
     )
     lock.release()
     
-    logEvent(username=determineUser(request), ip = determineIP(request), subject="/toil/{personality}", eventtype="end_toil")
+    logEvent(username=determineUser(request), ip = determineIP(request), subject="/toil/"+personality, eventtype="end_toil", data=millisSince(start))
 
     if(response_format is None) :
         return flask.Response(result["choices"][0]["message"]["content"], mimetype="text/plain")
@@ -681,6 +731,5 @@ app.config["MAX_CONTENT_LENGTH"] = 1024*1024*1024
 # Start the Flask server
 if __name__ == "__main__":
     app.run(host="0.0.0.0")
-
 # debug=True
 
