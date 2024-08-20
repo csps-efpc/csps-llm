@@ -133,4 +133,8 @@ Nothing makes us happier than constructive feedback and well-formed PRs - if you
 * Add personality feature: conversation summarization & reporting
 * Personality caching optimization: if calls across personalities use the same model and the same config, they can share cached models all the way to the GPU, although the benefit might be negligible is there's enough RAM to keep the models in MMIO.
 * Make choice of personality for pechakucha/explainer/newscast configurable by end-user
-* Make config files patch one another incrementally
+* Make personality config files patch one another incrementally
+* Make diffusion model selectable as a parameter
+* Add initial stats monitor
+* Add support for a LRU cache of models (for multi-GPU environments)
+
