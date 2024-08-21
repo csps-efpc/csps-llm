@@ -16,12 +16,16 @@
         <div class="w-full flex flex-wrap join">
             <label class="input input-bordered flex items-center gap-2 join-item grow">Prompt<input class="grow"
                     type="text" id="prompt" /></label>
+            <label class="input input-bordered flex items-center gap-2 join-item grow">Negative Prompt<input
+                    class="grow" type="text" id="negativeprompt" /></label>
             <label class="input input-bordered flex items-center gap-2 join-item">Seed<input type="number" id="seed"
                     value="1" /></label>
+            <button id="increment-button"
+                class="input input-bordered flex items-center gap-2 join-item btn btn-primary">&#x1f3b2;</button>
             <label class="input input-bordered flex items-center gap-2 join-item">Steps<input type="number" id="steps"
-                    value="20" /></label>
+                    value="10" /></label>
             <label class="input input-bordered flex items-center gap-2 join-item">Cfg<input type="number" id="cfg"
-                    value="7" /></label>
+                    value="4" /></label>
             <label class="input input-bordered flex items-center gap-2 join-item grow">Size<select id="size" id="size">
                     <option value="384" />small</option>
                     <option value="512" selected />medium</option>
@@ -43,13 +47,11 @@
 
 </body>
 <script>
-    document.getElementById("seed").addEventListener("change", function (event) {
-        sendPrompt();
-    });
-    document.getElementById("steps").addEventListener("change", function (event) {
-        sendPrompt();
-    });
     document.getElementById("go-button").addEventListener("click", function (event) {
+        sendPrompt();
+    });
+    document.getElementById("increment-button").addEventListener("click", function (event) {
+        document.getElementById("seed").value = Math.round(Math.random() * Number.MAX_SAFE_INTEGER);
         sendPrompt();
     });
     function loadImage(url) {
@@ -63,6 +65,7 @@
 
     function sendPrompt() {
         var prompt = document.getElementById("prompt").value;
+        var negativeprompt = document.getElementById("negativeprompt").value;
         var seed = document.getElementById("seed").value;
         var steps = document.getElementById("steps").value;
         var cfg = document.getElementById("cfg").value;
@@ -87,7 +90,7 @@
             width = parseInt(size);
             height = parseInt(size);
         }
-        url.search = new URLSearchParams({ prompt: prompt, seed: seed, cfg: cfg, steps: steps, format: "JPEG", width: width, height: height });
+        url.search = new URLSearchParams({ prompt: prompt, negativeprompt: negativeprompt, seed: seed, cfg: cfg, steps: steps, format: "JPEG", width: width, height: height });
         loadImage(url)
             .then(image => {
                 imageHolder.innerHTML = "";

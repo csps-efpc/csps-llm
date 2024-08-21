@@ -515,6 +515,7 @@ def stablediffusion():
     width = 512
     height = 512
     format = "PNG"
+    negativeprompt = None
     if ('format' in request.args): 
         format = request.args["format"]
     if ('seed' in request.args): 
@@ -527,6 +528,8 @@ def stablediffusion():
         config_value = float(request.args["cfg"])
     if ('height' in request.args): 
         height = int(request.args["height"])
+    if ('negativeprompt' in request.args): 
+        negativeprompt = request.args["negativeprompt"]
     prompt = request.args["prompt"]
     output = None
     if(not lock.acquire(blocking=False)):
@@ -549,7 +552,7 @@ def stablediffusion():
                 width=width,
                 height=height,
                 cfg_scale=config_value,
-                negative_prompt=rag.get_sd_negative_prompt(),
+                negative_prompt=rag.get_sd_negative_prompt() + " " + ( negativeprompt if negativeprompt else "" ),
                 sample_method=sd_cpp.stable_diffusion_cpp.SampleMethod.EULER_A
             )
             image = images[-1]
@@ -573,7 +576,7 @@ def stablediffusion():
                 "-p",
                 unidecode.unidecode(prompt),
                 "-n",
-                rag.get_sd_negative_prompt(),
+                rag.get_sd_negative_prompt() + " " + ( negativeprompt if negativeprompt else "" ),
                 "--steps",
                 str(steps_value),
                 "--cfg-scale",
@@ -586,6 +589,8 @@ def stablediffusion():
                 str(width),
                 "--sampling-method",
                 "dpm++2s_a",
+		"--schedule",
+		"karras",
                 "-o",
                 filename])
             process.wait()
