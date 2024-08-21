@@ -2,18 +2,32 @@
 import feedparser
 import requests
 import json
+import collections
 import os
 from bs4 import BeautifulSoup
 from datetime import datetime
 
+# Recursive implementation of dictionary update
+def deep_update(d, u):
+    for k, v in u.items():
+        if isinstance(v, collections.abc.Mapping):
+            d[k] = deep_update(d.get(k, {}), v)
+        else:
+            d[k] = v
+    return d
+
 # Load personalities from JSON files
 personalities = {}
 personalities_directory = os.fsencode("./personalities.d")
-    
-for personality_file in os.listdir(personalities_directory):
+
+personality_files = os.listdir(personalities_directory);
+personality_files.sort()
+print(personality_files)
+
+for personality_file in personality_files:
     personality_filename = os.fsdecode(personality_file)
     if personality_filename.endswith(".json"): 
-        personalities.update(json.load(open("./personalities.d/"+personality_filename)))
+        personalities = deep_update(personalities, json.load(open("./personalities.d/"+personality_filename)))
         
 # Define default values for various parameters
 default_llm_local_file=os.environ.get("LLM_MODEL_FILE", None)
@@ -29,6 +43,8 @@ default_ui_features=os.environ.get("UI_FEATURES", "").split(";")
 default_llm_voice=os.environ.get("LLM_VOICE", "../en_US-hfc_female-medium.onnx")
 # A basic set of things we'd prefer not to generate. 
 default_sd_negative_prompt=os.environ.get("SD_NEGATIVE_PROMPT", "scary, nipple, ((naked)), low quality, extra fingers, mutated hands, watermark, signature")
+
+
 
 def get_sd_negative_prompt():
     return default_sd_negative_prompt
