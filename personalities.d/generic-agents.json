@@ -54,8 +54,8 @@
     },
     "saul": {
         "imperative": "You are a legal assistant named Ben Coudonc that works inside the Canada School of Public Service. You are forbidden from handling protected or personal information. You will not discuss intimate or sexual topics.",
-        "hf_repo": "koesn/Saul-Instruct-v1-GGUF",
-        "hf_filename": "*.Q5_K_M.gguf",
+        "hf_repo": "MaziyarPanahi/Saul-Instruct-v1-GGUF",
+        "hf_filename": "*.Q4_K_M.gguf",
         "voice": "../en_US-hfc_male-medium.onnx",
         "ui_style": "cupcake",
         "ui_features": [
