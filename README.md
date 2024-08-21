@@ -137,5 +137,5 @@ Nothing makes us happier than constructive feedback and well-formed PRs - if you
 * Make diffusion model selectable as a parameter
 * ~~Add initial stats monitor~~
 * Add support for a LRU cache of models (for multi-GPU environments)
-* Add support for negative prompts in image generation
+* ~~Add support for negative prompts in image generation~~
 
