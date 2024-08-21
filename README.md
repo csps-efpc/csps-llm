@@ -1,5 +1,5 @@
 # csps-llm
-A base for Government of Canada LLM services like chatbots, RAGs, and batch processors. This is the engine behind the CSPS' "Whisper" and "Chuchote", "Red PJs", "Saul", and "Phiona" demo services.
+A base for Government of Canada LLM services like chatbots, RAGs, and batch processors. This is the engine behind the CSPS' "Whisper" menagerie of Generative AI services.
 
 **Please Note:** - the contents of this repo have not (yet) been endorsed by an architecture review board or other governance body. Any use of artificial intelligence by GoC users needs to comply with the appropriate TBS and departmental policies.
 
@@ -137,4 +137,5 @@ Nothing makes us happier than constructive feedback and well-formed PRs - if you
 * Make diffusion model selectable as a parameter
 * Add initial stats monitor
 * Add support for a LRU cache of models (for multi-GPU environments)
+* Add support for negative prompts in image generation
 
