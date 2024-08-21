@@ -162,3 +162,4 @@ cython_debug/
 
 # Don't commit default logs
 log.csv
+personalities.d/zzz_local_patch.json
