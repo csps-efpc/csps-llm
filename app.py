@@ -709,12 +709,14 @@ def toil(personality):
         prompt = "Consider the following text: " + rag_text + "\n\nGiven the preceding text, " + prompt
 
     messages = []
-
-    if isSystemlessModel(model_spec['hf_repo']) : 
-        messages.append({"role": "user", "content": rag.get_personality_prefix(personality)})
-        messages.append({"role": "system", "content": ""})
+    if('session' in request.args and request.args['session'] in __cached_sessions):
+        messages = __cached_sessions.get(request.args['session'], '').copy()
     else:
-        messages.append({"role": "system", "content": rag.get_personality_prefix(personality)})
+        if isSystemlessModel(model_spec['hf_repo']) : 
+            messages.append({"role": "user", "content": rag.get_personality_prefix(personality)})
+            messages.append({"role": "system", "content": ""})
+        else:
+            messages.append({"role": "system", "content": rag.get_personality_prefix(personality)})
 
     messages.append({"role": "user", "content": prompt})
 

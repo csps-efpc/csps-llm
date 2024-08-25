@@ -101,10 +101,34 @@ nextUtterance = function () {
 
 loadEmotionalAffect = async function () {
     var personality = window.personality ? window.personality : "whisper";
-    var url = new URL('../../gpt/' + personality, window.location);
-    url.search = new URLSearchParams({ session: window.llmSessionId, prompt: "What is an appropriate 2-word emotional response to this conversation? Use a gerund verb and an adverb. Respond with only 2 words." }).toString();
-
-    fetch(url).then((resp) => resp.text()).then((text) => renderEmotionalAffect(window.persona + ", " + text + " at the camera."));
+    var url = new URL('../../toil/' + personality, window.location);
+    var payload = { session: window.llmSessionId, prompt: "What is an appropriate 2-word emotional response to this conversation? Use a gerund verb and an adverb. Respond in JSON format, with a short explanation in the 'explanation' field",
+        schema: {
+            "$schema": "http://json-schema.org/draft-04/schema#",
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string"
+                  },
+                "gerundVerb": {
+                    "type": "string"
+                  },
+                  "adverb": {
+                    "type": "string"
+                  }
+            },
+            "required": [
+                "gerundVerb", 
+                "adverb",
+                "description"
+            ]
+          }
+     };
+    fetch(url, {
+        method: "POST",
+        headers: {'Content-Type' : 'application/json'},
+        body: JSON.stringify(payload) 
+    }).then((resp) => resp.json()).then((json) => renderEmotionalAffect(window.persona + ", "+ json.gerundVerb +" " + json.description + " at the camera."));
 }
 
 renderEmotionalAffect = function (affect) {
