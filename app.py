@@ -459,48 +459,51 @@ def gpt(personality):
 def llava_describe():
     start = datetime.now()
     logEvent(username=determineUser(request), ip = determineIP(request), subject="/llava/describe", eventtype="start_description")
-    the_file = io.BytesIO(request.data)
-    image = Image.open(the_file, formats=['PNG', "JPEG"])
-    output = io.BytesIO()
-    image.save(output, "JPEG")
-    output.flush()
-    output.seek(0)
-    base64_utf8_str = base64.b64encode(output.read()).decode('utf-8')
-    dataurl = f'data:image/jpeg;base64,{base64_utf8_str}'
-    if(not lock.acquire(blocking=False)):
-            print("Blocking for model lock")
-            logEvent(username=determineUser(request), ip = determineIP(request), subject="/llava/describe", eventtype="contention")
-            if( not lock.acquire(blocking=True, timeout=120)) :
-                print("Session timeout for image description")
+    try:
+        the_file = io.BytesIO(request.data)
+        image = Image.open(the_file, formats=['PNG', "JPEG"])
+        output = io.BytesIO()
+        image.save(output, "JPEG")
+        output.flush()
+        output.seek(0)
+        base64_utf8_str = base64.b64encode(output.read()).decode('utf-8')
+        dataurl = f'data:image/jpeg;base64,{base64_utf8_str}'
+        if(not lock.acquire(blocking=False)):
+                print("Blocking for model lock")
                 logEvent(username=determineUser(request), ip = determineIP(request), subject="/llava/describe", eventtype="contention")
-                time.sleep(0.5)
-                return ''
-    freeLlm()
-    chat_handler = NanoLlavaChatHandler(clip_model_path="../nanollava-mmproj-f16.gguf")
-    llm = Llama(
-        model_path="../nanollava-text-model-f16.gguf",
-        chat_handler=chat_handler,
-        n_ctx=4096
-    )
-    completion = llm.create_chat_completion(
-        messages=[
-            {"role":"system", "content": "You are an assistant that describes images in great detail."},
-            {"role":"user", "content": [
-                {"type":"text", "text":"Include as much detail about people as you can. In as much detail as possible, what's in this image?"},
-                {"type":"image_url", "image_url":dataurl}
-            ]}
-        ]
-    )
-    # The abomination on the next line is necessary to force the chat handler to free GPU 
-    # resources. The built-in catch code only waits for the end of the Python process.
-    chat_handler._llava_cpp.clip_free(chat_handler.clip_ctx)
-    
-    del chat_handler
-    del llm
-    gc.collect()
-    returnable = completion["choices"][0]["message"]["content"]
-    logEvent(username=determineUser(request), ip = determineIP(request), subject="/llava/describe", eventtype="end_description", data=millisSince(start))
+                if( not lock.acquire(blocking=True, timeout=120)) :
+                    print("Session timeout for image description")
+                    logEvent(username=determineUser(request), ip = determineIP(request), subject="/llava/describe", eventtype="contention")
+                    time.sleep(0.5)
+                    return ''
+        freeLlm()
+        chat_handler = NanoLlavaChatHandler(clip_model_path="../nanollava-mmproj-f16.gguf")
+        llm = Llama(
+            model_path="../nanollava-text-model-f16.gguf",
+            chat_handler=chat_handler,
+            n_ctx=4096
+        )
+        completion = llm.create_chat_completion(
+            messages=[
+                {"role":"system", "content": "You are an assistant that describes images in great detail."},
+                {"role":"user", "content": [
+                    {"type":"text", "text":"Include as much detail about people as you can. In as much detail as possible, what's in this image?"},
+                    {"type":"image_url", "image_url":dataurl}
+                ]}
+            ]
+        )
+        # The abomination on the next line is necessary to force the chat handler to free GPU 
+        # resources. The built-in catch code only waits for the end of the Python process.
+        # chat_handler._llava_cpp.clip_free(chat_handler.clip_ctx)
+        
+        del chat_handler
+        del llm
+        gc.collect()
+        returnable = completion["choices"][0]["message"]["content"]
+        logEvent(username=determineUser(request), ip = determineIP(request), subject="/llava/describe", eventtype="end_description", data=millisSince(start))
 
+    except Exception:
+        print(Exception.with_traceback)
     if(lock.locked()):
         lock.release()
     return returnable
@@ -514,8 +517,11 @@ def stablediffusion():
     config_value = 5
     width = 512
     height = 512
+    useFlux = False
     format = "PNG"
     negativeprompt = None
+    if ('useFlux' in request.args): 
+        useFlux = request.args["useFlux"]
     if ('format' in request.args): 
         format = request.args["format"]
     if ('seed' in request.args): 
@@ -567,32 +573,63 @@ def stablediffusion():
         else:
             freeLlm()
             filename = str(uuid.uuid1())+".png"
-            process = subprocess.Popen([
-                "../sd",
-                "-m",
-                "../sd.gguf",
-                "--vae",
-                "../sdxl_vae.gguf",
-                "-p",
-                unidecode.unidecode(prompt),
-                "-n",
-                rag.get_sd_negative_prompt() + " " + ( negativeprompt if negativeprompt else "" ),
-                "--steps",
-                str(steps_value),
-                "--cfg-scale",
-                str(config_value),
-                "-s",
-                str(seed_value),
-                "-H",
-                str(height),
-                "-W",
-                str(width),
-                "--sampling-method",
-                "dpm++2s_a",
-		"--schedule",
-		"karras",
-                "-o",
-                filename])
+            process = None
+            if(useFlux) :
+                process = subprocess.Popen([
+                    "../sd",
+                    "--diffusion-model",
+                    "../flux1-schnell-q4_k.gguf",
+                    "--vae",
+                    "../ae-f16.gguf",
+                    "--clip_l",
+                    "../clip_l-q8_0.gguf",
+                    "--t5xxl",
+                    "../t5xxl_q4_k.gguf",
+                    "--sampling-method",
+                    "euler",
+                    "-p",
+                    unidecode.unidecode(prompt),
+                    "-n",
+                    rag.get_sd_negative_prompt() + " " + ( negativeprompt if negativeprompt else "" ),
+                    "--steps",
+                    str(steps_value),
+                    "--cfg-scale",
+                    str(config_value),
+                    "-s",
+                    str(seed_value),
+                    "-H",
+                    str(height),
+                    "-W",
+                    str(width),
+                    "-o",
+                    filename])
+            else:
+                process = subprocess.Popen([
+                    "../sd",
+                    "-m",
+                    "../sd.gguf",
+                    "--vae",
+                    "../sdxl_vae.gguf",
+                    "-p",
+                    unidecode.unidecode(prompt),
+                    "-n",
+                    rag.get_sd_negative_prompt() + " " + ( negativeprompt if negativeprompt else "" ),
+                    "--steps",
+                    str(steps_value),
+                    "--cfg-scale",
+                    str(config_value),
+                    "-s",
+                    str(seed_value),
+                    "-H",
+                    str(height),
+                    "-W",
+                    str(width),
+                    "--sampling-method",
+                    "dpm++2s_a",
+                    "--schedule",
+                    "karras",
+                    "-o",
+                    filename])
             process.wait()
             f = open(filename, mode ="rb")
             output = io.BytesIO(initial_bytes=f.read())
