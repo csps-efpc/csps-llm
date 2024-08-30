@@ -9,6 +9,12 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
     <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.10/dist/full.min.css" rel="stylesheet" type="text/css" />
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        window.modelName = "sd.gguf";
+        if (window.location.hash) {
+            window.modelName = window.location.hash .substring(1);
+        }
+    </script>
 </head>
 
 <body>
@@ -90,7 +96,7 @@
             width = parseInt(size);
             height = parseInt(size);
         }
-        url.search = new URLSearchParams({ prompt: prompt, negativeprompt: negativeprompt, seed: seed, cfg: cfg, steps: steps, format: "JPEG", width: width, height: height });
+        url.search = new URLSearchParams({ prompt: prompt, negativeprompt: negativeprompt, seed: seed, cfg: cfg, steps: steps, format: "JPEG", width: width, height: height, model: window.modelName });
         loadImage(url)
             .then(image => {
                 imageHolder.innerHTML = "";

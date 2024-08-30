@@ -517,11 +517,11 @@ def stablediffusion():
     config_value = 5
     width = 512
     height = 512
-    useFlux = False
+    modelName = "sd.gguf"
     format = "PNG"
     negativeprompt = None
-    if ('useFlux' in request.args): 
-        useFlux = request.args["useFlux"]
+    if ('model' in request.args): 
+        modelName = request.args["model"]
     if ('format' in request.args): 
         format = request.args["format"]
     if ('seed' in request.args): 
@@ -550,6 +550,7 @@ def stablediffusion():
     try:
         output = io.BytesIO()
         if SD_IN_PROCESS:
+            # This path's feature set is behind the forked-process path, and should be deleted if the VRAM leak in stable-diffusion-cpp-python doen't get fixed 
             sd = getSd()
             images = sd.txt_to_img(
                 prompt=unidecode.unidecode(prompt),
@@ -574,11 +575,11 @@ def stablediffusion():
             freeLlm()
             filename = str(uuid.uuid1())+".png"
             process = None
-            if(useFlux) :
+            if("flux" in modelName) :
                 process = subprocess.Popen([
                     "../sd",
                     "--diffusion-model",
-                    "../flux1-schnell-q4_k.gguf",
+                    "../" + modelName,
                     "--vae",
                     "../ae-f16.gguf",
                     "--clip_l",
@@ -607,7 +608,7 @@ def stablediffusion():
                 process = subprocess.Popen([
                     "../sd",
                     "-m",
-                    "../sd.gguf",
+                    "../" + modelName,
                     "--vae",
                     "../sdxl_vae.gguf",
                     "-p",
