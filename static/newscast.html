@@ -10,8 +10,8 @@
     <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.10/dist/full.min.css" rel="stylesheet" type="text/css" />
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
-            window.personality = "gemma";
-            window.persona = "A watercolor painting of an an elf maiden wearing a red ruby bindi with a white background ";
+            window.personality = "whisper";
+            window.persona = "A simple comic illustration on a white background of the face of a pale androgynous person with a long purple ponytail wearing a white blouse ";
             window.persona_seed = 2;
     </script>
 </head>
@@ -130,12 +130,11 @@
         item = window.preso[index];
 
         item.image1 = new URL('../stablediffusion/generate', window.location);
-        item.image1.search = new URLSearchParams({ seed: document.getElementById("seed").value, cfg: 3, steps: 10, prompt: item.imagePrompt, width: 768 })
+        item.image1.search = new URLSearchParams({ seed: document.getElementById("seed").value, cfg: 4.5, steps: 12, prompt: item.imagePrompt, width: 768 })
         item.image2 = new URL('../stablediffusion/generate', window.location);
         item.image2.search = new URLSearchParams({ width: 384, height: 512, cfg:4, steps: 10, seed: (window.persona_seed ? window.persona_seed : "13"), prompt: window.persona + " " + item.posture })
         item.audio1 = new URL('../tts/' + window.personality, window.location);
         item.audio1.search = new URLSearchParams({ text: item.story });
-
 
         Promise.all([
             completeAudio(previousAudio),
