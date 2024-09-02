@@ -604,6 +604,29 @@ def stablediffusion():
                     str(width),
                     "-o",
                     filename])
+            elif ("sd3" in modelName) :
+                process = subprocess.Popen([
+                    "../sd",
+                    "-m",
+                    "../" + modelName,
+                    "--sampling-method",
+                    "euler",
+                    "-p",
+                    unidecode.unidecode(prompt),
+                    "-n",
+                    rag.get_sd_negative_prompt() + " " + ( negativeprompt if negativeprompt else "" ),
+                    "--steps",
+                    str(steps_value),
+                    "--cfg-scale",
+                    str(config_value),
+                    "-s",
+                    str(seed_value),
+                    "-H",
+                    str(height),
+                    "-W",
+                    str(width),
+                    "-o",
+                    filename])
             else:
                 process = subprocess.Popen([
                     "../sd",
