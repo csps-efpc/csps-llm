@@ -159,7 +159,7 @@ def render_stats():
         with open('log.csv', mode='r') as file:
             reader = csv.reader(file)
             for row in reader:
-                if(row[3] in ['cache_hit', 'message_socket', 'start_gpt','end_socket','end_gpt','end_generation']) :
+                if(row[3] in ['cache_hit', 'message_socket', 'start_gpt','end_socket','end_gpt','end_toil','end_generation']) :
                     gen_events.append([int((datetime.fromisoformat(row[0]) - epoch).total_seconds() * 1000), row[2], row[3], 'miss', row[5]])
         for index, row in enumerate(gen_events) :
             if(row[2] == 'cache_hit'):
