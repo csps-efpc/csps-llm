@@ -203,7 +203,7 @@
             "ui_emotions"
         ],
         "persona": "A close-up on a black background of a translucent male ((ghost)) made of circuitry ",
-        "persona_seed": 1,
+      use flash attention  "persona_seed": 1,
         "persona_cfg": 7,
         "persona_steps": 14,
         "intro_dialogue": "Hello, my name is Grant. I'm a coding specialist that works for the CSPS. I'm only allowed to handle unclassified information, and if you use anything I code, please make sure that comments reflect that an AI wrote it."
@@ -214,8 +214,8 @@
         "hf_filename": "*Q4_K_M.gguf",
         "voice":"../en_GB-alba-medium.onnx",
         "gpu_layers":31,
-        "context_window": 4500,
-        "rag_length": 4500,
+        "context_window": 5200,
+        "rag_length": 5200,
         "flash_attention": "true",
         "ui_style": "autumn",
         "ui_features": [
