@@ -203,7 +203,7 @@
             "ui_emotions"
         ],
         "persona": "A close-up on a black background of a translucent male ((ghost)) made of circuitry ",
-      use flash attention  "persona_seed": 1,
+        "persona_seed": 1,
         "persona_cfg": 7,
         "persona_steps": 14,
         "intro_dialogue": "Hello, my name is Grant. I'm a coding specialist that works for the CSPS. I'm only allowed to handle unclassified information, and if you use anything I code, please make sure that comments reflect that an AI wrote it."
