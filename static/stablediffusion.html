@@ -77,9 +77,8 @@
         var cfg = document.getElementById("cfg").value;
         var size = document.getElementById("size").value;
         var imageHolder = document.getElementById("imageHolder");
-        imageHolder.innerHTML = "";
         var spinner = document.createElement("div");
-        spinner.classList.add("skeleton", "h-32", "w-32");
+        spinner.classList.add("skeleton", "h-8", "w-64");
         imageHolder.appendChild(spinner);
         var url = new URL('../stablediffusion/generate', window.location);
         width = 512;
