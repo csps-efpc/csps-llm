@@ -40,6 +40,8 @@
                     <option value="portrait" />portrait</option>
                     <option value="landscape-wide" />landscape wide</option>
                     <option value="portrait-tall" />portrait tall</option>
+                    <option value="landscape-large" />landscape large</option>
+                    <option value="portrait-large" />portrait large</option>
                 </select>
             </label>
             <button id="go-button"
@@ -87,6 +89,12 @@
             height = 768;
         } else if (size === "landscape") {
             width = 768;
+        } else if (size === "portrait-large") {
+            width = 768;
+            height = 1024;
+        } else if (size === "landscape-large") {
+            height = 768;
+            width = 1024;
         } else if (size === "portrait-tall") {
             height = 1024;
         } else if (size === "landscape-wide") {
