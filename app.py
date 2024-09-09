@@ -64,11 +64,12 @@ __cached_sessions = {}
 
 def getSd(modelName):
     global __cached_sd
+    global __cached_sd_modelName
     if not lock.locked():
         #The method has been called by a thread not holding the lock.
         raise Exception('Attempted to control the loaded model without holding the exclusivity lock.')
     
-    if(__cached_sd is not None and __cached_sd_modelName is modelName) :
+    if((__cached_sd is not None) and (__cached_sd_modelName == modelName)) :
         logEvent(subject="cache", eventtype="cache_hit")
         return __cached_sd
     freeLlm()
