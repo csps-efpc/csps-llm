@@ -57,27 +57,30 @@ rag_suffix = "\nGiven the preceding text, "
 pleaseWaitText = "\n[Please note that I'm currently helping another user and will be with you as soon as they've finished.]\n"
 
 __cached_sd = None
+__cached_sd_modelName = None
 __cached_llm = None
 __cached_personality = None
 __cached_sessions = {}
 
-def getSd():
+def getSd(modelName):
     global __cached_sd
     if not lock.locked():
         #The method has been called by a thread not holding the lock.
         raise Exception('Attempted to control the loaded model without holding the exclusivity lock.')
     
-    if(__cached_sd is not None) :
+    if(__cached_sd is not None and __cached_sd_modelName is modelName) :
+        logEvent(subject="cache", eventtype="cache_hit")
         return __cached_sd
     freeLlm()
     #Instantiate the model
     sd = StableDiffusion(
-        model_path="../sd.gguf",
+        model_path="../" + modelName,
         vae_path="../sdxl_vae.gguf",
         vae_decode_only=True,
         vae_tiling=True
     )
     __cached_sd = sd
+    __cached_sd_modelName = modelName
     return sd
 
 # Function to get the LLM model based on the provided personality
@@ -551,7 +554,7 @@ def stablediffusion():
         output = io.BytesIO()
         if SD_IN_PROCESS:
             # This path's feature set is behind the forked-process path, and should be deleted if the VRAM leak in stable-diffusion-cpp-python doen't get fixed 
-            sd = getSd()
+            sd = getSd(modelName)
             images = sd.txt_to_img(
                 prompt=unidecode.unidecode(prompt),
                 sample_steps = steps_value,
