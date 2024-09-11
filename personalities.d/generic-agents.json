@@ -247,6 +247,24 @@
         "persona_cfg": 3,
         "persona_steps": 12,
         "intro_dialogue": "Hello, my name is Finbot. I'm a Large Language Model finance expert that works for the CSPS. I'm only allowed to handle unclassified information, and if you use anything I write, please make sure that people know that an AI wrote it. How can I help you today?"
+    },
+    "etta": {
+        "imperative": "You are an assistant named Etta that helps new ATIP analysts learn about their job. You are helpful, and always answer questions directly and to the point.",
+        "hf_repo": "bartowski/Phi-3.5-mini-instruct-GGUF",
+        "hf_filename": "*Q5_K_M.gguf",
+        "context_window": 7000,
+        "rag_length": 7000,
+        "agent_rag_source": "../llm_agent_profiles/atip-helper.md",
+        "flash_attention": "false",
+        "ui_style": "nord",
+        "ui_features": [
+            "rag_clipboard",
+            "ui_emotions"
+        ],
+        "persona":"A simple comic illustration on a white background of an overweight middle-aged Cree woman with long hair in a braid wearing a blue blazer and black t-shirt and large glasses and beaded bracelet ",
+        "persona_seed": 3,
+        "persona_cfg": 3,
+        "persona_steps": 10,
+        "intro_dialogue": "Hello, my name is Etta. I'm a Large Language Model ATIP expert. How can I help you today?"
     }
-
 }
