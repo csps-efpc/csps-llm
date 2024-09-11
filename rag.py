@@ -7,6 +7,10 @@ import os
 from bs4 import BeautifulSoup
 from datetime import datetime
 
+from requests import utils
+DEFAULT_USER_AGENT = 'Whisper Agent'
+utils.default_user_agent = lambda: DEFAULT_USER_AGENT
+
 # Recursive implementation of dictionary update
 def deep_update(d, u):
     for k, v in u.items():
@@ -42,7 +46,7 @@ default_ui_style=os.environ.get("UI_STYLE", "light")
 default_ui_features=os.environ.get("UI_FEATURES", "").split(";")
 default_llm_voice=os.environ.get("LLM_VOICE", "../en_US-hfc_female-medium.onnx")
 # A basic set of things we'd prefer not to generate. 
-default_sd_negative_prompt=os.environ.get("SD_NEGATIVE_PROMPT", "scary, nipple, ((naked)), low quality, extra fingers, mutated hands, watermark, signature")
+default_sd_negative_prompt=os.environ.get("SD_NEGATIVE_PROMPT", "scary, low quality, extra fingers, mutated hands, watermark, signature")
 
 
 
@@ -119,7 +123,7 @@ def fetchUrlText(url, max_url_content_length):
         else :
             returnable = soup.find('body').get_text()
     if(res.status_code == 200 and ( res.headers['content-type'].startswith("application/rss+xml") or res.headers['content-type'].startswith("application/xml") or res.headers['content-type'].startswith("text/xml") or res.headers['content-type'].startswith("application/atom+xml"))):
-        feed = feedparser.parse(url)
+        feed = feedparser.parse(url, agent=DEFAULT_USER_AGENT)
         returnable += "## "+feed.feed.title + "\n"
         if('description' in feed.feed.keys()):
             returnable += ""+feed.feed.description + "\n"
