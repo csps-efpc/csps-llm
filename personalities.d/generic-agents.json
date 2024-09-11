@@ -236,7 +236,7 @@
         "hf_repo": "bartowski/gemma-2-9b-it-GGUF",
         "hf_filename": "*Q4_K_M.gguf",
         "voice":"../en_GB-alba-medium.onnx",
-        "gpu_layers":31,
+        "gpu_layers":29,
         "context_window": 5200,
         "rag_length": 5200,
         "flash_attention": "true",
