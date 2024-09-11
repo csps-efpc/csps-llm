@@ -256,7 +256,7 @@
         "rag_length": 7000,
         "agent_rag_source": "../llm_agent_profiles/atip-helper.md",
         "flash_attention": "false",
-        "ui_style": "nord",
+        "ui_style": "bumblebee",
         "ui_features": [
             "rag_clipboard",
             "ui_emotions"
