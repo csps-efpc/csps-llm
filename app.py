@@ -40,6 +40,7 @@ session_cache_size = 100
 systemless_markers = [
     'granite-8b-code-instruct',
     'Phi-3-mini',
+    'Phi-3-medium',
     'Mistral-7B-Instruct-v0.3',
     'OLMo-7B-Instruct',
     'gemma-2-'
