@@ -26,7 +26,8 @@ import plotly.express as px
 import rag
 
 # Feature Flags
-SD_IN_PROCESS = True
+SD_IN_PROCESS = False
+SD_FLUSH_EVERY_TIME = True
 
 # Initialize the Flask app and a thread lock for the LLM model
 app = flask.Flask(__name__) #, static_url_path=''
@@ -562,7 +563,9 @@ def stablediffusion():
                     image.save(output, "PNG")
                 output.flush()
                 output.seek(0)
-                
+                if SD_FLUSH_EVERY_TIME:
+                    freeModels()
+
         # The code below can be completely replaced by the code above if the sd.cpp folks ever address https://github.com/leejet/stable-diffusion.cpp/issues/288
             else:
                 freeModels()
