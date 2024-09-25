@@ -16,8 +16,8 @@
             "ui_emotions_default"
         ],
         "intro_dialogue": "Hello, my name is Fyunch. I'm an assistant to Josh Turner that's here to help people with information about him and his work.",
-        "persona": "A close-up 3D cartoon image on a white background of a middle aged white man with an extended greying goatee and a bald head and glasses wearing a black t-shirt",
-        "persona_seed": 8,
+        "persona": "A Fiona Staples-style illustration on a white background of a middle aged white man with an extended greying goatee and a ((shaved head)) and glasses wearing a white dress shirt and a brown herringbone vest ",
+        "persona_seed": 80468545071840858,
         "persona_cfg": 7,
         "persona_steps": 15
     },
