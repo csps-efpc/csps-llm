@@ -139,4 +139,5 @@ Nothing makes us happier than constructive feedback and well-formed PRs - if you
 * Add support for a LRU cache of models (for multi-GPU environments)
 * ~~Add support for negative prompts in image generation~~
 * Make persona "neutral" avatars auto-generate and cache the first time they're called.
-
+* Make Wikipedia RAG use the MediaWiki API
+* Add GCWiki RAG
