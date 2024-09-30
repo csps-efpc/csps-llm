@@ -239,7 +239,7 @@ def gpt_socket(personality):
         reflection = None
         matches = None
         with lock:
-            reflection = ask("If the following text is a question that could be answered with a web search, answer with a relevant search term. Answer with only the terms surrounded by \" characters, or \"none\" if the question is inappropriate. Do not answer anything after the quoted string.\n\n" + message, personality)
+            reflection = ask("If the following text is a question that could be answered with a web search, answer with a relevant search term. Answer with only the terms surrounded by \" characters, or \"none\" if the question is inappropriate. Do not answer anything after the quoted string.\n\n" + message, personality = personality)
             print(reflection)
             matches = re.search(r'"([^"]+)"', reflection)
         if(matches is not None and matches.group(1) != "none") :
@@ -254,7 +254,7 @@ def gpt_socket(personality):
                         ws.send("\n\n")
                         self_eval = "false"
                         with lock:
-                            self_eval = ask("Consider the following content: \n\n" + possible_text + "\n\nDoes the content answer the request \""+message+"\"?", force_boolean=True)
+                            self_eval = ask("Consider the following content: \n\n" + possible_text + "\n\nDoes the content answer the request \""+message+"\"?", force_boolean=True, personality = personality)
                         if(self_eval == 'true') :
                             ws.send("Content is relevant: ["+ results[i]['title'] +"](" + results[i]['href'] + "):")
                             ws.send("\n\n")
