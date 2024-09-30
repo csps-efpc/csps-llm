@@ -1,0 +1,259 @@
+<html lang="en" data-theme="cupcake">
+
+<head>
+    <title>Whisper fact extraction</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- local resources -->
+    <link href="css/main.css" rel="stylesheet" />
+    <!-- CDN resources -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.10/dist/full.min.css" rel="stylesheet" type="text/css" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script type="module">
+        import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
+
+        window.getUniqueObjects = function (arr) {
+  const uniqueArr = [];
+  arr.forEach((obj) => {
+    if (!uniqueArr.some((uniqueObj) => JSON.stringify(obj) === JSON.stringify(uniqueObj))) {
+      uniqueArr.push(obj);
+    }
+  });
+  return uniqueArr;
+}
+
+window.chart = function (data){
+  // Specify the dimensions of the chart
+  const width = 928;
+  const height = 600;
+  const predicates = Array.from(new Set(data.links.map(d => d.label)));
+  const types = Array.from(new Set(data.nodes.map(d => d.type)));
+  // Specify the color scale.
+  const color = d3.scaleOrdinal(d3.schemeCategory10);
+
+  // The force simulation mutates links and nodes, so create a copy
+  // so that re-evaluating this cell produces the same result.
+  const links = data.links.map(d => ({...d}));
+  const nodes = data.nodes.map(d => ({...d}));
+
+  // Create a simulation with several forces.
+  const simulation = d3.forceSimulation(nodes)
+      .force("link", d3.forceLink(links).id(d => d.id))
+      .force("charge", d3.forceManyBody().strength(-100))
+      .force("center", d3.forceCenter(width / 2, height / 2))
+      .on("tick", ticked);
+
+function linkArc(d) {
+  const r = Math.hypot(d.target.x - d.source.x, d.target.y - d.source.y);
+  return `
+    M${d.source.x},${d.source.y}
+    A${r},${r} 0 0,1 ${d.target.x},${d.target.y}
+  `;
+}
+  // Create the SVG container.
+  const svg = d3.create("svg")
+      .attr("width", width)
+      .attr("height", height)
+      .attr("viewBox", [0, 0, width, height])
+      .attr("style", "max-width: 100%; height: auto;  font: 12px sans-serif;");
+
+ // Per-type markers, as they don't inherit styles.
+ svg.append("defs").selectAll("marker")
+    .data(predicates)
+    .join("marker")
+      .attr("id", d => `arrow-${d}`)
+      .attr("viewBox", "0 -5 10 10")
+      .attr("refX", 15)
+      .attr("refY", -0.5)
+      .attr("markerWidth", 6)
+      .attr("markerHeight", 6)
+      .attr("orient", "auto")
+    .append("path")
+      .attr("fill", color)
+      .attr("d", "M0,-5L10,0L0,5");
+
+      const link = svg.append("g")
+      .attr("fill", "none")
+      .attr("stroke-width", 1.5)
+    .selectAll("path")
+    .data(links)
+    .join("path")
+      .attr("stroke", d => color(d.label))
+      .attr("marker-end", d => `url(${new URL(`#arrow-${d.label}`, location)})`);
+      link.append("titie").text(d => d.source + " " + d.label + " " + d.target)
+
+
+  const node = svg.append("g")
+      .attr("fill", "currentColor")
+      .attr("stroke-linecap", "round")
+      .attr("stroke-linejoin", "round")
+    .selectAll("g")
+    .data(nodes)
+    .join("g");
+    //  .call(drag(simulation));
+
+  node.append("circle")
+      .attr("stroke", "white")
+      .attr("stroke-width", 1.5)
+      .attr("fill", d => color(d.type))
+      .attr("r", 4);
+  node.append("title").text(d => d.type + ":" + d.id + " - " + d.detailed_type)
+  node.append("text")
+      .attr("x", 8)
+      .attr("y", "0.31em")
+      .text(d => d.id)
+    .clone(true).lower()
+      .attr("fill", "none")
+      .attr("stroke", "white")
+      .attr("stroke-width", 3);
+
+  simulation.on("tick", () => {
+    link.attr("d", linkArc);
+    node.attr("transform", d => `translate(${d.x},${d.y})`);
+  });
+
+  // Add a drag behavior.
+  node.call(d3.drag()
+        .on("start", dragstarted)
+        .on("drag", dragged)
+        .on("end", dragended));
+
+  // Set the position attributes of links and nodes each time the simulation ticks.
+  function ticked() {
+    link
+        .attr("x1", d => d.source.x)
+        .attr("y1", d => d.source.y)
+        .attr("x2", d => d.target.x)
+        .attr("y2", d => d.target.y);
+
+    node
+        .attr("cx", d => d.x)
+        .attr("cy", d => d.y);
+  }
+
+  // Reheat the simulation when drag starts, and fix the subject position.
+  function dragstarted(event) {
+    if (!event.active) simulation.alphaTarget(0.3).restart();
+    event.subject.fx = event.subject.x;
+    event.subject.fy = event.subject.y;
+  }
+
+  // Update the subject (dragged node) position during drag.
+  function dragged(event) {
+    event.subject.fx = event.x;
+    event.subject.fy = event.y;
+  }
+
+  // Restore the target alpha so the simulation cools after dragging ends.
+  // Unfix the subject position now that it’s no longer being dragged.
+  function dragended(event) {
+    if (!event.active) simulation.alphaTarget(0);
+    event.subject.fx = null;
+    event.subject.fy = null;
+  }
+
+  return svg.node();
+}
+    </script>
+</head>
+
+<body>
+    <div class="footer">
+        <div class="w-full flex join">
+            <button id="listen-button" class="btn btn-active join-item" hidden>Listen &#x1F399;</button>
+            <label class="input input-bordered flex items-center gap-2 join-item grow">Text<input class="grow"
+                    type="text" id="prompt" value ="The quick brown fox jumps over the lazy dog."/></label>
+                    
+        </div>
+    </div>
+    <div class="w-full h-full grid place-content-center">
+        <div id="mediaHolder">
+            Audio goes here.
+        </div>
+    </div>
+
+</body>
+<script>
+    var micEmoji = 'Listen \u{1F399}';
+    var earEmoji = 'Listening... \u{1F442}';
+    // Bind the "enter" keystroke.
+    document.getElementById("prompt").addEventListener("keypress", function (event) {
+        if (event.key === "Enter") {
+            event.preventDefault();
+            sendPrompt();
+        }
+    });
+    startDictation = function () {
+    listenButton = document.getElementById('listen-button');
+    if (window.hasOwnProperty('webkitSpeechRecognition')) {
+        var recognition = new webkitSpeechRecognition();
+
+        recognition.continuous = false;
+        recognition.interimResults = false;
+        recognition.lang = 'en-US';
+        listenButton.innerText = earEmoji;
+        recognition.start();
+
+        recognition.onresult = function (e) {
+            document.getElementById('prompt').value = e.results[0][0].transcript;
+            recognition.stop();
+            listenButton.innerText = micEmoji;
+            sendPrompt();
+        };
+        recognition.onerror = function (e) {
+            recognition.stop();
+        };
+    }
+}
+    if (window.hasOwnProperty('webkitSpeechRecognition')) {
+        var listenButton = document.getElementById('listen-button');
+        listenButton.hidden = false;
+        listenButton.addEventListener("click", function (event) {
+          startDictation();
+        });
+      }
+    async function sendPrompt() {
+        var prompt = document.getElementById("prompt").value;
+        var mediaHolder = document.getElementById("mediaHolder");
+        mediaHolder.innerHTML = "";
+        var spinner = document.createElement("span");
+        spinner.classList.add("loading", "loading-spinner", "loading-lg");
+        mediaHolder.appendChild(spinner);
+        var url = new URL('../toil/tribble', window.location);
+        payload = {
+            prompt: "-------Text begin-------\n"+
+            prompt +
+            "\n-------Text end-------",
+            schema: {"type":"object","properties":{"nodes":{"type":"array","items":{"type":"object","properties":{"id":{"type":"string"},"type":{"type":"string"},"detailed_type":{"type":"string"}},"required":["id","type","detailed_type"],"additionalProperties":false}},"edges":{"type":"array","items":{"type":"object","properties":{"from":{"type":"string"},"to":{"type":"string"},"label":{"type":"string"}},"required":["from","to","label"],"additionalProperties":false}}},"required":["nodes","edges"],"additionalProperties":false}
+
+        };
+        try {
+            const response = await fetch(url, {
+                method: "POST",
+                body: JSON.stringify(payload),
+                headers: {
+                    "Content-Type": "application/json",
+                    }
+                }
+            ).then((response) => response.json())
+            .then((data) => {
+                data.links=[]
+                for (const edge of data.edges) {
+                    data.links.push({
+                        source: edge.from,
+                        target: edge.to,
+                        label: edge.label
+                    });
+                }
+                data.nodes = window.getUniqueObjects(data.nodes);
+                mediaHolder.append(window.chart(data));
+                mediaHolder.removeChild(spinner);
+            })
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
+</script>
+
+</html>
