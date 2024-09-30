@@ -45,6 +45,7 @@ default_llm_flash_attention=os.environ.get("LLM_FLASH_ATTENTION", "false")
 default_ui_style=os.environ.get("UI_STYLE", "light")
 default_ui_features=os.environ.get("UI_FEATURES", "").split(";")
 default_llm_voice=os.environ.get("LLM_VOICE", "../en_US-hfc_female-medium.onnx")
+default_llm_voice_param=os.environ.get("LLM_VOICE_PARAM", "0")
 # A basic set of things we'd prefer not to generate. 
 default_sd_negative_prompt=os.environ.get("SD_NEGATIVE_PROMPT", "scary, low quality, extra fingers, mutated hands, watermark, signature")
 
@@ -67,6 +68,7 @@ def get_model_spec(personality):
         'rag_length': default_llm_rag_length,
         'flash_attention': default_llm_flash_attention,
         'voice': default_llm_voice,
+        'voice_param': default_llm_voice_param,
         'ui_style': default_ui_style,
         'ui_features': default_ui_features,
         'cpu_threads': default_llm_cpu_threads,

@@ -414,6 +414,7 @@ def tts(personality):
     logEvent(username=determineUser(request), ip = determineIP(request), subject="/tts/"+personality, eventtype="start_speech")
     model_spec = rag.get_model_spec(personality)
     model_path = model_spec["voice"]
+    model_param = model_spec["voice_param"]
     filename = str(uuid.uuid1())
     if(not tts_lock.acquire(blocking=False)):
             print("Blocking for TTS lock")
@@ -428,6 +429,8 @@ def tts(personality):
         "../piper/piper",
         "-m",
         model_path,
+        "--speaker",
+        model_param,
         "-c",
         model_path+".json",
         "-f",
