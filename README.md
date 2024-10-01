@@ -141,3 +141,4 @@ Nothing makes us happier than constructive feedback and well-formed PRs - if you
 * Make persona "neutral" avatars auto-generate and cache the first time they're called.
 * Make Wikipedia RAG use the MediaWiki API
 * Add GCWiki RAG
+* Make context-stuffing options capable of calling http, so that contexts can by dynamically stuffed.
