@@ -142,3 +142,4 @@ Nothing makes us happier than constructive feedback and well-formed PRs - if you
 * Make Wikipedia RAG use the MediaWiki API
 * Add GCWiki RAG
 * Make context-stuffing options capable of calling http, so that contexts can by dynamically stuffed.
+* Make the /toil endpoint stream responses, even JSON ones.
