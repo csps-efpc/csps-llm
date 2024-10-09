@@ -14,12 +14,15 @@ import unidecode
 import threading
 import subprocess
 import uuid
+import json
 import time
 import io
 import base64
 import csv
 from datetime import datetime
 from duckduckgo_search import DDGS
+import wikipedia
+
 import plotly.express as px
 
 # Import nearby python files
@@ -242,33 +245,59 @@ def gpt_socket(personality):
             reflection = ask("If the following text is a question that could be answered with a web search, answer with a relevant search term. Answer with only the terms surrounded by \" characters, or \"none\" if the question is inappropriate. Do not answer anything after the quoted string.\n\n" + message, personality = personality)
             print(reflection)
             matches = re.search(r'"([^"]+)"', reflection)
-        if(matches is not None and matches.group(1) != "none") :
-            ws.send("Searching for \""+matches.group(1)+"\" ... ")
-            query = matches.group(1) + " site:" + (" OR site:".join(rag_domain.split('|')))
-            results = DDGS().text(query)
-            if(results) :
-                for i, result in enumerate(results, start = 1) :
-                    if(i < 3 and text is None) :
-                        possible_text = rag.fetchUrlText(results[i]['href'], model_spec['rag_length'])
-                        ws.send("Evaluating search result "+ str(i) + "...")
+            if(matches is not None and matches.group(1) != "none") :            
+                if(rag_domain == "wikipedia.org") :
+                    ws.send("Searching wikipedia for \""+matches.group(1)+"\" ... ")
+                    results = wikipedia.search(matches.group(1))
+                    if(results) :
+                        results = ask("Sort the following topics into a JSON array like [\"first\",\"second\",\"third\"] from highest relevance to lowest for the query \""+matches.group(1)+"\":\n" + "\n".join(results), personality=personality, schema={
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }                    
+                        })
+                        for i in range(3) :
+                            if(i < 3 and text is None) :
+                                result = wikipedia.page(results[i])
+                                possible_text = result.content[:model_spec['rag_length']]
+                                ws.send("Evaluating search result ["+ result.title +"](" + result.url + ") ...")
+                                ws.send("\n\n")
+                                ask_response = ask("Consider the following content: \n\n" + possible_text + "\n\nIs the content about \""+matches.group(1)+"\"?", force_boolean=True, personality = personality)
+                                if(ask_response) :
+                                    ws.send("Content is relevant:")
+                                    ws.send("\n\n")
+                                    rag_source_description = "The page \""+result.title+"\" at "+ result.url +" says:\n"
+                                    text = possible_text
+                                    print("Accepting the page \""+result.title+"\" at "+ result.url +" as relevant.")
+                                else:
+                                    print("Discarding the page \""+result.title+"\" at "+ result.url +" as irrelevant.")
+                    else:
+                        ws.send("Couldn't find a suitable reference.")
                         ws.send("\n\n")
-                        self_eval = "false"
-                        with lock:
-                            self_eval = ask("Consider the following content: \n\n" + possible_text + "\n\nDoes the content answer the request \""+message+"\"?", force_boolean=True, personality = personality)
-                        if(self_eval == 'true') :
-                            ws.send("Content is relevant: ["+ results[i]['title'] +"](" + results[i]['href'] + "):")
-                            ws.send("\n\n")
-                            rag_source_description = "The page \""+results[i]['title']+"\" at "+ results[i]['href'] +" says:\n"
-                            text = possible_text
-                            print("Accepting the page \""+results[i]['title']+"\" at "+ results[i]['href'] +" as relevant.")
-                        else:
-                            print("Discarding the page \""+results[i]['title']+"\" at "+ results[i]['href'] +" as irrelevant.")
+                else:
+                    ws.send("Searching for \""+matches.group(1)+"\" ... ")
+                    query = matches.group(1) + " site:" + (" OR site:".join(rag_domain.split('|')))
+                    results = DDGS().text(query)
+                    if(results) :
+                        for i, result in enumerate(results, start = 1) :
+                            if(i < 3 and text is None) :
+                                possible_text = rag.fetchUrlText(results[i]['href'], model_spec['rag_length'])
+                                ws.send("Evaluating search result "+ str(i) + "...")
+                                ws.send("\n\n")
+                                if(ask("Consider the following content: \n\n" + possible_text + "\n\nIs the content about \""+matches.group(1)+"\"?", force_boolean=True, personality = personality)) :
+                                    ws.send("Content is relevant: ["+ results[i]['title'] +"](" + results[i]['href'] + "):")
+                                    ws.send("\n\n")
+                                    rag_source_description = "The page \""+results[i]['title']+"\" at "+ results[i]['href'] +" says:\n"
+                                    text = possible_text
+                                    print("Accepting the page \""+results[i]['title']+"\" at "+ results[i]['href'] +" as relevant.")
+                                else:
+                                    print("Discarding the page \""+results[i]['title']+"\" at "+ results[i]['href'] +" as irrelevant.")
+                    else:
+                        ws.send("Couldn't find a suitable reference.")
+                        ws.send("\n\n")
             else:
-                ws.send("Couldn't find a suitable reference.")
+                ws.send("No search necessary.")
                 ws.send("\n\n")
-        else:
-            ws.send("No search necessary.")
-            ws.send("\n\n")
     elif(message.startswith("http")):
         s = message.split(" ",1)
         message = s[1]
@@ -669,7 +698,7 @@ def stablediffusion():
         return flask.send_file(output, mimetype="image/jpeg", download_name="image.jpg", max_age=3600)
     return flask.send_file(output, mimetype="image/png", download_name="image.png", max_age=3600)
 
-def ask(prompt, personality="whisper", chat_context = [], force_boolean = False):
+def ask(prompt, personality="whisper", chat_context = [], force_boolean = False, schema=None):
 
     if not lock.locked():
         #The method has been called by a thread not holding the lock.
@@ -698,6 +727,11 @@ def ask(prompt, personality="whisper", chat_context = [], force_boolean = False)
                     "type": "boolean"
                 }
             }
+        elif(schema) :
+            response_format = {
+                "type": "json_object",
+                "schema": schema
+            }
 
         result=llm.create_chat_completion(
             messages=messages,
@@ -706,6 +740,11 @@ def ask(prompt, personality="whisper", chat_context = [], force_boolean = False)
             response_format=response_format,
             max_tokens=model_spec['context_window']        
         )
+        print(result["choices"][0]["message"]["content"])
+        if(schema) :
+            return json.loads(result["choices"][0]["message"]["content"])
+        elif force_boolean :
+            return result["choices"][0]["message"]["content"] == "true"
         return result["choices"][0]["message"]["content"]
     except Exception:
         return ""
