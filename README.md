@@ -146,3 +146,4 @@ Nothing makes us happier than constructive feedback and well-formed PRs - if you
 * Add wav2lip generation to speech synth. New endpoint?
 * Add "360" use case, where several participants contribute opinions, and the model synthesizes themes.
 * Add better error-handling code to the chat UI, addressing network failure cases and the like.
+* Add support for RAG "teaming" - using one model for tool-calling, and another for the subsequent interaction.
