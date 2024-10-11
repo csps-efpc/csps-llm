@@ -139,8 +139,10 @@ Nothing makes us happier than constructive feedback and well-formed PRs - if you
 * Add support for a LRU cache of models (for multi-GPU environments)
 * ~~Add support for negative prompts in image generation~~
 * Make persona "neutral" avatars auto-generate and cache the first time they're called.
-* Make Wikipedia RAG use the MediaWiki API
+* ~~Make Wikipedia RAG use the MediaWiki API~~
 * Add GCWiki RAG
 * Make context-stuffing options capable of calling http, so that contexts can by dynamically stuffed.
 * Make the /toil endpoint stream responses, even JSON ones.
 * Add wav2lip generation to speech synth. New endpoint?
+* Add "360" use case, where several participants contribute opinions, and the model synthesizes themes.
+* Add better error-handling code to the chat UI, addressing network failure cases and the like.
