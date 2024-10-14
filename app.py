@@ -220,6 +220,9 @@ def gpt_socket(personality):
     sessionkey = uuid.uuid4().urn
     rag_source_description = ""
     model_spec = rag.get_model_spec(personality)
+    rag_personality = personality
+    if(model_spec["rag_helper"]) :
+        rag_personality = model_spec["rag_helper"]
     ## TODO: make this bit modular.
     if(message.startswith("|SESSION|")):
         s = message[9:].split("""|/SESSION|""",1)
@@ -242,7 +245,7 @@ def gpt_socket(personality):
         reflection = None
         matches = None
         with lock:
-            reflection = ask("If the following text is a question that could be answered with a web search, answer with a relevant search term. Answer with only the terms surrounded by \" characters, or \"none\" if the question is inappropriate. Do not answer anything after the quoted string.\n\n" + message, personality = personality)
+            reflection = ask("If the following text is a question that could be answered with a web search, answer with a relevant search term. Answer with only the terms surrounded by \" characters, or \"none\" if the question is inappropriate. Do not answer anything after the quoted string.\n\n" + message, personality = rag_personality)
             print(reflection)
             matches = re.search(r'"([^"]+)"', reflection)
             if(matches is not None and matches.group(1) != "none") :            
@@ -250,7 +253,7 @@ def gpt_socket(personality):
                     ws.send("Searching wikipedia for \""+matches.group(1)+"\" ... ")
                     results = wikipedia.search(matches.group(1))
                     if(results) :
-                        results = ask("Sort the following topics into a JSON array like [\"first\",\"second\",\"third\"] from highest relevance to lowest for the query \""+matches.group(1)+"\":\n" + "\n".join(results), personality=personality, schema={
+                        results = ask("Sort the following topics into a JSON array like [\"first\",\"second\",\"third\"] from highest relevance to lowest for the query \""+matches.group(1)+"\":\n" + "\n".join(results), personality=rag_personality, schema={
                             "type": "array",
                             "items": {
                                 "type": "string"
@@ -262,7 +265,7 @@ def gpt_socket(personality):
                                 possible_text = result.content[:model_spec['rag_length']]
                                 ws.send("Evaluating search result ["+ result.title +"](" + result.url + ") ...")
                                 ws.send("\n\n")
-                                ask_response = ask("Consider the following content: \n\n" + possible_text + "\n\nIs the content about \""+matches.group(1)+"\"?", force_boolean=True, personality = personality)
+                                ask_response = ask("Consider the following content: \n\n" + possible_text + "\n\nIs the content about \""+matches.group(1)+"\"?", force_boolean=True, personality = rag_personality)
                                 if(ask_response) :
                                     ws.send("Content is relevant:")
                                     ws.send("\n\n")
@@ -284,7 +287,7 @@ def gpt_socket(personality):
                                 possible_text = rag.fetchUrlText(results[i]['href'], model_spec['rag_length'])
                                 ws.send("Evaluating search result "+ str(i) + "...")
                                 ws.send("\n\n")
-                                if(ask("Consider the following content: \n\n" + possible_text + "\n\nIs the content about \""+matches.group(1)+"\"?", force_boolean=True, personality = personality)) :
+                                if(ask("Consider the following content: \n\n" + possible_text + "\n\nIs the content about \""+matches.group(1)+"\"?", force_boolean=True, personality = rag_personality)) :
                                     ws.send("Content is relevant: ["+ results[i]['title'] +"](" + results[i]['href'] + "):")
                                     ws.send("\n\n")
                                     rag_source_description = "The page \""+results[i]['title']+"\" at "+ results[i]['href'] +" says:\n"

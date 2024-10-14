@@ -102,6 +102,7 @@
         "voice_param":"3",
         "context_window": 30000,
         "rag_length": 10000,
+        "rag_helper": "whisper",
         "flash_attention": "true",
         "ui_style": "autumn",
         "ui_features": [
@@ -184,6 +185,7 @@
         "hf_filename": "*Q4_K_L.gguf",
         "context_window": 2000,
         "rag_length": 2000,
+        "rag_helper": "whisper",
         "flash_attention": "false",
         "ui_style": "nord",
         "ui_features": [
@@ -204,6 +206,7 @@
         "hf_filename": "*Q8_0.gguf",
         "context_window": 4096,
         "rag_length": 4096,
+        "rag_helper": "whisper",
         "flash_attention": "true",
         "ui_style": "nord",
         "ui_features": [
