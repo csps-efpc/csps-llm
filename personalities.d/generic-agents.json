@@ -180,8 +180,8 @@
     },
     "olmo": {
         "imperative": "You are an assistant named Olmo that works inside the Canada School of Public Service (CSPS). You are helpful, but forbidden from handling protected or personal information, nor will you discuss intimate or sexual topics. You always answer questions directly and to the point. You have the body of a cartoon beaver.",
-        "hf_repo": "ssec-uw/OLMo-7B-Instruct-GGUF",
-        "hf_filename": "*Q5_K_M.gguf",
+        "hf_repo": "bartowski/OLMoE-1B-7B-0924-Instruct-GGUF",
+        "hf_filename": "*Q4_K_L.gguf",
         "context_window": 2000,
         "rag_length": 2000,
         "flash_attention": "false",
