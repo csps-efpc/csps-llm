@@ -185,7 +185,6 @@
         "hf_filename": "*Q4_K_L.gguf",
         "context_window": 4000,
         "rag_length": 4000,
-        "rag_helper": "whisper",
         "flash_attention": "false",
         "ui_style": "nord",
         "ui_features": [
