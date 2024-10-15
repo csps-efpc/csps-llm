@@ -7,7 +7,7 @@ A base for Government of Canada LLM services like chatbots, RAGs, and batch proc
 
 Given a base install of both Python 3 and `pip`, install dependencies with:
 ```
-pip install flask simple_websocket llama_cpp_python stable_diffusion_cpp_python feedparser requests bs4 huggingface_hub duckduckgo_search unidecode plotly pandas
+pip install flask simple_websocket llama_cpp_python stable_diffusion_cpp_python feedparser requests bs4 huggingface_hub duckduckgo_search unidecode plotly pandas wikipedia
 ```
 As an absolute minimum, you'll need 8GB of free RAM and as much local on-disk storage to work with a 7-billion parameter model. To be able to reasonably work with your model, you'll need an AVX2-capable CPU with four real cores (not hyperthreaded).
 
@@ -146,4 +146,5 @@ Nothing makes us happier than constructive feedback and well-formed PRs - if you
 * Add wav2lip generation to speech synth. New endpoint?
 * Add "360" use case, where several participants contribute opinions, and the model synthesizes themes.
 * Add better error-handling code to the chat UI, addressing network failure cases and the like.
-* Add support for RAG "teaming" - using one model for tool-calling, and another for the subsequent interaction.
+* Add better error-handling code to the streaming API, addressing memory issues and context overruns.
+* ~~Add support for RAG "teaming" - using one model for tool-calling, and another for the subsequent interaction.~~
