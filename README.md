@@ -148,3 +148,5 @@ Nothing makes us happier than constructive feedback and well-formed PRs - if you
 * Add better error-handling code to the chat UI, addressing network failure cases and the like.
 * Add better error-handling code to the streaming API, addressing memory issues and context overruns.
 * ~~Add support for RAG "teaming" - using one model for tool-calling, and another for the subsequent interaction.~~
+* Switch utterance detaction and speech recognition to something hybrid client/server-side.
+* 
