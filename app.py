@@ -410,6 +410,8 @@ def gpt_socket(personality):
     except Exception as e:
         print(e)
         logEvent(username=determineUser(request), ip = determineIP(request), subject="/gpt-socket/"+personality, eventtype="exception_socket", data=str(e), session_id=sessionkey)
+        if(ws.connected):
+            ws.send("Error: " + e)
         pass
     # remove the cached session from whrever it is in the cache so it gets reinserted at the tail.
     if(sessionkey in __cached_sessions):
@@ -490,7 +492,9 @@ def gpt(personality):
     logEvent(username=determineUser(request), ip = determineIP(request), subject="/gpt/"+personality, eventtype="start_gpt", data=prompt, session_id=session_id)
 
     print(prompt)
-    responseText = flask.Response(ask(prompt, personality, chat_context=messages), mimetype="text/plain")
+    responseText = ""
+    with lock :
+        responseText = flask.Response(ask(prompt, personality, chat_context=messages), mimetype="text/plain")
     logEvent(username=determineUser(request), ip = determineIP(request), subject="/gpt/"+personality, eventtype="end_gpt", data = millisSince(start))
     return responseText
 
