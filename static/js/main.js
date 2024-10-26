@@ -158,6 +158,9 @@ createWebSocket = function (prompt) {
     ws.onclose = function (evt) {
         //        contextElement.hidden = false;
     };
+    ws.onerror = function (evt) {
+        console.log(evt)
+    };
     ws.onmessage = function (evt) {
         token = evt.data;
         if (token.startsWith("<END ")) {
@@ -185,6 +188,21 @@ createWebSocket = function (prompt) {
     };
     return ws;
 }
+showError = function (error) {
+    dialogueElement = document.getElementById('dialogue');
+    var errorTextElement = document.createElement('div');
+    errorElement = document.createElement('div');
+    errorElement.classList.add('chat');
+    //userTextElement.classList.add('user');
+    errorTextElement.classList.add('animate__animated');
+    errorTextElement.classList.add('animate__fadeInUp');
+    errorTextElement.textContent = error;
+
+    errorTextElement.classList.add('chat-bubble');
+    errorTextElement.classList.add('chat-bubble-error');
+    errorElement.append(errorTextElement);
+    dialogueElement.append(errorElement);
+}
 sendPrompt = async function () {
     contextElement.hidden = true;
     var promptElement = document.getElementById('prompt');
@@ -195,6 +213,7 @@ sendPrompt = async function () {
     chatElement = document.createElement('div');
     chatElement.classList.add('chat');
     chatElement.classList.add('chat-end');
+
     //userTextElement.classList.add('user');
     userTextElement.classList.add('animate__animated');
     userTextElement.classList.add('animate__fadeInUp');
