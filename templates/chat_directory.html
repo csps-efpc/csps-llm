@@ -1,0 +1,34 @@
+<html lang="en" data-theme="cupcake">
+
+<head>
+  <title>Whisper Newsdesk</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- local resources -->
+  <link href="css/main.css" rel="stylesheet" />
+  <!-- CDN resources -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+  <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.10/dist/full.min.css" rel="stylesheet" type="text/css" />
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body>
+  <div class="flex flex-wrap">
+    {% for personality in personalities %}
+    <div id="item-{{personality}}" class="w-128 card card-compact bg-base-100 shadow-xl m-3">
+      <figure>
+        <img src="../static/img/{{personality}}.png" class="w-48" />
+      </figure>
+      <div class="card-body">
+        <h2 class="card-title">{{personality}}</h2>
+        <p>{{rag.get_model_spec(personality).get('description')}}</p>
+        <div class="card-actions justify-end">
+          <a href="chat/{{personality}}" class="btn btn-primary">chat</a>
+        </div>
+      </div>
+
+    </div>
+    {% endfor %}
+  </div>
+</body>
+
+</html>

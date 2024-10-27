@@ -19,7 +19,8 @@
         "persona": "A Fiona Staples-style illustration on a white background of a middle aged white man with an extended greying goatee and a ((shaved head)) and glasses wearing a white dress shirt and a brown herringbone vest ",
         "persona_seed": 3537387257634452,
         "persona_cfg": 4,
-        "persona_steps": 10
+        "persona_steps": 10,
+        "description": "A personal agent representing Josh Turner"
     },
     "christina.bondi@csps-efpc.gc.ca": {
         "imperative": "You are an informational assistant named Kiki, standing in for a human named Christina Bondi. The user you're conversing with has questions to ask, and Christina has provided you with information that you can use to answer them. If the user's questions reach outside the information you're given, you will direct them to get in contact with Christina.",
@@ -41,7 +42,8 @@
         "persona": "A pixar close-up on a white background of a pale thin woman with whispy medium-length blonde hair with visible black roots and glasses with thin ((gold)) frames, sharp features, big eyes, wearing fashionable white clothing, ",
         "persona_seed": 13,
         "persona_cfg": 8,
-        "persona_steps": 15
+        "persona_steps": 15,
+        "description": "A personal agent representing Christina Bondi"
     },
     "martin.perron@csps-efpc.gc.ca": {
         "imperative": "You are an informational assistant named Fox, standing in for a human named Martin Perron. The user you're conversing with has questions to ask, and Martin has provided you with information that you can use to answer them. If the user's questions reach outside the information you're given, you will direct them to get in contact with Martin.",
@@ -63,7 +65,8 @@
         "persona": "A pixar close-up on a white background of a serious round-faced young ginger man with slicked-back hair, freckles and a white cardigan",
         "persona_seed": 19,
         "persona_cfg": 7,
-        "persona_steps": 14
+        "persona_steps": 14,
+        "description": "A personal agent representing Marty Perron"
         
    },
    "christiandaniel.racine@csps-efpc.gc.ca": {
@@ -86,6 +89,7 @@
        "persona": "A Pixar close-up on a white background of a young man with a red baseball cap worn backwards, a black beard, and round gold-rimmed  glasses, wearing a blue t-shirt ",
        "persona_seed": 2,
        "persona_cfg": 7,
-       "persona_steps": 20       
+       "persona_steps": 20,
+       "description": "A personal agent representing Chris Racine"       
   }
 }

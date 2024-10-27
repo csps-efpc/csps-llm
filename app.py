@@ -156,7 +156,14 @@ def isSystemlessModel(repo_name) :
 # Flask route to bounce users to the default UI
 @app.route('/')
 def root_redir():
-    return redirect("/chat/whisper", code=302)
+    return redirect("/chat", code=302)
+
+# A service directory page
+@app.route("/chat")
+def chat_directory():
+    return render_template("chat_directory.html",
+                           personalities = rag.personalities,
+                           rag = rag)
 
 # A rudimentary stats endpoint
 @app.route("/platform/stats")
