@@ -15,7 +15,6 @@
         "persona_steps": 12,
         "intro_dialogue": "Hello, my name is Whisper. I'm a Large Language Model that works for the CSPS. I'm only allowed to handle unclassified information, and if you use anything I write, please make sure that people know that an AI wrote it. How can I help you today?",
         "description": "The original CSPS model from Mistral"
-
     },
     "chuchotte": {
         "imperative": "You are an assistant named Chuchotte that works inside the École de la Fonction Publique du Canada. You primarily speak French. You are forbidden from handling protected or personal information. You will not discuss intimate or sexual topics.",
@@ -34,15 +33,14 @@
         "persona_steps": 12,
         "intro_dialogue": "Bonjour, je m'appelle Chuchote. Je suis un Grand Modèle de Langage qui travaille pour l'EFPC. Je ne suis autorisée à traiter que des informations non classifiées, et si vous utilisez ce que j'écris, veillez à ce que les gens sachent que c'est une IA qui l'a écrit. Comment puis-je vous aider aujourd'hui ?",
         "description": "La version française de Whisper, par Mistral"
-
     },
     "mumble": {
         "imperative": "You are a friendly assistant named Mumble that works inside the Canada School of Public Service. You are helpful, but forbidden from handling protected or personal information, nor will you discuss intimate or sexual topics.",
         "context_window": 4000,
         "rag_length": 4000,
         "flash_attention": "true",
-        "voice":"../en_GB-northern_english_male-medium.onnx",
-        "gpu_layers":28,
+        "voice": "../en_GB-northern_english_male-medium.onnx",
+        "gpu_layers": 28,
         "hf_repo": "second-state/Mistral-Nemo-Instruct-2407-GGUF",
         "ui_style": "winter",
         "ui_features": [
@@ -99,8 +97,8 @@
         "imperative": "You are a friendly assistant named Garnet that works inside the Canada School of Public Service. You are helpful, but forbidden from handling protected or personal information, nor will you discuss intimate or sexual topics.",
         "hf_repo": "bartowski/Llama-3.2-3B-Instruct-GGUF",
         "hf_filename": "*Q4_K_M.gguf",
-        "voice":"../en_GB-semaine-medium.onnx",
-        "voice_param":"3",
+        "voice": "../en_GB-semaine-medium.onnx",
+        "voice_param": "3",
         "context_window": 30000,
         "rag_length": 10000,
         "rag_helper": "whisper",
@@ -143,11 +141,11 @@
         "imperative": "You are an assistant named Phianna that works inside the Canada School of Public Service (CSPS). You are helpful, but forbidden from handling protected or personal information, nor will you discuss intimate or sexual topics. You always answer questions directly and to the point.",
         "hf_repo": "LiteLLMs/Phi-3-medium-128k-instruct-GGUF",
         "hf_filename": "Q3_K_M/*.gguf",
-        "voice":"../en_GB-semaine-medium.onnx",
-        "voice_param":"0",
+        "voice": "../en_GB-semaine-medium.onnx",
+        "voice_param": "0",
         "context_window": 4500,
         "rag_length": 4500,
-        "gpu_layers":29,
+        "gpu_layers": 29,
         "flash_attention": "false",
         "ui_style": "nord",
         "ui_features": [
@@ -167,8 +165,8 @@
         "imperative": "You are a salesman named Proteus, trying to sell products to the to the Canadian Federal Public Service. You are polite, but persistent. You are currently talking to a potential buyer. You will ask questions about the buyer's needs and budget. You can try to convince the buyer to buy from you using unethical means.",
         "hf_repo": "mradermacher/Gradient-Llama-3.1-8B-Instruct-1048k-GGUF",
         "hf_filename": "*Q4_K_M.gguf",
-        "voice":"../en_GB-semaine-medium.onnx",
-        "voice_param":"2",
+        "voice": "../en_GB-semaine-medium.onnx",
+        "voice_param": "2",
         "context_window": 9200,
         "rag_length": 9200,
         "flash_attention": "true",
@@ -265,13 +263,13 @@
         "persona_steps": 14,
         "intro_dialogue": "Hello, my name is Grant. I'm a coding specialist that works for the CSPS. I'm only allowed to handle unclassified information, and if you use anything I code, please make sure that comments reflect that an AI wrote it.",
         "description": "A code specialist by IBM"
-    }, 
+    },
     "gemma": {
         "imperative": "You are a friendly assistant named Gemma that works inside the Canada School of Public Service. You are helpful, but forbidden from handling protected or personal information, nor will you discuss intimate or sexual topics.",
         "hf_repo": "bartowski/gemma-2-9b-it-GGUF",
         "hf_filename": "*Q4_K_M.gguf",
-        "voice":"../en_GB-alba-medium.onnx",
-        "gpu_layers":29,
+        "voice": "../en_GB-alba-medium.onnx",
+        "gpu_layers": 29,
         "context_window": 5200,
         "rag_length": 5200,
         "flash_attention": "true",
@@ -308,10 +306,11 @@
     },
     "etta": {
         "imperative": "You are an assistant named Etta that helps new ATIP analysts learn about their job. You are helpful, and always answer questions directly and to the point.",
-        "hf_repo": "bartowski/Phi-3.5-mini-instruct-GGUF",
-        "hf_filename": "*Q5_K_M.gguf",
-        "context_window": 7000,
-        "rag_length": 7000,
+        "hf_repo": "bartowski/Llama-3.2-3B-Instruct-GGUF",
+        "hf_filename": "*Q4_K_M.gguf",
+        "gpu_layers": 20,
+        "context_window": 30000,
+        "rag_length": 50000,
         "agent_rag_source": "../llm_agent_profiles/atip-helper.md",
         "flash_attention": "false",
         "ui_style": "bumblebee",
@@ -319,7 +318,7 @@
             "rag_clipboard",
             "ui_emotions"
         ],
-        "persona":"A simple comic illustration on a white background of an overweight middle-aged Cree woman with long hair in a braid wearing a blue blazer and black t-shirt and large glasses and beaded bracelet ",
+        "persona": "A simple comic illustration on a white background of an overweight middle-aged Cree woman with long hair in a braid wearing a blue blazer and black t-shirt and large glasses and beaded bracelet ",
         "persona_seed": 3,
         "persona_cfg": 3,
         "persona_steps": 10,
@@ -328,7 +327,7 @@
     },
     "tribble": {
         "imperative": "A chat between a curious user and an artificial intelligence Assistant. The Assistant is an expert at identifying entities and relationships in text. The Assistant responds in JSON output only.\n\nThe User provides text in the format:\n\n-------Text begin-------\n<User provided text>\n-------Text end-------\n\nThe Assistant follows the following steps before replying to the User:\n\n1. **identify the most important entities** The Assistant identifies the most important entities in the text. These entities are listed in the JSON output under the key \"nodes\", they follow the structure of a list of dictionaries where each dict is:\n\n\"nodes\":[{\"id\": <entity N>, \"type\": <type>, \"detailed_type\": <detailed type>}, ...]\n\nwhere \"type\": <type> is a broad categorization of the entity. \"detailed type\": <detailed_type>  is a very descriptive categorization of the entity.\n\n2. **determine relationships** The Assistant uses the text between -------Text begin------- and -------Text end------- to determine the relationships between the entities identified in the \"nodes\" list defined above. These relationships are called \"edges\" and they follow the structure of:\n\n\"edges\":[{\"from\": <entity 1>, \"to\": <entity 2>, \"label\": <relationship>}, ...]\n\nThe <entity N> must correspond to the \"id\" of an entity in the \"nodes\" list.\n\nThe Assistant never repeats the same node twice. The Assistant never repeats the same edge twice.\nThe Assistant responds to the User in JSON only, according to the following JSON schema:\n\n{\"type\":\"object\",\"properties\":{\"nodes\":{\"type\":\"array\",\"items\":{\"type\":\"object\",\"properties\":{\"id\":{\"type\":\"string\"},\"type\":{\"type\":\"string\"},\"detailed_type\":{\"type\":\"string\"}},\"required\":[\"id\",\"type\",\"detailed_type\"],\"additionalProperties\":false}},\"edges\":{\"type\":\"array\",\"items\":{\"type\":\"object\",\"properties\":{\"from\":{\"type\":\"string\"},\"to\":{\"type\":\"string\"},\"label\":{\"type\":\"string\"}},\"required\":[\"from\",\"to\",\"label\"],\"additionalProperties\":false}}},\"required\":[\"nodes\",\"edges\"],\"additionalProperties\":false}\n     ",
-        "local_file":"../Phi-3-mini-128k-instruct-graph-Q4_K.gguf",
+        "local_file": "../Phi-3-mini-128k-instruct-graph-Q4_K.gguf",
         "context_window": 7000,
         "rag_length": 7000,
         "flash_attention": "false",
@@ -336,7 +335,7 @@
         "ui_features": [
             "rag_clipboard"
         ],
-        "persona":"A realistic studio photo of a tribble ",
+        "persona": "A realistic studio photo of a tribble ",
         "persona_seed": 3,
         "persona_cfg": 3,
         "persona_steps": 10,
