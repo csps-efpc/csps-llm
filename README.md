@@ -145,9 +145,9 @@ Nothing makes us happier than constructive feedback and well-formed PRs - if you
 * Make the /toil endpoint stream responses, even JSON ones.
 * Add wav2lip generation to speech synth. New endpoint?
 * Add "360" use case, where several participants contribute opinions, and the model synthesizes themes.
-* Add better error-handling code to the chat UI, addressing network failure cases and the like.
-* Add better error-handling code to the streaming API, addressing memory issues and context overruns.
+* ~~Add better error-handling code to the chat UI, addressing network failure cases and the like.~~
+* ~~Add better error-handling code to the streaming API, addressing memory issues and context overruns.~~
 * ~~Add support for RAG "teaming" - using one model for tool-calling, and another for the subsequent interaction.~~
 * Switch utterance detaction and speech recognition to something hybrid client/server-side.
-* Make speech synth compress audio to mp3 before sending
+* ~~Make speech synth compress audio to mp3 before sending~~
 * ~~Add directory of chat agents~~
