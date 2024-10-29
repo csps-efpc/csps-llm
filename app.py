@@ -31,6 +31,7 @@ import rag
 # Feature Flags
 SD_IN_PROCESS = False
 SD_FLUSH_EVERY_TIME = True
+COMPRESS_AUDIO_TO_MP3 = True
 
 # Initialize the Flask app and a thread lock for the LLM model
 app = flask.Flask(__name__) #, static_url_path=''
@@ -457,6 +458,7 @@ def tts(personality):
     model_path = model_spec["voice"]
     model_param = model_spec["voice_param"]
     filename = str(uuid.uuid1())
+    mime_type = "audio/wav"
     if(not tts_lock.acquire(blocking=False)):
             print("Blocking for TTS lock")
             logEvent(username=determineUser(request), ip = determineIP(request), subject="/tts/"+personality, eventtype="contention")
@@ -478,13 +480,27 @@ def tts(personality):
         filename], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     wav, errs = process.communicate(prompt.encode())
     process.wait()
+    if COMPRESS_AUDIO_TO_MP3 :
+        process = subprocess.Popen([
+            "lame",
+            "-m",
+            "s",
+            "--preset",
+            "medium",
+            filename,
+            filename + ".mp3"
+        ])
+        process.wait()
+        os.remove(filename)
+        filename = filename + ".mp3"
+        mime_type = "audio/mp3"
     f = open(filename, mode ="rb")
     data = f.read()
     f.close()
     os.remove(filename)
     logEvent(username=determineUser(request), ip = determineIP(request), subject="/tts/"+personality, eventtype="end_speech", data = str(datetime.now() - start))
     tts_lock.release()
-    return flask.Response(data, mimetype="audio/wav")
+    return flask.Response(data, mimetype=mime_type)
 
 # Flask route for handling plain old webservice endpoints
 @app.route("/gpt/<personality>", methods=["GET", "POST"])
