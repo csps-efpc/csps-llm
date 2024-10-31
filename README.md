@@ -151,3 +151,4 @@ Nothing makes us happier than constructive feedback and well-formed PRs - if you
 * Switch utterance detaction and speech recognition to something hybrid client/server-side.
 * ~~Make speech synth compress audio to mp3 before sending~~
 * ~~Add directory of chat agents~~
+* Make auto-detection of LAME on the system happen at startup, and do audio compression only if it's present.
