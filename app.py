@@ -273,7 +273,7 @@ def gpt_socket(personality):
                                 possible_text = result.content[:model_spec['rag_length']]
                                 ws.send("Evaluating search result ["+ result.title +"](" + result.url + ") ...")
                                 ws.send("\n\n")
-                                ask_response = ask("Consider the following content: \n\n" + possible_text + "\n\nIs the content about \""+matches.group(1)+"\"?", force_boolean=True, personality = rag_personality)
+                                ask_response = ask("Consider the following content: \n\n" + possible_text + "\n\nAnswer \"true\" or \"false\": Is the content about \""+matches.group(1)+"\"?", force_boolean=True, personality = rag_personality)
                                 if(ask_response) :
                                     ws.send("Content is relevant:")
                                     ws.send("\n\n")
