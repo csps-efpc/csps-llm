@@ -31,7 +31,7 @@ import rag
 # Feature Flags
 SD_IN_PROCESS = False
 SD_FLUSH_EVERY_TIME = True
-COMPRESS_AUDIO_TO_MP3 = True
+COMPRESS_AUDIO_TO_MP3 = os.path.exists("/usr/bin/lame")
 
 # Initialize the Flask app and a thread lock for the LLM model
 app = flask.Flask(__name__) #, static_url_path=''
