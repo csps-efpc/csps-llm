@@ -84,7 +84,8 @@ def getSd(modelName):
     freeModels()
     #Instantiate the model
     __cached_sd = StableDiffusion(
-        model_path="../" + modelName
+        model_path="../" + modelName,
+        vae_decode_only=True
     )
     __cached_sd_modelName = modelName
     return __cached_sd
