@@ -149,11 +149,7 @@ def freeModels():
         time.sleep(0.5)
 
 def isSystemlessModel(repo_name) :
-    for marker in systemless_markers :
-        if marker in repo_name :
-            return True
-    return False
-
+    return  not any(map(lambda marker : marker in repo_name, systemless_markers))
 
 # Flask route to bounce users to the default UI
 @app.route('/')
