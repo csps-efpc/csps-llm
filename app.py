@@ -849,14 +849,19 @@ def toil(personality):
             messages=messages,
             response_format=response_format,
             temperature=0.7,
+            stream=True
         )
+        def generate():
+                for tok in result:
+                    if(("content" in tok["choices"][0]['delta'].keys())) :
+                        yield tok["choices"][0]['delta']["content"]
     
     logEvent(username=determineUser(request), ip = determineIP(request), subject="/toil/"+personality, eventtype="end_toil", data=millisSince(start))
 
     if(response_format is None) :
-        return flask.Response(result["choices"][0]["message"]["content"], mimetype="text/plain")
+        return generate(), {"Content-Type" : "text/plain"}
     else:
-        return flask.Response(result["choices"][0]["message"]["content"], mimetype="application/json")
+        return generate(), {"Content-Type" : "application/json"}
 
 app.config["MAX_CONTENT_LENGTH"] = 1024*1024*1024
 # Start the Flask server
