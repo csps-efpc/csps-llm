@@ -267,19 +267,22 @@ def gpt_socket(personality):
                         })
                         for i in range(3) :
                             if(i < 3 and text is None) :
-                                result = wikipedia.page(results[i])
-                                possible_text = result.content[:model_spec['rag_length']]
-                                ws.send("Evaluating search result ["+ result.title +"](" + result.url + ") ...")
-                                ws.send("\n\n")
-                                ask_response = ask("Consider the following content: \n\n" + possible_text + "\n\nAnswer \"true\" or \"false\": Is the content about \""+matches.group(1)+"\"?", force_boolean=True, personality = rag_personality)
-                                if(ask_response) :
-                                    ws.send("Content is relevant:")
+                                try:
+                                    result = wikipedia.page(results[i])
+                                    possible_text = result.content[:model_spec['rag_length']]
+                                    ws.send("Evaluating search result ["+ result.title +"](" + result.url + ") ...")
                                     ws.send("\n\n")
-                                    rag_source_description = "The page \""+result.title+"\" at "+ result.url +" says:\n"
-                                    text = possible_text
-                                    print("Accepting the page \""+result.title+"\" at "+ result.url +" as relevant.")
-                                else:
-                                    print("Discarding the page \""+result.title+"\" at "+ result.url +" as irrelevant.")
+                                    ask_response = ask("Consider the following content: \n\n" + possible_text + "\n\nAnswer \"true\" or \"false\": Is the content about \""+matches.group(1)+"\"?", force_boolean=True, personality = rag_personality)
+                                    if(ask_response) :
+                                        ws.send("Content is relevant:")
+                                        ws.send("\n\n")
+                                        rag_source_description = "The page \""+result.title+"\" at "+ result.url +" says:\n"
+                                        text = possible_text
+                                        print("Accepting the page \""+result.title+"\" at "+ result.url +" as relevant.")
+                                    else:
+                                        print("Discarding the page \""+result.title+"\" at "+ result.url +" as irrelevant.")
+                                except wikipedia.exceptions.PageError:
+                                    pass
                     else:
                         ws.send("Couldn't find a suitable reference.")
                         ws.send("\n\n")
