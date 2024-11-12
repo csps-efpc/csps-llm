@@ -156,4 +156,4 @@ Nothing makes us happier than constructive feedback and well-formed PRs - if you
 * Make image generation endpoint support random seed
 * Make image generation UI support continuous generation, with several rotating prompts
 * Add a RAG feature to expose the authenticated user's name to the prompt.
-* DEFECT: If the model directing RAG hallucinates a page entry, recover gracefully. 
+* ~~DEFECT: If the model directing RAG hallucinates a page entry, recover gracefully.~~ 
