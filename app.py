@@ -29,8 +29,10 @@ import plotly.express as px
 import rag
 
 # Feature Flags
-SD_IN_PROCESS = False
-SD_FLUSH_EVERY_TIME = True
+SD_IN_PROCESS = True
+if(os.getenv('WHISPER_FORK_SD', 'false').lower() == "true"):
+    SD_IN_PROCESS = False
+SD_FLUSH_EVERY_TIME = False
 COMPRESS_AUDIO_TO_MP3 = os.path.exists("/usr/bin/lame")
 
 # Initialize the Flask app and a thread lock for the LLM model
@@ -86,7 +88,8 @@ def getSd(modelName):
     #Instantiate the model
     __cached_sd = StableDiffusion(
         model_path="../" + modelName,
-        vae_decode_only=True
+        vae_decode_only=True,
+        vae_path="../sdxl.vae.safetensors"
     )
     __cached_sd_modelName = modelName
     return __cached_sd
