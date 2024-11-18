@@ -51,6 +51,7 @@ systemless_markers = [
     'granite-8b-code-instruct',
     #'Phi-3-mini',
     'Phi-3-medium',
+    'Ministral-8B-Instruct',
     'Mistral-Nemo-Instruct',
     'Mistral-7B-Instruct-v0.3',
     'OLMo-7B-Instruct',
