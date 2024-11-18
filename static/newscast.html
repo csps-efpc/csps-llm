@@ -17,34 +17,34 @@
 </head>
 
 <body>
-    <div class="footer">
-        <div class="w-full flex p-2 gap-2 join">
+    <div class="footer grid-rows-2">
+        <div class="row-span-full w-full flex flex-wrap p-2 gap-2 join">
+            <div id="audioHolder">
+            </div>
             <label class="input input-bordered flex items-center gap-2 join-item grow">Feed<select id="prompt"
-                    id="prompt">
-                    <option value="https://www.cbc.ca/webfeed/rss/rss-topstories" />CBC Top Stories</option>
-                    <option value="https://www.cbc.ca/webfeed/rss/rss-sports" />CBC Sports</option>
-                    <option value="https://www.cbc.ca/webfeed/rss/rss-world" />CBC World News</option>
-                    <option value="https://www.cbc.ca/webfeed/rss/rss-canada" />CBC National News</option>
-                    <option value="https://www.cbc.ca/webfeed/rss/rss-politics" />CBC Political News</option>
-                    <option value="https://www.cbc.ca/webfeed/rss/rss-canada-ottawa" />CBC Ottawa News</option>
-                    <option value="https://rss.nytimes.com/services/xml/rss/nyt/HomePage.xml" />New York Times</option>
-                    <option value="http://feeds.bbci.co.uk/news/rss.xml" />BBC Top Stories</option>
-                    <option value="https://www.reutersagency.com/feed/?taxonomy=best-topics&post_type=best" />Reuters
-                    </option>
+                id="prompt">
+                <option value="https://www.cbc.ca/webfeed/rss/rss-topstories" />CBC Top Stories</option>
+                <option value="https://www.cbc.ca/webfeed/rss/rss-sports" />CBC Sports</option>
+                <option value="https://www.cbc.ca/webfeed/rss/rss-world" />CBC World News</option>
+                <option value="https://www.cbc.ca/webfeed/rss/rss-canada" />CBC National News</option>
+                <option value="https://www.cbc.ca/webfeed/rss/rss-politics" />CBC Political News</option>
+                <option value="https://www.cbc.ca/webfeed/rss/rss-canada-ottawa" />CBC Ottawa News</option>
+                <option value="https://rss.nytimes.com/services/xml/rss/nyt/HomePage.xml" />New York Times</option>
+                <option value="http://feeds.bbci.co.uk/news/rss.xml" />BBC Top Stories</option>
+                <option value="https://www.reutersagency.com/feed/?taxonomy=best-topics&post_type=best" />Reuters
+                </option>
 
-                </select></label>
+            </select></label>
 
-            <label class="input input-bordered flex items-center gap-2 join-item">Seed<input type="number" id="seed"
-                    value="1" /></label>
             <button id="go-button"
                 class="input input-bordered flex items-center gap-2 join-item btn btn-primary">Go</button>
         </div>
     </div>
-    <div class="flex p-2 gap-2 w-full h-full place-content-center">
-        <div id="imageHolder" class="flex-auto w-64">
+    <div class="flex flex-row p-2 gap-2 w-full h-full place-content-center">
+        <div id="imageHolder" class="basis-1/2 md:basis-3/4">
 
         </div>
-        <div id="presenterHolder" class="flex-initial w-64">
+        <div id="presenterHolder" class="basis-1/2 md:basis-1/4">
 
         </div>
 
@@ -92,8 +92,10 @@
         // Display images and audio
         var imageHolder = document.getElementById("imageHolder");
         var presenterHolder = document.getElementById("presenterHolder");
+        var audioHolder = document.getElementById("audioHolder");
         imageHolder.innerHTML = "";
         presenterHolder.innerHTML = "";
+        audioHolder.innerHTML = "";
         image1 = document.createElement('img');
         image1.setAttribute('src', window.preso[item].image1);
         image1.setAttribute('alt', window.preso[item].imagePrompt);
@@ -112,7 +114,7 @@
         imageHolder.append(image1);
         imageHolder.append(document.createTextNode(preso[item].imagePrompt));
         presenterHolder.append(image2);
-        presenterHolder.append(audio1);
+        audioHolder.append(audio1);
         presenterHolder.append(document.createTextNode("[ " + (item + 1) + " / " + preso.length + " ] "));
         headlineElement = document.createElement("h3");
         headlineElement.append(document.createTextNode(preso[item].headline));
@@ -130,7 +132,7 @@
         item = window.preso[index];
 
         item.image1 = new URL('../stablediffusion/generate', window.location);
-        item.image1.search = new URLSearchParams({ seed: document.getElementById("seed").value, cfg: 4.5, steps: 12, prompt: item.imagePrompt, width: 768 })
+        item.image1.search = new URLSearchParams({ seed: 1, cfg: 4.5, steps: 15, prompt: item.imagePrompt, width: 768 })
         item.image2 = new URL('../stablediffusion/generate', window.location);
         item.image2.search = new URLSearchParams({ width: 384, height: 512, cfg:4, steps: 10, seed: (window.persona_seed ? window.persona_seed : "13"), prompt: window.persona + " " + item.posture })
         item.audio1 = new URL('../tts/' + window.personality, window.location);
@@ -149,7 +151,6 @@
 
     async function sendPrompt() {
         var prompt = document.getElementById("prompt").value;
-        var seed = document.getElementById("seed").value;
         var imageHolder = document.getElementById("imageHolder");
         imageHolder.innerHTML = "";
         var spinner = document.createElement("span");
