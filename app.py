@@ -345,11 +345,6 @@ def gpt_socket(personality):
         if("ottawa citizen".casefold() in folded):
             url = "https://ottawacitizen.com/feed"
         ws.send("Checking the news...\n")
-    elif("busrides".casefold() in folded):
-        rag_source_description = "Busrides is a series of articles from the CSPS. Busrides is not about riding public transit. What follows is a list of the newest article titles and summaries from Busrides:\n"
-        url = "https://busrides.ghost.io/rss/"
-        ws.send("Checking the latest microlearning...\n")
-
     elif(("csps".casefold() in folded or "school".casefold() in folded) and ("cours".casefold() in folded or "learn".casefold() in folded)):
         rag_source_description = "The latest learning products from the CSPS are:\n"
         url = "https://www.csps-efpc.gc.ca/stayconnected/csps-rss-eng.xml"
