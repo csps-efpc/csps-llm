@@ -54,7 +54,6 @@ The websocket endpoint offers certain RAG integrations with public services. Ses
 # Example prompts:
 * "Given the weather forecast, what should I wear tomorrow?"
 * "What's the most interesting new learning product from the CSPS?"
-* "What are the latest articles about AI on Busrides?"
 
 Similarly, custom context can be used with if a session begins with something like:
 ```
