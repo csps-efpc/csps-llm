@@ -29,11 +29,11 @@ import plotly.express as px
 import rag
 
 # Feature Flags
-SD_IN_PROCESS = True
-if(os.getenv('WHISPER_FORK_SD', 'false').lower() == "true"):
-    SD_IN_PROCESS = False
+SD_IN_PROCESS = (os.getenv('WHISPER_FORK_SD', 'false').lower() != "false")
 SD_FLUSH_EVERY_TIME = False
 COMPRESS_AUDIO_TO_MP3 = os.path.exists("/usr/bin/lame")
+EMBEDDING_MODEL = os.getenv('WHISPER_EMBEDDING_MODEL', "nomic-ai/nomic-embed-text-v1.5-GGUF")
+
 
 # Initialize the Flask app and a thread lock for the LLM model
 app = flask.Flask(__name__) #, static_url_path=''
@@ -130,6 +130,28 @@ def getLlm(personality):
         )
     __cached_personality = personality
     return __cached_llm
+
+
+# Function to get the embedding model from the given HF repo
+def getEmbedding(embedder):
+    global __cached_llm
+    global __cached_personality
+    if not lock.locked():
+        #The method has been called by a thread not holding the lock.
+        raise Exception('Attempted to control the loaded model without holding the exclusivity lock.')
+    if(embedder == __cached_personality):
+        logEvent(subject="cache", eventtype="cache_hit")
+        return __cached_llm
+    freeModels()
+    __cached_llm = Llama.from_pretrained(
+        repo_id=embedder,
+        filename="*Q5_K_M.gguf",
+        verbose=True,
+        embedding=True
+    )
+    __cached_personality = embedder
+    return __cached_llm
+
 
 # Unload any cached models
 def freeModels():
@@ -447,6 +469,32 @@ def describe(personality):
     del model_spec["persona_cfg"]
     del model_spec["persona_steps"]
     return(model_spec)
+
+
+# Flask route for document embedding
+@app.route("/embedding/document", methods=["GET","POST"])
+def embedDocument():
+    start = datetime.now()
+    returnable = []
+    if lock.locked():
+        logEvent(username=determineUser(request), ip = determineIP(request), subject="/embedding/document/", eventtype="contention")
+    with lock:
+        llm = getEmbedding(EMBEDDING_MODEL)
+        returnable = llm.embed("search_document: "+ request.args["text"])
+    logEvent(username=determineUser(request), ip = determineIP(request), subject="/embedding/document/", eventtype="embedding", data=millisSince(start))
+    return returnable
+
+@app.route("/embedding/query", methods=["GET","POST"])
+def embedQuery():
+    start = datetime.now()
+    returnable = []
+    if lock.locked():
+        logEvent(username=determineUser(request), ip = determineIP(request), subject="/embedding/query", eventtype="contention")
+    with lock:
+        llm = getEmbedding(EMBEDDING_MODEL)
+        returnable = llm.embed("search_query: "+ request.args["text"])
+    logEvent(username=determineUser(request), ip = determineIP(request), subject="/embedding/document/", eventtype="embedding", data=millisSince(start))
+    return returnable
 
 # Flask route for handling tts requests
 @app.route("/tts/<personality>", methods=["GET"])
