@@ -137,7 +137,7 @@ Nothing makes us happier than constructive feedback and well-formed PRs - if you
 * ~~Add initial stats monitor~~
 * Add support for a LRU cache of models (for multi-GPU environments)
 * ~~Add support for negative prompts in image generation~~
-* Make persona "neutral" avatars auto-generate and cache the first time they're called.
+* Make persona "neutral" avatars auto-generate and cache the first time they're called - cache using a hash?
 * ~~Make Wikipedia RAG use the MediaWiki API~~
 * Add GCWiki RAG
 * Make context-stuffing options capable of calling http, so that contexts can by dynamically stuffed.
@@ -156,4 +156,6 @@ Nothing makes us happier than constructive feedback and well-formed PRs - if you
 * Make image generation UI support continuous generation, with several rotating prompts
 * Add a RAG feature to expose the authenticated user's name to the prompt.
 * ~~DEFECT: If the model directing RAG hallucinates a page entry, recover gracefully.~~
-* Introduce guard model and endpoint as demo of alignment
+* ~~Introduce guard model and endpoint as demo of alignment~~
+* Make Tribble UI filter out orphan subject/object nodes
+* Add flag to image-generation API endpoint forcing out-of-process generation, and bind to UI.
