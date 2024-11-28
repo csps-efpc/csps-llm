@@ -246,11 +246,14 @@
           // First we massage the data
           data.links = []
           for (const edge of data.edges) {
-            data.links.push({
-              source: edge.from,
-              target: edge.to,
-              label: edge.label
-            });
+            //Ensure that all edges are anchored.
+            if (data.nodes.some(obj => obj.id === edge.from) && data.nodes.some(obj => obj.id === edge.to)) {
+              data.links.push({
+                source: edge.from,
+                target: edge.to,
+                label: edge.label
+              });
+            }
           }
           // get rid of duplicate entities (yes, the model still sometimes emits them).
           data.nodes = window.getUniqueObjects(data.nodes);
