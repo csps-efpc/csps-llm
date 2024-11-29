@@ -30,7 +30,6 @@
                 <option value="https://www.cbc.ca/webfeed/rss/rss-politics" />CBC Political News</option>
                 <option value="https://www.cbc.ca/webfeed/rss/rss-canada-ottawa" />CBC Ottawa News</option>
                 <option value="https://rss.nytimes.com/services/xml/rss/nyt/HomePage.xml" />New York Times</option>
-                <option value="http://feeds.bbci.co.uk/news/rss.xml" />BBC Top Stories</option>
                 <option value="https://www.reutersagency.com/feed/?taxonomy=best-topics&post_type=best" />Reuters
                 </option>
 
@@ -132,9 +131,9 @@
         item = window.preso[index];
 
         item.image1 = new URL('../stablediffusion/generate', window.location);
-        item.image1.search = new URLSearchParams({ seed: 1, cfg: 4.5, steps: 15, prompt: item.imagePrompt, width: 768 })
+        item.image1.search = new URLSearchParams({ seed: 1, cfg: 2, steps: 15, prompt: item.imagePrompt, width: 768 })
         item.image2 = new URL('../stablediffusion/generate', window.location);
-        item.image2.search = new URLSearchParams({ width: 384, height: 512, cfg:4, steps: 10, seed: (window.persona_seed ? window.persona_seed : "13"), prompt: window.persona + " " + item.posture })
+        item.image2.search = new URLSearchParams({ width: 384, height: 512, cfg:2, steps: 10, seed: (window.persona_seed ? window.persona_seed : "13"), prompt: window.persona + " " + item.posture })
         item.audio1 = new URL('../tts/' + window.personality, window.location);
         item.audio1.search = new URLSearchParams({ text: item.story });
 
