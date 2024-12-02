@@ -128,7 +128,7 @@ loadEmotionalAffect = async function () {
         method: "POST",
         headers: {'Content-Type' : 'application/json'},
         body: JSON.stringify(payload) 
-    }).then((resp) => resp.json()).then((json) => renderEmotionalAffect(window.persona + ", "+ json.gerundVerb +" " + json.description + " at the camera."));
+    }).then((resp) => resp.json()).then((json) => renderEmotionalAffect(window.persona + ", "+ json.gerundVerb +" " + json.adverb + " at the camera."));
 }
 
 renderEmotionalAffect = function (affect) {
