@@ -29,7 +29,7 @@ import plotly.express as px
 import rag
 
 # Feature Flags
-SD_IN_PROCESS = (os.getenv('WHISPER_FORK_SD', 'false').lower() != "false")
+SD_IN_PROCESS = (os.getenv('WHISPER_FORK_SD', 'false').lower() == "false")
 SD_FLUSH_EVERY_TIME = False
 COMPRESS_AUDIO_TO_MP3 = os.path.exists("/usr/bin/lame")
 EMBEDDING_MODEL = os.getenv('WHISPER_EMBEDDING_MODEL', "nomic-ai/nomic-embed-text-v1.5-GGUF")
