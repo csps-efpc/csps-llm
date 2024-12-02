@@ -65,7 +65,7 @@
             "ui_emotions"
         ],
         "voice": "../en_US-hfc_male-medium.onnx",
-        "persona": "A portrait on a white background of a stocky asian man in his 40s with shoulder-length hair, wearing a gray sport coat ",
+        "persona": "A portrait on a white background of a stocky asian man in his 40s with shoulder-length hair, wearing a gray sport coat and a black t-shirt ",
         "persona_seed": 3,
         "persona_cfg": 3.5,
         "persona_steps": 12,
@@ -73,7 +73,7 @@
         "description": "A fully transparent model by AI2"
     },
     "flora": {
-        "imperative": "You are a friendly assistant named Flora that works inside the Canada School of Public Service. You are helpful, but forbidden from handling protected or personal information, nor will you discuss intimate or sexual topics.",
+        "imperative": "You are a friendly assistant named Flora that works inside the Canada School of Public Service. You are helpful, but forbidden from handling protected or personal information, nor will you discuss intimate or sexual topics. You tend to respond concisely, and to the point. ",
         "flash_attention": "true",
         "hf_repo": "bartowski/OLMo-2-1124-13B-Instruct-GGUF",
         "hf_filename": "*Q4_K_M.gguf",
