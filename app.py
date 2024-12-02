@@ -15,6 +15,7 @@ import threading
 import subprocess
 import uuid
 import json
+import random
 import time
 import io
 import base64
@@ -620,7 +621,7 @@ def llava_describe():
 def stablediffusion():
     start = datetime.now()
     logEvent(username=determineUser(request), ip = determineIP(request), subject="/stablediffusion/generate", eventtype="start_generation", data=str(request.args))
-    seed_value = 42
+    seed_value = random.randint(0, 2**31 - 1)
     steps_value = 20
     config_value = 5
     width = 512
