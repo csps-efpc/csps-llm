@@ -7,6 +7,7 @@ from flask import redirect, render_template, request, abort
 from simple_websocket import Server, ConnectionClosed
 from llama_cpp import Llama
 from llama_cpp.llama_chat_format import NanoLlavaChatHandler
+from llama_cpp.llama_speculative import LlamaPromptLookupDecoding
 from stable_diffusion_cpp import StableDiffusion
 import stable_diffusion_cpp as sd_cpp
 from PIL import Image
@@ -30,6 +31,7 @@ import plotly.express as px
 import rag
 
 # Feature Flags
+SPECULATIVE_DECODING = (int(os.getenv('WHISPER_SPECULATIVE_DECODING', '0')))
 SD_IN_PROCESS = (os.getenv('WHISPER_FORK_SD', 'false').lower() == "false")
 SD_FLUSH_EVERY_TIME = False
 COMPRESS_AUDIO_TO_MP3 = os.path.exists("/usr/bin/lame")
@@ -56,7 +58,7 @@ systemless_markers = [
     'Mistral-Nemo-Instruct',
     'Mistral-7B-Instruct-v0.3',
     'OLMo-7B-Instruct',
-    'gemma-2-'
+    #'gemma-2-'
 ]
 
 # Prompt parts
@@ -107,6 +109,9 @@ def getLlm(personality):
         logEvent(subject="cache", eventtype="cache_hit")
         return __cached_llm
     freeModels()    
+    draft_model = None
+    if(SPECULATIVE_DECODING > 0) :
+        draft_model = LlamaPromptLookupDecoding(num_pred_tokens=SPECULATIVE_DECODING)
     model_spec = rag.get_model_spec(personality)
     if(model_spec['local_file'] is not None) :
         __cached_llm = Llama(
@@ -116,7 +121,8 @@ def getLlm(personality):
             numa=False, 
             verbose=True,
             n_ctx=model_spec['context_window'],
-            flash_attn=(model_spec['flash_attention'] == 'true')
+            flash_attn=(model_spec['flash_attention'] == 'true'),
+            draft_model=draft_model
         )
     else:
         __cached_llm = Llama.from_pretrained(
@@ -127,7 +133,8 @@ def getLlm(personality):
             n_threads=model_spec['cpu_threads'], 
             numa=False, 
             n_ctx=model_spec['context_window'],
-            flash_attn=(model_spec['flash_attention'] == 'true')
+            flash_attn=(model_spec['flash_attention'] == 'true'),
+            draft_model=draft_model
         )
     __cached_personality = personality
     return __cached_llm
