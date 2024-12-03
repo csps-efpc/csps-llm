@@ -32,8 +32,6 @@ import rag
 
 # Feature Flags
 SPECULATIVE_DECODING = (int(os.getenv('WHISPER_SPECULATIVE_DECODING', '0')))
-SD_IN_PROCESS = (os.getenv('WHISPER_FORK_SD', 'false').lower() == "false")
-SD_FLUSH_EVERY_TIME = False
 COMPRESS_AUDIO_TO_MP3 = os.path.exists("/usr/bin/lame")
 EMBEDDING_MODEL = os.getenv('WHISPER_EMBEDDING_MODEL', "nomic-ai/nomic-embed-text-v1.5-GGUF")
 
@@ -633,6 +631,8 @@ def stablediffusion():
     modelName = "sd.gguf"
     format = "PNG"
     negativeprompt = None
+    fork = False
+
     if ('model' in request.args): 
         modelName = request.args["model"]
     if ('format' in request.args): 
@@ -649,6 +649,8 @@ def stablediffusion():
         height = int(request.args["height"])
     if ('negativeprompt' in request.args): 
         negativeprompt = request.args["negativeprompt"]
+    if ('fork' in request.args):
+        fork = request.args["fork"].lower() == 'true'
     prompt = request.args["prompt"]
     output = None
     if lock.locked():
@@ -657,32 +659,7 @@ def stablediffusion():
     with lock:
         try:
             output = io.BytesIO()
-            if SD_IN_PROCESS:
-                # This path's feature set is behind the forked-process path, and should be deleted if the VRAM leak in stable-diffusion-cpp-python doen't get fixed 
-                sd = getSd(modelName)
-                images = sd.txt_to_img(
-                    prompt=unidecode.unidecode(prompt),
-                    sample_steps = steps_value,
-                    seed=seed_value,
-                    width=width,
-                    height=height,
-                    cfg_scale=config_value,
-                    negative_prompt=rag.get_sd_negative_prompt() + " " + ( negativeprompt if negativeprompt else "" ),
-                    sample_method=sd_cpp.stable_diffusion_cpp.SampleMethod.EULER_A
-                )
-                image = images[-1]
-                if(format == "JPEG") :
-                    image = image.convert('RGB')
-                    image.save(output, "JPEG")
-                else:
-                    image.save(output, "PNG")
-                output.flush()
-                output.seek(0)
-                if SD_FLUSH_EVERY_TIME:
-                    freeModels()
-
-        # The code below can be completely replaced by the code above if the sd.cpp folks ever address https://github.com/leejet/stable-diffusion.cpp/issues/288
-            else:
+            if fork:
                 freeModels()
                 filename = str(uuid.uuid1())+".png"
                 process = None
@@ -760,7 +737,7 @@ def stablediffusion():
                         "-W",
                         str(width),
                         "--sampling-method",
-                        "dpm++2s_a",
+                        "euler",
                         "--schedule",
                         "karras",
                         "-o",
@@ -770,6 +747,29 @@ def stablediffusion():
                 output = io.BytesIO(initial_bytes=f.read())
                 f.close()
                 os.remove(filename)
+
+            else :
+                # This path's feature set is behind the forked-process path, and should be deleted if the VRAM leak in stable-diffusion-cpp-python doen't get fixed 
+                sd = getSd(modelName)
+                images = sd.txt_to_img(
+                    prompt=unidecode.unidecode(prompt),
+                    sample_steps = steps_value,
+                    seed=seed_value,
+                    width=width,
+                    height=height,
+                    cfg_scale=config_value,
+                    negative_prompt=rag.get_sd_negative_prompt() + " " + ( negativeprompt if negativeprompt else "" ),
+                    sample_method=sd_cpp.stable_diffusion_cpp.SampleMethod.EULER_A
+                )
+                image = images[-1]
+                if(format == "JPEG") :
+                    image = image.convert('RGB')
+                    image.save(output, "JPEG")
+                else:
+                    image.save(output, "PNG")
+                output.flush()
+                output.seek(0)
+                
 
             logEvent(username=determineUser(request), ip = determineIP(request), subject="/stablediffusion/generate", eventtype="end_generation", data=millisSince(start))
         except Exception as e:
