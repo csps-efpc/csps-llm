@@ -52,13 +52,10 @@ temperature = 0.8
 session_cache_size = 100
 systemless_markers = [
     'granite-8b-code-instruct',
-    #'Phi-3-mini',
     'Phi-3-medium',
-    'Ministral-8B-Instruct',
-    'Mistral-Nemo-Instruct',
     'Mistral-7B-Instruct-v0.3',
     'OLMo-7B-Instruct',
-    #'gemma-2-'
+    'gemma-2-'
 ]
 
 # Prompt parts
@@ -184,7 +181,7 @@ def freeModels():
         time.sleep(0.5)
 
 def isSystemlessModel(repo_name) :
-    return not any(map(lambda marker : marker in repo_name, systemless_markers))
+    return any(map(lambda marker : marker in repo_name, systemless_markers))
 
 # Flask route to bounce users to the default UI
 @app.route('/')
