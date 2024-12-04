@@ -66,13 +66,19 @@ makeSocketAddress = function (personality) {
     return protocol + "://" + window.location.host + "/gpt-socket/" + personality;
 }
 
+function extractContent(s) {
+    var span = document.createElement('span');
+    span.innerHTML = s;
+    return span.textContent || span.innerText;
+  };
+
 addUtterance = function () {
     if (speechAccumulator) {
         var personality = window.personality ? window.personality : "whisper";
-        var encodedText = encodeURIComponent(speechAccumulator);
+        var strippedText = extractContent(md.render(speechAccumulator));
         if (document.getElementById("speech-toggle").checked) {
             var url = new URL('/tts/'+personality, window.location);
-            url.search = new URLSearchParams({ text: speechAccumulator })
+            url.search = new URLSearchParams({ text: strippedText })
             currentAudio = new Audio(url);
             utteranceQueue.push(currentAudio);
             speechAccumulator = "";
