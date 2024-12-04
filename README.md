@@ -162,4 +162,5 @@ Nothing makes us happier than constructive feedback and well-formed PRs - if you
 * ~~DEFECT: If the model directing RAG hallucinates a page entry, recover gracefully.~~
 * ~~Introduce guard model and endpoint as demo of alignment~~
 * ~~Make Tribble UI filter out orphan subject/object nodes~~
-* Add flag to image-generation API endpoint forcing out-of-process generation, and bind to UI.
+* ~~Add flag to image-generation API endpoint forcing out-of-process generation~~, and bind to UI.
+* Strip markdown from text to be spoken in the chat UI.
