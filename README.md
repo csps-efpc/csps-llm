@@ -157,10 +157,10 @@ Nothing makes us happier than constructive feedback and well-formed PRs - if you
 * ~~Make auto-detection of LAME on the system happen at startup, and do audio compression only if it's present.~~
 * ~~DEFECT: Let upstream uthenticators identify users by name *or* email.~~
 * ~~Make image generation endpoint support random seed~~
-* Make image generation UI support continuous generation, with several rotating prompts
+* Make image generation UI support continuous generation, with several rotating prompts - ensure that seeds advance monotonically, so users can "go back".
 * Add a RAG feature to expose the authenticated user's name to the prompt.
 * ~~DEFECT: If the model directing RAG hallucinates a page entry, recover gracefully.~~
 * ~~Introduce guard model and endpoint as demo of alignment~~
 * ~~Make Tribble UI filter out orphan subject/object nodes~~
 * ~~Add flag to image-generation API endpoint forcing out-of-process generation~~, and bind to UI.
-* Strip markdown from text to be spoken in the chat UI.
+* ~~Strip markdown from text to be spoken in the chat UI.~~
