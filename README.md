@@ -144,7 +144,7 @@ Nothing makes us happier than constructive feedback and well-formed PRs - if you
 * Make persona "neutral" avatars auto-generate and cache the first time they're called - cache using a hash?
 * ~~Make Wikipedia RAG use the MediaWiki API~~
 * Add GCWiki RAG
-* Make context-stuffing options capable of calling http, so that contexts can by dynamically stuffed.
+* Make context-stuffing options capable of calling http, so that contexts can be dynamically stuffed.
 * ~~Make the /toil endpoint stream responses, even JSON ones.~~
 * Add wav2lip generation to speech synth. New endpoint?
 * Add "360" use case, where several participants contribute opinions, and the model synthesizes themes.
@@ -157,10 +157,11 @@ Nothing makes us happier than constructive feedback and well-formed PRs - if you
 * ~~Make auto-detection of LAME on the system happen at startup, and do audio compression only if it's present.~~
 * ~~DEFECT: Let upstream uthenticators identify users by name *or* email.~~
 * ~~Make image generation endpoint support random seed~~
-* Make image generation UI support continuous generation, with several rotating prompts - ensure that seeds advance monotonically, so users can "go back".
+* ~~Make image generation UI support continuous generation, with several rotating prompts - ensure that seeds advance monotonically, so users can "go back".~~
 * Add a RAG feature to expose the authenticated user's name to the prompt.
 * ~~DEFECT: If the model directing RAG hallucinates a page entry, recover gracefully.~~
 * ~~Introduce guard model and endpoint as demo of alignment~~
 * ~~Make Tribble UI filter out orphan subject/object nodes~~
 * ~~Add flag to image-generation API endpoint forcing out-of-process generation~~, and bind to UI.
 * ~~Strip markdown from text to be spoken in the chat UI.~~
+* DEFECT: Visual recognition failed at some point.
