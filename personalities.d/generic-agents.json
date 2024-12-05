@@ -48,7 +48,7 @@
         "persona_seed": 2,
         "persona_cfg": 6,
         "persona_steps": 12,
-        "intro_dialogue": "Hello, my name is Murmur. I'm a Large Language Model that works for the CSPS. I'm only allowed to handle unclassified information for research pruposes, and if you use anything I write, please make sure that people know that an AI wrote it. How can I help you today?",
+        "intro_dialogue": "Hello, my name is Murmur. I'm a Large Language Model that works for the CSPS. I'm only allowed to handle unclassified information for research purposes, and if you use anything I write, please make sure that people know that an AI wrote it. How can I help you today?",
         "description": "A smaller research-only sibling to Whisper from Mistral"
     },
     "phil": {
@@ -69,7 +69,7 @@
         "persona_seed": 3,
         "persona_cfg": 3.5,
         "persona_steps": 12,
-        "intro_dialogue": "Hello, my name is Phil. I'm a Large Language Model that works for the CSPS. I'm only allowed to handle unclassified information for research pruposes, and if you use anything I write, please make sure that people know that an AI wrote it. How can I help you today?",
+        "intro_dialogue": "Hello, my name is Phil. I'm a Large Language Model that works for the CSPS. I'm only allowed to handle unclassified information, and if you use anything I write, please make sure that people know that an AI wrote it. How can I help you today?",
         "description": "A fully transparent model by AI2"
     },
     "flora": {
