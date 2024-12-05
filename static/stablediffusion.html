@@ -12,7 +12,7 @@
     <script>
         window.modelName = "sd.gguf";
         if (window.location.hash) {
-            window.modelName = window.location.hash .substring(1);
+            window.modelName = window.location.hash.substring(1);
         }
     </script>
 </head>
@@ -28,6 +28,8 @@
                     value="1" /></label>
             <button id="increment-button"
                 class="input input-bordered flex items-center gap-2 join-item btn btn-primary">&#x1f3b2;</button>
+            <input id="continuous-button" type="checkbox"
+                class="input input-bordered flex items-center gap-2 join-item btn" aria-label="&#x1F5D8;" />
             <label class="input input-bordered flex items-center gap-2 join-item">Steps<input type="number" id="steps"
                     value="10" /></label>
             <label class="input input-bordered flex items-center gap-2 join-item">Cfg<input type="number" id="cfg"
@@ -108,6 +110,12 @@
             .then(image => {
                 imageHolder.innerHTML = "";
                 imageHolder.appendChild(image);
+                var size = document.getElementById("size").value;
+
+                if (document.getElementById("continuous-button").checked) {
+                    document.getElementById("seed").value = parseInt(seed) + 1;
+                    sendPrompt();
+                }
             })
             .catch(error => {
                 console.error(error);
