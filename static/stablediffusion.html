@@ -37,7 +37,7 @@
             <label class="input input-bordered flex items-center gap-2 join-item grow">Size<select id="size" id="size">
                     <option value="384" />small</option>
                     <option value="512" selected />medium</option>
-                    <option value="768" />large</option>
+                    <option value="large" />large</option>
                     <option value="landscape" />landscape</option>
                     <option value="portrait" />portrait</option>
                     <option value="landscape-wide" />landscape wide</option>
@@ -80,6 +80,7 @@
         var steps = document.getElementById("steps").value;
         var cfg = document.getElementById("cfg").value;
         var size = document.getElementById("size").value;
+        var fork = "false";
         var imageHolder = document.getElementById("imageHolder");
         var spinner = document.createElement("div");
         spinner.classList.add("skeleton", "h-8", "w-64");
@@ -91,21 +92,29 @@
             height = 768;
         } else if (size === "landscape") {
             width = 768;
+        } else if (size === "large") {
+            width = 768;
+            height = 768;
+            fork = "true";
         } else if (size === "portrait-large") {
             width = 768;
             height = 1024;
+            fork = "true";
         } else if (size === "landscape-large") {
             height = 768;
+            fork = "true";
             width = 1024;
         } else if (size === "portrait-tall") {
             height = 1024;
+            fork = "true";
         } else if (size === "landscape-wide") {
             width = 1024;
+            fork = "true";
         } else {
             width = parseInt(size);
             height = parseInt(size);
         }
-        url.search = new URLSearchParams({ prompt: prompt, negativeprompt: negativeprompt, seed: seed, cfg: cfg, steps: steps, format: "JPEG", width: width, height: height, model: window.modelName });
+        url.search = new URLSearchParams({ prompt: prompt, fork: fork, negativeprompt: negativeprompt, seed: seed, cfg: cfg, steps: steps, format: "JPEG", width: width, height: height, model: window.modelName });
         loadImage(url)
             .then(image => {
                 imageHolder.innerHTML = "";
