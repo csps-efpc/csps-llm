@@ -425,7 +425,7 @@ def gpt_socket(personality):
                     if results:
                         for i, result in enumerate(results, start=1):
                             if i < 3 and text is None:
-                                possible_text = rag.fetchUrlText(
+                                possible_text = rag.fetch_url_text(
                                     results[i]["href"], model_spec["rag_length"]
                                 )
                                 ws.send("Evaluating search result " + str(i) + "...")
@@ -582,7 +582,7 @@ def gpt_socket(personality):
                     }
                 )
             if url is not None:
-                text = rag.fetchUrlText(url, model_spec["rag_length"])
+                text = rag.fetch_url_text(url, model_spec["rag_length"])
             if text is not None:
                 first_prompt += (
                     "Consider the following content:\n"
@@ -1251,7 +1251,7 @@ def toil(personality):
         if request_context["text"].startswith("http://") or request_context[
             "text"
         ].startswith("https://"):
-            rag_text = rag.fetchUrlText(
+            rag_text = rag.fetch_url_text(
                 request_context["text"], model_spec["rag_length"]
             )
         else:
