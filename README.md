@@ -106,7 +106,7 @@ Nothing makes us happier than constructive feedback and well-formed PRs - if you
 * ~~Add true RAG - medium~~
 * ~~Add self-RAG - medium~~
 * Make the RSS/Atom RAG retriever configurable at runtime - medium
-* Add server-side RAG fact databases - medium -- Initial implementation complete; ie. GPT-style context stuffing.
+* Add server-side RAG fact databases - medium -- ~~Initial implementation complete; ie. GPT-style context stuffing.~~
 * ~~Add Internet RAG fact databases - medium~~
 * ~~Move model configuration to environment variables configured at runtime, with sane defaults - trivial~~
 * ~~- AND - Move model configuration to being attributes of "personalities", and make them hot-swap during execution. - easy~~
@@ -144,7 +144,7 @@ Nothing makes us happier than constructive feedback and well-formed PRs - if you
 * Make persona "neutral" avatars auto-generate and cache the first time they're called - cache using a hash?
 * ~~Make Wikipedia RAG use the MediaWiki API~~
 * Add GCWiki RAG
-* Make context-stuffing options capable of calling http, so that contexts can be dynamically stuffed.
+* ~~Make context-stuffing options capable of calling http, so that contexts can be dynamically stuffed.~~
 * ~~Make the /toil endpoint stream responses, even JSON ones.~~
 * Add wav2lip generation to speech synth. New endpoint?
 * Add "360" use case, where several participants contribute opinions, and the model synthesizes themes.
