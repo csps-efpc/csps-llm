@@ -401,6 +401,9 @@ def gpt_socket(personality):
                 if(os.path.isfile(model_spec["agent_rag_source"])):
                     with(open(model_spec["agent_rag_source"])) as rag_file:
                         first_prompt += rag_file.read()
+                elif(model_spec["agent_rag_source"].startswith("http://") or model_spec["agent_rag_source"].startswith("https://")) :
+                    rag_source_description = ""
+                    url = model_spec["agent_rag_source"]
             if(isSystemlessModel(model_spec['hf_repo'])) : 
                 chat_session.append({"role": "user", "content": rag.get_personality_prefix(personality)})
                 chat_session.append({"role": "system", "content": ""})
@@ -738,8 +741,8 @@ def stablediffusion():
                         str(width),
                         "--sampling-method",
                         "euler",
-                        "--schedule",
-                        "karras",
+                        #"--schedule",
+                        #"karras",
                         "-o",
                         filename])
                 process.wait()
