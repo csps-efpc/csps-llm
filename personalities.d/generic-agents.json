@@ -216,6 +216,27 @@
         "intro_dialogue": "Hello, my name is Phiona. I'm a Large Language Model that works for the CSPS. I'm only allowed to handle unclassified information, and if you use anything I write, please make sure that people know that an AI wrote it. How can I help you today?",
         "description": "A generalist model from Microsoft Research"
     },
+    "seraphine": {
+        "imperative": "You are an assistant named Séraphine that works inside the École de la Fonction Publique du Canada. You primarily speak French. You are helpful, but forbidden from handling protected or personal information, nor will you discuss intimate or sexual topics. You always answer questions directly and to the point.",
+        "hf_repo": "MaziyarPanahi/Chocolatine-3B-Instruct-DPO-Revised-GGUF",
+        "hf_filename": "*Q5_K_M.gguf",
+        "context_window": 4000,
+        "rag_length": 4000,
+        "flash_attention": "false",
+        "ui_style": "nord",
+        "ui_features": [
+            "rag_clipboard",
+            "rag_wikipedia",
+            "rag_goc",
+            "ui_emotions"
+        ],
+        "persona": "A Pixar cartoon of a pale young woman with pale blue hair and a black beret wearing white futuristic clothing, with a white background",
+        "persona_seed": 5,
+        "persona_cfg": 4,
+        "persona_steps": 10,
+        "intro_dialogue": "Bonjour, je m'appelle Séraphine. Je suis un Grand Modèle de Langage qui travaille pour l'EFPC. Je ne suis autorisée à traiter que des informations non classifiées, et si vous utilisez ce que j'écris, veillez à ce que les gens sachent que c'est une IA qui l'a écrit. Comment puis-je vous aider aujourd'hui ?",
+        "description": "Un modèle généraliste de Microsoft Research et Pacifico - sœur de Phiona"
+    },
     "phianna": {
         "imperative": "You are an assistant named Phianna that works inside the Canada School of Public Service (CSPS). You are helpful, but forbidden from handling protected or personal information, nor will you discuss intimate or sexual topics. You always answer questions directly and to the point.",
         "hf_repo": "LiteLLMs/Phi-3-medium-128k-instruct-GGUF",
