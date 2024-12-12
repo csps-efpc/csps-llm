@@ -227,7 +227,7 @@ def render_stats():
         color_hints = []
         plot = ""
         epoch = datetime.fromtimestamp(0)
-        with open("log.csv", mode="r", encoding="utf8") as file:
+        with open("log.csv", mode="r") as file:
             reader = csv.reader(file)
             for row in reader:
                 if row[3] in [
@@ -908,7 +908,7 @@ def llava_describe():
     return returnable
 
 
-def generate_sd_image_in_fork(modelName, prompt, negativeprompt, steps_value, config_value, seed_value, height, width, mode):
+def generate_sd_image_in_fork(modelName, prompt, negativeprompt, steps_value, config_value, seed_value, height, width):
     freeModels()
     filename = str(uuid.uuid1()) + ".png"
     process = None
@@ -970,6 +970,12 @@ def generate_sd_image_in_fork(modelName, prompt, negativeprompt, steps_value, co
                 str(height),
                 "-W",
                 str(width),
+                "--clip_l",
+                "../clip_l.safetensors",
+                "--clip_g",
+                "../clip_g.safetensors",
+                "--t5xxl",
+                "../t5xxl_q4_k.gguf",
                 "-o",
                 filename,
             ]
@@ -1093,7 +1099,7 @@ def stablediffusion():
         try:
             output = io.BytesIO()
             if fork:
-                output = generate_sd_image_in_fork(modelName, prompt, negativeprompt, steps_value, config_value, seed_value, height, width, mode, initial_bytes)
+                output = generate_sd_image_in_fork(modelName, prompt, negativeprompt, steps_value, config_value, seed_value, height, width)
             else:
                 output = generate_sd_image_in_process(modelName, prompt, steps_value, seed_value, width, height, config_value, negativeprompt, format)
             log_event(
