@@ -31,7 +31,7 @@ The choice of model defaults can be configured at runtime using environment vari
 
 There's a convenient mechanism for declaring several personas in JSON in the folder named `personalities.d`. Over a dozen examples are included in the repo.
 
-### Going fast
+### Going fast on NVIDIA
 
 If you have a CUDA-capable GPU, you can make the endpoint use it by following a few additional steps:
 * Make sure you have `cmake` installed. Typically `sudo apt install cmake` is all you need.
@@ -45,6 +45,14 @@ CMAKE_ARGS="-DGGML_CUDA=on -DSD_CUBLAS=on" ~/python/bin/pip install llama_cpp_py
 ```
 
 A device that can do CUDA capability 6.1 or better *really* helps (that's Pascal, GTX 1000, or better). The "Whisper" demo at the CSPS uses a single GTX 1060.
+
+### Going fast on Metal
+
+With kind thanks to our colleagues at Health Canada, the equivalent command on Metal is:
+```
+CMAKE_ARGS="-DGGML_METAL=ON -DSD_METAL=ON" python/bin/pip install llama_cpp_python stable-diffusion-cpp-python==0.2.1 --upgrade --force-reinstall --no-cache-dir
+```
+Note that the stable diffusion library is backpinned, because of a defect on Metal in 0.2.2
 
 Brave implementers with other GPUs, extremely new CPUs, or other fancy hardware are encouraged to check out the awesome work at https://github.com/abetlen/llama-cpp-python and to let us know how you make out.
 
