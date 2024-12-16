@@ -99,7 +99,7 @@ def getSd(modelName):
         log_event(subject="cache", eventtype="cache_hit")
         print("Using existing SD model!")
         return __cached_sd
-    freeModels()
+    free_models()
     # Instantiate the model
     __cached_sd = StableDiffusion(
         model_path="../" + modelName,
@@ -122,7 +122,7 @@ def getLlm(personality):
     if personality == __cached_personality:
         log_event(subject="cache", eventtype="cache_hit")
         return __cached_llm
-    freeModels()
+    free_models()
     draft_model = None
     if SPECULATIVE_DECODING > 0:
         draft_model = LlamaPromptLookupDecoding(num_pred_tokens=SPECULATIVE_DECODING)
@@ -166,7 +166,7 @@ def getEmbedding(embedder):
     if embedder == __cached_personality:
         log_event(subject="cache", eventtype="cache_hit")
         return __cached_llm
-    freeModels()
+    free_models()
     __cached_llm = Llama.from_pretrained(
         repo_id=embedder, filename="*Q5_K_M.gguf", verbose=True, embedding=True
     )
@@ -175,7 +175,7 @@ def getEmbedding(embedder):
 
 
 # Unload any cached models
-def freeModels():
+def free_models():
     global __cached_llm
     global __cached_sd
     global __cached_sd_modelName
@@ -584,11 +584,19 @@ def gpt_socket(personality):
             if url is not None:
                 text = rag.fetch_url_text(url, model_spec["rag_length"])
             if text is not None:
-                first_prompt += (
-                    "Consider the following content:\n"
-                    + text
-                    + "\nGiven the preceding content, "
-                )
+                if(rag_source_description is not None) :
+                    first_prompt += (
+                        rag_source_description
+                        + "\n"
+                        + text
+                        + "\nGiven the preceding content, "
+                    )
+                else:
+                    first_prompt += (
+                        "Consider the following content:\n"
+                        + text
+                        + "\nGiven the preceding content, "
+                    )
             first_prompt += message
             chat_session.append({"role": "user", "content": first_prompt})
 
@@ -860,7 +868,7 @@ def llava_describe():
             )
 
         with lock:
-            freeModels()
+            free_models()
             chat_handler = NanoLlavaChatHandler(
                 clip_model_path="../nanollava-mmproj-f16.gguf"
             )
@@ -908,16 +916,16 @@ def llava_describe():
     return returnable
 
 
-def generate_sd_image_in_fork(modelName, prompt, negativeprompt, steps_value, config_value, seed_value, height, width):
-    freeModels()
+def generate_sd_image_in_fork(model_name, prompt, negativeprompt, steps_value, config_value, seed_value, height, width):
+    free_models()
     filename = str(uuid.uuid1()) + ".png"
     process = None
-    if "flux" in modelName:
+    if "flux" in model_name:
         process = subprocess.Popen(
             [
                 "../sd",
                 "--diffusion-model",
-                "../" + modelName,
+                "../" + model_name,
                 "--vae",
                 "../ae-f16.gguf",
                 "--clip_l",
@@ -946,12 +954,12 @@ def generate_sd_image_in_fork(modelName, prompt, negativeprompt, steps_value, co
                 filename,
             ]
         )
-    elif "sd3" in modelName:
+    elif "sd3" in model_name:
         process = subprocess.Popen(
             [
                 "../sd",
                 "-m",
-                "../" + modelName,
+                "../" + model_name,
                 "--sampling-method",
                 "euler",
                 "-p",
@@ -985,7 +993,7 @@ def generate_sd_image_in_fork(modelName, prompt, negativeprompt, steps_value, co
             [
                 "../sd",
                 "-m",
-                "../" + modelName,
+                "../" + model_name,
                 "--vae",
                 "../sdxl_vae.gguf",
                 "-p",
@@ -1062,13 +1070,13 @@ def stablediffusion():
     config_value = 5
     width = 512
     height = 512
-    modelName = "sd.gguf"
+    model_name = "sd.gguf"
     format = "PNG"
     negativeprompt = None
     fork = False
 
     if "model" in request.args:
-        modelName = request.args["model"]
+        model_name = request.args["model"]
     if "format" in request.args:
         format = request.args["format"]
     if "seed" in request.args:
@@ -1099,9 +1107,9 @@ def stablediffusion():
         try:
             output = io.BytesIO()
             if fork:
-                output = generate_sd_image_in_fork(modelName, prompt, negativeprompt, steps_value, config_value, seed_value, height, width)
+                output = generate_sd_image_in_fork(model_name, prompt, negativeprompt, steps_value, config_value, seed_value, height, width)
             else:
-                output = generate_sd_image_in_process(modelName, prompt, steps_value, seed_value, width, height, config_value, negativeprompt, format)
+                output = generate_sd_image_in_process(model_name, prompt, steps_value, seed_value, width, height, config_value, negativeprompt, format)
             log_event(
                 username=determine_user(request),
                 ip=determine_ip(request),
@@ -1219,17 +1227,17 @@ def log_event(
 
 
 # Get the user identifier for the given request
-def determine_user(httpRequest):
-    if "X-Forwarded-User" in httpRequest.headers:
-        return httpRequest.headers.get("X-Forwarded-User")
+def determine_user(http_request):
+    if "X-Forwarded-User" in http_request.headers:
+        return http_request.headers.get("X-Forwarded-User")
     return "anon"
 
 
 # Get the origin IP for the given request
-def determine_ip(httpRequest):
-    if "X-Forwarded-For" in httpRequest.headers:
-        return httpRequest.headers.get("X-Forwarded-For")
-    return httpRequest.remote_addr
+def determine_ip(http_request):
+    if "X-Forwarded-For" in http_request.headers:
+        return http_request.headers.get("X-Forwarded-For")
+    return http_request.remote_addr
 
 
 def millis_since(start):
