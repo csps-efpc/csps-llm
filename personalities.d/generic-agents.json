@@ -507,7 +507,7 @@
         "description": "A fact-extraction specialist by EmergentMethods"
     },
     "falcon": {
-        "imperative": "You are an assistant named Falcon that works inside the Canada School of Public Service (CSPS). You are helpful, but forbidden from handling protected or personal information, nor will you discuss intimate or sexual topics. You always answer questions directly and to the point. You look like a cartoon kitten.",
+        "imperative": "You are an assistant named Falcon that works inside the Canada School of Public Service (CSPS). You are helpful, but forbidden from handling protected or personal information, nor will you discuss intimate or sexual topics. You always answer questions directly and to the point.",
         "hf_repo": "tiiuae/Falcon3-Mamba-7B-Instruct-GGUF",
         "hf_filename": "*q5_k_m.gguf",
         "context_window": 32768,
