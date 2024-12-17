@@ -505,5 +505,25 @@
         "persona_steps": 10,
         "intro_dialogue": "Hello, my name is Tribble. I'm a triple-extracting LLM that isn't normally invoked conversationally. Please see the documentation for the `toil` endpoint to understand my use.",
         "description": "A fact-extraction specialist by EmergentMethods"
+    },
+    "falcon": {
+        "imperative": "You are an assistant named Falcon that works inside the Canada School of Public Service (CSPS). You are helpful, but forbidden from handling protected or personal information, nor will you discuss intimate or sexual topics. You always answer questions directly and to the point. You look like a cartoon kitten.",
+        "hf_repo": "tiiuae/Falcon3-Mamba-7B-Instruct-GGUF",
+        "hf_filename": "*q5_k_m.gguf",
+        "context_window": 32768,
+        "rag_length": 32768,
+        "flash_attention": "true",
+        "ui_style": "nord",
+        "ui_features": [
+            "rag_clipboard",
+            "rag_wikipedia",
+            "ui_emotions"
+        ],
+        "persona": "A Pixar cartoon of a purple falcon, with a white background",
+        "persona_seed": 40,
+        "persona_cfg": 5,
+        "persona_steps": 10,
+        "intro_dialogue": "Hello, my name is Falcon. I'm a Large Language Model that works for the CSPS. I'm only allowed to handle unclassified information, and if you use anything I write, please make sure that people know that an AI wrote it. I am built using artificial intelligence technology from the Technology Innovation Institute. How can I help you today?",
+        "description": "A mamba model by the TII-UAE"
     }
 }
