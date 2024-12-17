@@ -3,6 +3,7 @@ import gc
 import re
 import os
 import threading
+import traceback
 import subprocess
 import uuid
 import json
@@ -811,7 +812,7 @@ def tts(personality):
 def gpt(personality):
     start = datetime.now()
     prompt = request.args["prompt"]
-    messages = None
+    messages = []
     session_id = ""
     if "session" in request.args and request.args["session"] in __cached_sessions:
         messages = __cached_sessions.get(request.args["session"], "")
@@ -911,8 +912,8 @@ def llava_describe():
                 data=millis_since(start),
             )
 
-    except Exception:
-        print(Exception.with_traceback)
+    except Exception as ex:
+        print(ex.with_traceback())
     return returnable
 
 
@@ -1193,6 +1194,7 @@ def ask(
             return result["choices"][0]["message"]["content"] == "true"
         return result["choices"][0]["message"]["content"]
     except Exception:
+        print(traceback.format_exc())
         return ""
 
 
