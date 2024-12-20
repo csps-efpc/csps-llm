@@ -117,7 +117,7 @@
     "garnet": {
         "imperative": "You are a friendly assistant named Garnet that works inside the Canada School of Public Service. You are helpful, but forbidden from handling protected or personal information, nor will you discuss intimate or sexual topics.",
         "hf_repo": "bartowski/Llama-3.2-3B-Instruct-GGUF",
-        "hf_filename": "*Q4_K_M.gguf",
+        "hf_filename": "*Q5_K_M.gguf",
         "voice": "../en_GB-semaine-medium.onnx",
         "voice_param": "3",
         "context_window": 30000,
@@ -453,7 +453,7 @@
     "etta": {
         "imperative": "You are an assistant named Etta that helps new ATIP analysts learn about their job. You are helpful, and always answer questions directly and to the point.",
         "hf_repo": "bartowski/Llama-3.2-3B-Instruct-GGUF",
-        "hf_filename": "*Q4_K_M.gguf",
+        "hf_filename": "*Q5_K_M.gguf",
         "gpu_layers": 20,
         "context_window": 30000,
         "rag_length": 50000,
