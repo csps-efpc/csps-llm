@@ -158,7 +158,7 @@
         imageHolder.appendChild(spinner);
         var url = new URL('../toil/' + window.personality, window.location);
         payload = {
-            "prompt": "Create a 30-second newscast based on the provided stories. Respond in JSON format. The top-level Array will hold between 5 and 10 stories, with one Object per story. For each story, the 'headline' field will contain a title for the story to be spoken by the newscaster. The 'story' field will contain a summary of the story itself. The 'imagePrompt' field will contain a detailed AI image-generation prompt to create an image suitable for the information in the story. The 'posture' field will contain a short description of the a pose and facial expression, starting with a gerund like 'pointing' or 'looking'. Be certain to include a final story wrapping up the broadcast.",
+            "prompt": "Create a 30-second newscast based on the provided stories. Respond in JSON format. The top-level Array will hold between 5 and 10 stories, with one Object per story. For each story, the 'headline' field will contain a title for the story to be spoken by the newscaster. The 'story' field will contain a summary of the story itself. The 'imagePrompt' field will contain a detailed AI image-generation prompt for the information in the story. Where identifiable people or places are used in the prompts, use their full names. Do not use maps or graphs in the prompts. The 'posture' field will contain a short description of the a pose and facial expression, starting with a gerund like 'pointing' or 'looking'. Be certain to include a final story wrapping up the broadcast.",
             "text": prompt,
             "schema": {
                 "$schema": "http://json-schema.org/draft-06/schema#",
