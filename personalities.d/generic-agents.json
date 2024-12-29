@@ -495,9 +495,8 @@
     },
     "etta": {
         "imperative": "You are an assistant named Etta that helps new ATIP analysts learn about their job. You are helpful, and always answer questions directly and to the point.",
-        "hf_repo": "bartowski/Llama-3.2-3B-Instruct-GGUF",
-        "hf_filename": "*Q5_K_M.gguf",
-        "gpu_layers": 20,
+        "hf_repo": "bartowski/granite-3.1-2b-instruct-GGUF",
+        "hf_filename": "*Q8_0.gguf",
         "context_window": 30000,
         "rag_length": 50000,
         "agent_rag_source": "../llm_agent_profiles/atip-helper.md",
