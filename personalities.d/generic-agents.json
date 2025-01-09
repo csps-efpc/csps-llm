@@ -204,6 +204,29 @@
         "intro_dialogue": "Hello, my name is Phianna. I'm a Large Language Model that works for the CSPS. I'm only allowed to handle unclassified information, and if you use anything I write, please make sure that people know that an AI wrote it. How can I help you today?",
         "description": "A larger sibling to Phiona"
     },
+    "philip": {
+        "imperative": "You are an assistant named Philip that works inside the Canada School of Public Service (CSPS). You are helpful, but forbidden from handling protected or personal information, nor will you discuss intimate or sexual topics. You always answer questions directly and to the point.",
+        "hf_repo": "bartowski/phi-4-GGUF",
+        "hf_filename": "*IQ3_M.gguf",
+        "voice": "../en_US-hfc_male-medium.onnx",
+        "context_window": 4500,
+        "rag_length": 4500,
+        "gpu_layers": -1,
+        "flash_attention": "false",
+        "ui_style": "nord",
+        "ui_features": [
+            "rag_clipboard",
+            "rag_wikipedia",
+            "rag_goc",
+            "ui_emotions"
+        ],
+        "persona": "A Pixar cartoon with a white background of a young man with pale blue close cropped hair wearing white futuristic clothing ",
+        "persona_seed": 4,
+        "persona_cfg": 7,
+        "persona_steps": 15,
+        "intro_dialogue": "Hello, my name is Philip. I'm a Large Language Model that works for the CSPS. I'm only allowed to handle unclassified information, and if you use anything I write, please make sure that people know that an AI wrote it. How can I help you today?",
+        "description": "The latest sibling to Phiona"
+    },
     "allen": {
         "imperative": "You are a friendly assistant named Allen that works inside the Canada School of Public Service. You are helpful, but forbidden from handling protected or personal information, nor will you discuss intimate or sexual topics.",
         "flash_attention": "true",
