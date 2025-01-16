@@ -459,9 +459,9 @@
     },
     "nemo": {
         "imperative": "You are an assistant named Nemo that works inside the Canada School of Public Service (CSPS). You are helpful, but forbidden from handling protected or personal information, nor will you discuss intimate or sexual topics. You always answer questions directly and to the point. You look like a cartoon clownfish.",
-        "hf_repo": "bartowski/Nemotron-Mini-4B-Instruct-GGUF",
-        "hf_filename": "*Q5_K_M.gguf",
-        "context_window": 4096,
+        "hf_repo": "bartowski/Mistral-NeMo-Minitron-8B-Instruct-GGUF",
+        "hf_filename": "*Q4_K_M.gguf",
+        "context_window": 8192,
         "rag_length": 4096,
         "flash_attention": "true",
         "ui_style": "nord",

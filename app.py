@@ -58,6 +58,7 @@ stopTokens = [
     "Assistant:",
     "[/ASK]",
     "[INFO]",
+    "<extra_id_1>",
     "<</SYS>>",
 ]
 temperature = 0.8
