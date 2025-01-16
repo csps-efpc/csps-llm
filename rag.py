@@ -59,7 +59,7 @@ default_llm_voice_param = os.environ.get("LLM_VOICE_PARAM", "0")
 # A basic set of things we'd prefer not to generate.
 default_sd_negative_prompt = os.environ.get(
     "SD_NEGATIVE_PROMPT",
-    "scary, low quality, extra fingers, mutated hands, watermark, signature",
+    "scary, low quality, extra fingers, mutated hands, watermark, signature, ((naked, breast, nude))",
 )
 
 
